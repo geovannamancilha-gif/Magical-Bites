@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Magical Bites | Receitas Disney ✨</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: #3d4f8f;
+    color: white;
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(135deg, #060220, #2d3f87);
+    padding: 20px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* BUSCA */
+.search-box {
+    text-align: center;
+    margin: 30px;
+}
+
+.search-box input {
+    padding: 12px;
+    width: 300px;
+    border-radius: 20px;
+    border: none;
+}
+
+.search-box button {
+    padding: 12px 20px;
+    border-radius: 20px;
+    border: none;
+    background: #2d4fd7;
+    color: white;
+    cursor: pointer;
+}
+
+/* CONTAINER */
+.container {
+    width: 85%;
+    margin: auto;
+}
+
+/* DESTAQUE */
+.destaque {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card-grande {
+    flex: 2;
+    background: white;
+    color: black;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-grande img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.card-grande h3 {
+    padding: 15px;
+}
+
+/* LATERAL */
+.lateral {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.card-pequeno {
+    background: white;
+    color: black;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card-pequeno img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+}
+
+.card-pequeno p {
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* LISTA */
+.lista {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+}
+
+.card {
+    background: white;
+    color: black;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+.card img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+.card p {
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    Magical Bites ✨ (Receitas Disney)
+</div>
+
+<div class="search-box">
+    <input type="text" placeholder="Procure uma receita...">
+    <button>Buscar</button>
+</div>
+
+<div class="container">
+
+    <!-- DESTAQUE -->
+    <div class="destaque">
+
+        <div class="card-grande">
+            <img src="https://i.imgur.com/6X4R7bR.jpg">
+            <h3>🍗 Frango mágico da Tiana</h3>
+        </div>
+
+        <div class="lateral">
+            <div class="card-pequeno">
+                <img src="https://i.imgur.com/2l9K6Xy.jpg">
+                <p>🍰 Bolo da Bela</p>
+            </div>
+
+            <div class="card-pequeno">
+                <img src="https://i.imgur.com/BvGQKpR.jpg">
+                <p>🍎 Maçã da Branca de Neve</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LISTA -->
+    <div class="lista">
+
+        <div class="card">
+            <img src="https://i.imgur.com/2l9K6Xy.jpg">
+            <p>Bolo encantado</p>
+        </div>
+
+        <div class="card">
+            <img src="https://i.imgur.com/6X4R7bR.jpg">
+            <p>Frango real</p>
+        </div>
+
+        <div class="card">
+            <img src="https://i.imgur.com/BvGQKpR.jpg">
+            <p>Maçã mágica</p>
+        </div>
+
+        <div class="card">
+            <img src="https://i.imgur.com/6X4R7bR.jpg">
+            <p>Prato do reino</p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
