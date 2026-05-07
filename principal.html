@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 <meta charset="UTF-8">
 <title>Magical Bites | Receitas Disney ✨</title>
@@ -7,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
+
 * {
     margin: 0;
     padding: 0;
@@ -39,6 +41,7 @@ body {
     width: 300px;
     border-radius: 20px;
     border: none;
+    outline: none;
 }
 
 .search-box button {
@@ -48,6 +51,11 @@ body {
     background: #2d4fd7;
     color: white;
     cursor: pointer;
+    transition: 0.3s;
+}
+
+.search-box button:hover {
+    background: #1f3bb3;
 }
 
 /* CONTAINER */
@@ -63,17 +71,24 @@ body {
     margin-bottom: 30px;
 }
 
+/* CARD GRANDE */
 .card-grande {
     flex: 2;
     background: white;
     color: black;
     border-radius: 10px;
     overflow: hidden;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.card-grande:hover {
+    transform: scale(1.02);
 }
 
 .card-grande img {
     width: 100%;
-    height: 250px;
+    height: 300px;
     object-fit: cover;
 }
 
@@ -94,11 +109,17 @@ body {
     color: black;
     border-radius: 10px;
     overflow: hidden;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.card-pequeno:hover {
+    transform: scale(1.03);
 }
 
 .card-pequeno img {
     width: 100%;
-    height: 100px;
+    height: 120px;
     object-fit: cover;
 }
 
@@ -112,6 +133,7 @@ body {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 15px;
+    margin-bottom: 40px;
 }
 
 .card {
@@ -120,6 +142,7 @@ body {
     border-radius: 10px;
     overflow: hidden;
     transition: 0.3s;
+    text-decoration: none;
 }
 
 .card:hover {
@@ -128,15 +151,17 @@ body {
 
 .card img {
     width: 100%;
-    height: 120px;
+    height: 150px;
     object-fit: cover;
 }
 
 .card p {
-    padding: 10px;
+    padding: 12px;
     font-size: 14px;
     text-align: center;
+    font-weight: 600;
 }
+
 </style>
 
 </head>
@@ -144,11 +169,11 @@ body {
 <body>
 
 <div class="header">
-    Magical Bites ✨ (Receitas Disney)
+    Magical Bites ✨
 </div>
 
 <div class="search-box">
-    <input type="text" placeholder="Procure uma receita...">
+    <input type="text" placeholder="Procure uma receita mágica...">
     <button>Buscar</button>
 </div>
 
@@ -157,47 +182,69 @@ body {
     <!-- DESTAQUE -->
     <div class="destaque">
 
-        <div class="card-grande">
+        <a href="receita.html" class="card-grande">
             <img src="https://i.imgur.com/6X4R7bR.jpg">
             <h3>🍗 Frango mágico da Tiana</h3>
-        </div>
+        </a>
 
         <div class="lateral">
-            <div class="card-pequeno">
+
+            <a href="receita.html" class="card-pequeno">
                 <img src="https://i.imgur.com/2l9K6Xy.jpg">
                 <p>🍰 Bolo da Bela</p>
-            </div>
+            </a>
 
-            <div class="card-pequeno">
+            <a href="receita.html" class="card-pequeno">
                 <img src="https://i.imgur.com/BvGQKpR.jpg">
                 <p>🍎 Maçã da Branca de Neve</p>
-            </div>
+            </a>
+
         </div>
 
     </div>
 
-    <!-- LISTA -->
+    <!-- LISTA DE RECEITAS -->
     <div class="lista">
 
-        <div class="card">
+        <a href="receita.html" class="card">
             <img src="https://i.imgur.com/2l9K6Xy.jpg">
             <p>Bolo encantado</p>
-        </div>
+        </a>
 
-        <div class="card">
+        <a href="receita.html" class="card">
             <img src="https://i.imgur.com/6X4R7bR.jpg">
             <p>Frango real</p>
-        </div>
+        </a>
 
-        <div class="card">
+        <a href="receita.html" class="card">
             <img src="https://i.imgur.com/BvGQKpR.jpg">
             <p>Maçã mágica</p>
-        </div>
+        </a>
 
-        <div class="card">
+        <a href="receita.html" class="card">
+            <img src="https://i.imgur.com/zW5FZBd.jpg">
+            <p>Panquecas do Mickey</p>
+        </a>
+
+        <a href="receita.html" class="card">
             <img src="https://i.imgur.com/6X4R7bR.jpg">
-            <p>Prato do reino</p>
-        </div>
+            <p>Banquete do castelo</p>
+        </a>
+
+        <a href="receita.html" class="card">
+            <img src="https://i.imgur.com/2l9K6Xy.jpg">
+            <p>Cupcake mágico</p>
+        </a>
+
+        <a href="receita.html" class="card">
+            <img src="https://i.imgur.com/BvGQKpR.jpg">
+            <p>Doce da Rapunzel</p>
+        </a>
+
+        <a href="receita.html" class="card">
+            <img src="https://i.imgur.com/zW5FZBd.jpg">
+            <p>Cookies encantados</p>
+        </a>
 
     </div>
 
