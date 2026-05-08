@@ -9,7 +9,7 @@ try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Pega o ID da receita pela URL (Ex: receita.php?id=1). Se não tiver, usa o 1 como padrão para teste.
+    // CORREÇÃO: Mudado de 0 para 1 para garantir que ele ache a primeira receita no teste
     $id_receita = isset($_GET['id']) ? (int)$_GET['id'] : 1;
 
     // Busca as informações da receita no banco de dados
@@ -20,7 +20,7 @@ try {
 
     // Se a receita não existir, para a execução
     if (!$receita) {
-        die("<h1>Receita não encontrada!</h1>");
+        die("<h1>Receita não encontrada no banco de dados para o ID: $id_receita!</h1>");
     }
 
     // Transforma o texto de ingredientes "item1;item2" em uma lista/array
@@ -40,7 +40,6 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* MANTIVE EXATAMENTE O SEU CSS AQUI */
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins', sans-serif;}
         body{background:#3d4f8f;color:white;}
         .header{background:linear-gradient(135deg,#060220,#2d3f87);padding:24px;text-align:center;font-size:32px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 20px rgba(0,0,0,0.25);}
