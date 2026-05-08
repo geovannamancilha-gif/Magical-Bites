@@ -2,7 +2,7 @@
 // Dados do banco
 $servidor = "localhost";
 $usuario = "root";
-$senha = "";
+$senha = "Home@spSENAI2025!";
 $banco = "magical_bites";
 
 // Criar conexão

@@ -1,7 +1,7 @@
 <?php
 include "conexao.php";
 
-$nome = $_POST["nome_usuario"];
+$nome = $_POST["nome"];
 $email = $_POST["email"];
 $senha = $_POST["senha"];
 
