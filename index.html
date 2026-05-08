@@ -27,7 +27,7 @@ body{
 .navbar{
     width:100%;
     background:#1f4396;
-    padding:18px 50px;
+    padding:14px 25px;
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -37,10 +37,18 @@ body{
     z-index:100;
 }
 
+.logo{
+    position:relative;
+    width:180px;
+    height:40px;
+}
+
 .logo img{
-    height:45px;
+    position:absolute;
+    top:-8px; /* sobe a logo */
+    left:0;
+    height:60px; /* aumenta a logo */
     width:auto;
-    display:block;
 }
 
 .menu{
@@ -339,6 +347,19 @@ body{
         padding:13px 20px;
         font-size:14px;
     }
+
+        .profile-icon{
+        font-size:22px;
+        text-decoration:none;
+        transition:0.3s;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .profile-icon:hover{
+        transform:scale(1.1);
+    }
 }
 
 </style>
@@ -359,7 +380,9 @@ body{
         <a href="#">Receitas</a>
         <a href="#">Sobre</a>
         <a href="#">Favoritos</a>
-        <div class="search-icon">🔍</div>
+        <a href="login.html" class="profile-icon">
+    👤
+</a>
     </div>
 
 </div>
