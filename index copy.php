@@ -1,3 +1,11 @@
+<?php
+// Conexão com o banco (igual ao do receita.php)
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+
+// Busca todas as receitas doces
+$stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
+$receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -425,31 +433,31 @@ body{
 
     <div class="lista">
 
-        <a href="receita.html" class="card">
-            <img src="trufas_frozen.png">
-            <div class="tag doce">DOCE</div>
-            <p>❄️ Trufas de Frozen</p>
-        </a>
+       <a href="receita.php?id=2" class="card">
+    <img src="trufas_frozen.png">
+    <div class="tag doce">DOCE</div>
+    <p>❄️ Trufas de Frozen</p>
+      </a>
 
-        <a href="receita.html" class="card">
-            <img src="cookies_enrolados.png">
-            <div class="tag doce">DOCE</div>
-            <p>🦎 Cookies de Enrolados</p>
-        </a>
+       <a href="receita.php?id=3" class="card">
+    <img src="cookies_enrolados.png">
+    <div class="tag doce">DOCE</div>
+    <p>🦎 Cookies de Enrolados</p>
+      </a>
 
-        <a href="receita.html" class="card">
+        <a href="receita.php?id=1" class="card">
             <img src="torta_maca_branca_neve.png">
             <div class="tag doce">DOCE</div>
             <p>🍎 Torta de Maçã da Branca de Neve</p>
         </a>
 
-        <a href="receita.html" class="card">
+        <a href="receita.php?id=4" class="card">
             <img src="beignet_princesa_sapo.png">
             <div class="tag doce">DOCE</div>
             <p>☕ Beignet da Princesa e o Sapo</p>
         </a>
 
-        <a href="receita.html" class="card">
+        <a href="receita.php?" class="card">
             <img src="biscoitos_alice.png">
             <div class="tag doce">DOCE</div>
             <p>♠️ Biscoitos de Alice no País das Maravilhas</p>
@@ -462,19 +470,19 @@ body{
 
     <div class="lista">
 
-        <a href="receita.html" class="card">
+        <a href="receita.php?id=5" class="card">
             <img src="ratatouille.png">
             <div class="tag salgado">SALGADO</div>
             <p>🐭 Ratatouille</p>
         </a>
 
-        <a href="receita.html" class="card">
+        <a href="receita.php?id=6" class="card">
             <img src="arepas_encanto.png">
             <div class="tag salgado">SALGADO</div>
             <p>🌽 Arepas con queso de Encanto</p>
         </a>
 
-        <a href="receita.html" class="card">
+        <a href="receita.php?id=7" class="card">
             <img src="macarrao_pesto_luca.png">
             <div class="tag salgado">SALGADO</div>
             <p>🍃 Macarrão ao molho pesto de Luca</p>

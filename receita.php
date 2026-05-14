@@ -69,6 +69,8 @@ try {
 </head>
 <body>
 
+
+
 <div class="header">Magical Bites ✨</div>
 
 <div class="container">
@@ -118,6 +120,9 @@ try {
         </div>
     </div>
 </div>
+
+
+
 
 </body>
 </html>

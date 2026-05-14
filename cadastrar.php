@@ -1,7 +1,7 @@
 <?php
 include "conexao.php";
 
-$nome = $_POST["nome"];
+$nome = $_POST["nome "];
 $email = $_POST["email"];
 $senha = $_POST["senha"];
 
@@ -147,7 +147,7 @@ $con->close();
                 <p><?php echo $erro; ?></p>
                 <?php endif; ?>
 
-                <a href="index.html">
+                <a href="index.php">
                     <button>IR PARA A PÁGINA INICIAL</button>
                 </a>
 
