@@ -3,7 +3,8 @@
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; // Coloque seu usuário do banco
-$pass = 'Home@spSENAI2025!';     // Coloque sua senha do banco
+//$pass = 'Home@spSENAI2025!';     // Coloque sua senha do banco
+$pass = '';     // Coloque sua senha do banco
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
