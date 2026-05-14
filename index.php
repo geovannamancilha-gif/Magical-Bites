@@ -31,126 +31,66 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         .menu a{ color:white; text-decoration:none; font-size:15px; font-weight:500; transition:0.3s; cursor: pointer; }
         .menu a:hover{ color:#ffe45c; }
 
-        /* --- HERO --- */
+        /* --- HERO & SLIDER --- */
         .hero{ width:100%; height:620px; overflow:hidden; position:relative; background-size:cover; background-position:center; transition:background-image 0.6s ease-in-out; }
         .hero-content{ position:absolute; left:90px; top:50%; transform:translateY(-50%); max-width:470px; color: white; }
-        .hero-content h1{ font-size:72px; line-height:1.05; margin-bottom:22px; font-weight:700; }
-        .hero-content p{ font-size:22px; line-height:1.6; color:#ededed; margin-bottom:32px; }
+        .hero-content h1{ font-size:72px; line-height:1.05; margin-bottom:22px; font-weight:700; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
+        .hero-content p{ font-size:22px; line-height:1.6; color:#ededed; margin-bottom:32px; text-shadow: 1px 1px 4px rgba(0,0,0,0.4); }
         .hero-btn{ display:inline-block; padding:18px 30px; background:#ffe45c; color:#1e0061; border-radius:14px; text-decoration:none; font-weight:700; transition:0.3s; font-size:16px; }
 
-        /* --- NOVO LAYOUT DOS CARDS (RESPONSIVO E CENTRALIZADO) --- */
-        .container {
-            width: 100%; 
-            max-width: 1250px; 
-            margin: 0 auto; 
-            padding: 0 30px; 
-        }
-
-        .titulo { 
-            margin: 50px 0 30px; 
-            font-size: 30px; 
-            font-weight: 700; 
-            color: #1f4396; 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-        }
-
-        .lista {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 35px; 
-            justify-content: center; 
-            margin-bottom: 60px;
-        }
-
-        .card {
-            background: white;
-            color: black;
-            border-radius: 22px;
-            overflow: hidden;
-            text-decoration: none;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.20);
-        }
-
-        .card img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-        }
-
-        .tag {
-            width: fit-content;
-            margin: 20px auto 10px;
-            padding: 6px 16px;
-            border-radius: 20px;
+        /* --- BOTÕES DO SLIDER --- */
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.3);
             color: white;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px); /* Efeito de vidro borrado */
         }
 
+        .slider-btn:hover {
+            background: rgba(255, 228, 92, 0.9);
+            color: #1e0061;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .slider-btn.prev { left: 30px; }
+        .slider-btn.next { right: 30px; }
+
+        /* --- LAYOUT DOS CARDS --- */
+        .container { width: 100%; max-width: 1250px; margin: 0 auto; padding: 0 30px; }
+        .titulo { margin: 50px 0 30px; font-size: 30px; font-weight: 700; color: #1f4396; display: flex; align-items: center; gap: 10px; }
+        .lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 35px; justify-content: center; margin-bottom: 60px; }
+        .card { background: white; color: black; border-radius: 22px; overflow: hidden; text-decoration: none; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.12); display: flex; flex-direction: column; height: 100%; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.20); }
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        .tag { width: fit-content; margin: 20px auto 10px; padding: 6px 16px; border-radius: 20px; color: white; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
         .doce { background: #ff69b4; }
         .salgado { background: #4CAF50; }
+        .card p { padding: 0 20px 25px; text-align: center; font-weight: 600; font-size: 16px; color: #333; }
 
-        .card p {
-            padding: 0 20px 25px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 16px;
-            color: #333;
-        }
-
-        /* --- SISTEMA DE MODAIS (CARDS FLUTUANTES) --- */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 999;
-        }
-
-        .card-flutuante {
-            display: none;
-            position: fixed;
-            top: 85px;
-            right: 25px;
-            width: 360px;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
-            padding: 30px;
-            z-index: 1000;
-            color: #333;
-            animation: fadeInSlide 0.3s ease-out;
-        }
-
-        @keyframes fadeInSlide {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
+        /* --- MODAIS FLUTUANTES --- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 999; }
+        .card-flutuante { display: none; position: fixed; top: 85px; right: 25px; width: 360px; background: white; border-radius: 28px; box-shadow: 0 15px 50px rgba(0,0,0,0.3); padding: 30px; z-index: 1000; color: #333; animation: fadeInSlide 0.3s ease-out; }
+        @keyframes fadeInSlide { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .btn-fechar { background: none; border: none; font-size: 26px; cursor: pointer; color: #999; }
-
         .input-group-modal { position: relative; margin-bottom: 15px; }
         .input-group-modal i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #1f4396; }
         .input-group-modal input { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #ddd; border-radius: 12px; outline: none; }
-
         .btn-acao { width: 100%; padding: 14px; background: #1f4396; color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         .btn-acao:hover { background: #162f6b; transform: scale(1.02); }
-
         .status-icon { font-size: 50px; margin-bottom: 15px; text-align: center; }
         .footer-modal { margin-top: 20px; font-size: 13px; text-align: center; color: #666; }
         .footer-modal a { color: #1f4396; text-decoration: none; font-weight: 600; cursor: pointer; }
@@ -222,6 +162,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
 <?php endif; ?>
 
 <div class="hero">
+    <button class="slider-btn prev" onclick="mudarSlide(-1)"><i class="fa fa-chevron-left"></i></button>
+    <button class="slider-btn next" onclick="mudarSlide(1)"><i class="fa fa-chevron-right"></i></button>
+
     <div class="hero-content">
         <h1>Receitas mágicas inspiradas na Disney</h1>
         <p>Descubra pratos incríveis direto dos filmes!</p>
@@ -285,6 +228,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
 </div>
 
 <script>
+// --- CONTROLO DOS MODAIS ---
 function fecharTodosModais() {
     document.getElementById('modalOverlay').style.display = 'none';
     document.getElementById('modalCadastro').style.display = 'none';
@@ -304,15 +248,47 @@ function alternarModais(tipo) {
     if(tipo === 'login') document.getElementById('modalLogin').style.display = 'block';
 }
 
-// Banner rotativo
+// --- CONTROLO DO SLIDER (Manual e Automático) ---
 const hero = document.querySelector(".hero");
 const banners = ["cookies_banner.png", "beignet_banner.png"];
 let idx = 0;
-setInterval(() => {
-    idx = (idx + 1) % banners.length;
+let tempoSlider;
+
+// Função para atualizar a imagem de fundo
+function atualizarBanner() {
     hero.style.backgroundImage = `url(${banners[idx]})`;
-}, 4000);
-hero.style.backgroundImage = `url(${banners[0]})`;
+}
+
+// Função executada quando clicamos nas setas
+function mudarSlide(direcao) {
+    idx += direcao;
+    
+    // Lógica para voltar ao início se passar do limite ou ir para o final se recuar demasiado
+    if (idx < 0) {
+        idx = banners.length - 1;
+    } else if (idx >= banners.length) {
+        idx = 0;
+    }
+    
+    atualizarBanner();
+    resetarTimer(); // Reinicia o relógio para que não mude automaticamente logo após clicar
+}
+
+// Função que passa os slides automaticamente
+function autoSlide() {
+    mudarSlide(1);
+}
+
+// Função para recriar o intervalo (evita que o slider fique descontrolado)
+function resetarTimer() {
+    clearInterval(tempoSlider);
+    tempoSlider = setInterval(autoSlide, 5000); // 5000 ms = 5 segundos
+}
+
+// Arranca o slider ao abrir a página
+atualizarBanner();
+tempoSlider = setInterval(autoSlide, 5000);
+
 </script>
 </body>
 </html>
