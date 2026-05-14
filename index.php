@@ -1,17 +1,17 @@
 <?php
-// Conexão com o banco
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", ""); // Ajuste a senha se necessário
+// Conexão com a base de dados
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", ""); // Ajuste a password se necessário
 
 // Busca receitas doces
 $stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
 $receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
 
-// Lógica para detectar se veio de um cadastro ou login
+// Lógica para detetar se veio de um registo ou login
 $status = isset($_GET['status']) ? $_GET['status'] : "";
 $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET['msg'] : "");
 ?>
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,44 +33,92 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
 
         /* --- HERO & SLIDER --- */
         .hero{ width:100%; height:620px; overflow:hidden; position:relative; background-size:cover; background-position:center; transition:background-image 0.6s ease-in-out; }
-        .hero-content{ position:absolute; left:90px; top:50%; transform:translateY(-50%); max-width:470px; color: white; }
+        .hero-content{ position:absolute; left:90px; top:50%; transform:translateY(-50%); max-width:470px; color: white; z-index: 5; }
         .hero-content h1{ font-size:72px; line-height:1.05; margin-bottom:22px; font-weight:700; text-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
-        .hero-content p{ font-size:22px; line-height:1.6; color:#ededed; margin-bottom:32px; text-shadow: 1px 1px 4px rgba(0,0,0,0.4); }
-        .hero-btn{ display:inline-block; padding:18px 30px; background:#ffe45c; color:#1e0061; border-radius:14px; text-decoration:none; font-weight:700; transition:0.3s; font-size:16px; }
+        .hero-content p{ font-size:22px; line-height:1.6; color:#ededed; margin-bottom:15px; text-shadow: 1px 1px 4px rgba(0,0,0,0.4); }
 
-        /* --- BOTÕES DO SLIDER --- */
-        .slider-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.3);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 10;
-            transition: all 0.3s ease;
-            display: flex;
+        /* --- DESIGN DO BOTÃO EXPLORAR (SEM EMOJI) --- */
+        .hero-btn {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(4px); /* Efeito de vidro borrado */
+            margin-top: 15px;
+            padding: 16px 40px;
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(5px); 
+            color: #ffe45c; 
+            border: 1.5px solid rgba(255, 255, 255, 0.4); 
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.20);
+            text-transform: uppercase;
         }
-
-        .slider-btn:hover {
-            background: rgba(255, 228, 92, 0.9);
+        .hero-btn:hover {
+            background: #ffe45c;
             color: #1e0061;
-            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 8px 30px rgba(255, 228, 92, 0.5);
+            transform: translateY(-4px) scale(1.03);
+            border: 1.5px solid #ffe45c;
         }
 
+        /* --- BOTÕES DO SLIDER (SETAS) --- */
+        .slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0, 0, 0, 0.3); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 10; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .slider-btn:hover { background: rgba(255, 228, 92, 0.9); color: #1e0061; transform: translateY(-50%) scale(1.1); }
         .slider-btn.prev { left: 30px; }
         .slider-btn.next { right: 30px; }
 
+        /* --- INDICADORES DO SLIDER (BOLINHAS) --- */
+        .slider-dots { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; }
+        .dot { width: 14px; height: 14px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .dot.active { background: #ffe45c; transform: scale(1.3); }
+        .dot:hover { background: rgba(255, 228, 92, 0.8); }
+
+        /* --- BARRA DE PESQUISA (CENTRAL) --- */
+        .search-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 40px auto 10px; 
+            padding: 0 20px;
+            width: 100%;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 30px;
+            padding: 12px 25px;
+            width: 100%;
+            max-width: 650px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .search-container:hover, .search-container:focus-within {
+            box-shadow: 0 15px 35px rgba(31, 67, 150, 0.15);
+            border: 2px solid #1f4396;
+            transform: translateY(-2px);
+        }
+        .search-container i { color: #1f4396; margin-right: 15px; font-size: 20px; }
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: #333;
+            outline: none;
+            width: 100%;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .search-container input::placeholder { color: #999; }
+
         /* --- LAYOUT DOS CARDS --- */
         .container { width: 100%; max-width: 1250px; margin: 0 auto; padding: 0 30px; }
-        .titulo { margin: 50px 0 30px; font-size: 30px; font-weight: 700; color: #1f4396; display: flex; align-items: center; gap: 10px; }
+        .titulo { margin: 30px 0 30px; font-size: 30px; font-weight: 700; color: #1f4396; display: flex; align-items: center; gap: 10px; }
         .lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 35px; justify-content: center; margin-bottom: 60px; }
         .card { background: white; color: black; border-radius: 22px; overflow: hidden; text-decoration: none; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 8px 20px rgba(0,0,0,0.12); display: flex; flex-direction: column; height: 100%; }
         .card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.20); }
@@ -79,6 +127,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         .doce { background: #ff69b4; }
         .salgado { background: #4CAF50; }
         .card p { padding: 0 20px 25px; text-align: center; font-weight: 600; font-size: 16px; color: #333; }
+
+        /* --- MENSAGEM "NENHUMA RECEITA ENCONTRADA" --- */
+        #msgSemResultado { display: none; text-align: center; font-size: 18px; color: #666; margin: 40px 0; font-weight: 500; width: 100%; grid-column: 1 / -1; }
 
         /* --- MODAIS FLUTUANTES --- */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 999; }
@@ -104,6 +155,8 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     <div class="menu">
         <a href="index.php">Início</a>
         <a href="#">Receitas</a>
+        <a href="#">Favoritos</a>
+        <a href="#">Filmes</a>
         <a href="javascript:void(0)" onclick="alternarModais('login')">👤 Perfil</a>
     </div>
 </div>
@@ -115,13 +168,13 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <img src="logo.png" style="width: 100px;">
         <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
     </div>
-    <h2 style="color:#1f4396">Crie sua conta</h2>
+    <h2 style="color:#1f4396">Crie a sua conta</h2>
     <p style="font-size:14px; color:#666; margin-bottom:20px">Junte-se à nossa comunidade!</p>
     <form action="cadastrar.php" method="POST">
         <div class="input-group-modal"><i class="fa fa-user"></i><input type="text" name="nome" placeholder="Nome completo" required></div>
         <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
         <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
-        <button type="submit" class="btn-acao">Cadastrar ✨</button>
+        <button type="submit" class="btn-acao">Registar</button>
     </form>
     <div class="footer-modal">Já tem conta? <a onclick="alternarModais('login')">Faça login</a></div>
 </div>
@@ -132,11 +185,11 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
     </div>
     <h2 style="color:#1f4396">Bem-vindo!</h2>
-    <p style="font-size:14px; color:#666; margin-bottom:20px">Acesse sua conta mágica.</p>
+    <p style="font-size:14px; color:#666; margin-bottom:20px">Aceda à sua conta mágica.</p>
     <form action="login_processo.php" method="POST">
         <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
         <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
-        <button type="submit" class="btn-acao">Entrar ✨</button>
+        <button type="submit" class="btn-acao">Entrar</button>
     </form>
     <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
 </div>
@@ -149,11 +202,11 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     <?php if ($status == "sucesso"): ?>
         <div class="status-icon">✅</div>
         <h2 style="color:#28a745">Sucesso!</h2>
-        <p>Sua conta foi criada com sucesso. Agora é só brilhar na cozinha!</p>
+        <p>A sua conta foi criada com sucesso. Agora é só brilhar na cozinha!</p>
         <button class="btn-acao" onclick="alternarModais('login')">Ir para Login</button>
     <?php else: ?>
         <div class="status-icon">❌</div>
-        <h2 style="color:#dc3545">Ops! Algo falhou.</h2>
+        <h2 style="color:#dc3545">Oops! Algo falhou.</h2>
         <p>Erro: <?php echo htmlspecialchars($erro_msg); ?></p>
         <button class="btn-acao" onclick="alternarModais('cadastro')">Tentar novamente</button>
     <?php endif; ?>
@@ -164,39 +217,49 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
 <div class="hero">
     <button class="slider-btn prev" onclick="mudarSlide(-1)"><i class="fa fa-chevron-left"></i></button>
     <button class="slider-btn next" onclick="mudarSlide(1)"><i class="fa fa-chevron-right"></i></button>
-
+    <div class="slider-dots">
+        <span class="dot" onclick="irParaSlide(0)"></span>
+        <span class="dot" onclick="irParaSlide(1)"></span>
+    </div>
     <div class="hero-content">
         <h1>Receitas mágicas inspiradas na Disney</h1>
-        <p>Descubra pratos incríveis direto dos filmes!</p>
-        <a href="#" class="hero-btn">Explorar ✨</a>
+        <p>Descubra pratos incríveis direto dos filmes que amamos!</p>
+        <a href="#containerReceitas" class="hero-btn">Explorar</a>
     </div>
 </div>
 
-<div class="container">
+<div class="search-wrapper">
+    <div class="search-container">
+        <i class="fa fa-search"></i>
+        <input type="text" id="inputPesquisa" placeholder="Procurar por receita ou filme..." onkeyup="pesquisarReceitas()">
+    </div>
+</div>
+
+<div class="container" id="containerReceitas">
     <h2 class="titulo">🍰 Receitas Doces</h2>
     <div class="lista">
        <a href="receita.php?id=2" class="card">
-            <img src="trufas_frozen.png">
+            <img src="trufas_frozen.png" alt="Trufas de Frozen">
             <div class="tag doce">DOCE</div>
             <p>❄️ Trufas de Frozen</p>
        </a>
        <a href="receita.php?id=3" class="card">
-            <img src="cookies_enrolados.png">
+            <img src="cookies_enrolados.png" alt="Cookies de Enrolados">
             <div class="tag doce">DOCE</div>
             <p>🦎 Cookies de Enrolados</p>
        </a>
        <a href="receita.php?id=1" class="card">
-            <img src="torta_maca_branca_neve.png">
+            <img src="torta_maca_branca_neve.png" alt="Torta de Maçã">
             <div class="tag doce">DOCE</div>
             <p>🍎 Torta de Maçã da Branca de Neve</p>
        </a>
        <a href="receita.php?id=4" class="card">
-            <img src="beignet_princesa_sapo.png">
+            <img src="beignet_princesa_sapo.png" alt="Beignet">
             <div class="tag doce">DOCE</div>
             <p>☕ Beignet da Princesa e o Sapo</p>
        </a>
        <a href="receita.php?id=5" class="card">
-            <img src="biscoitos_alice.png">
+            <img src="biscoitos_alice.png" alt="Biscoitos">
             <div class="tag doce">DOCE</div>
             <p>♠️ Biscoitos de Alice no País das Maravilhas</p>
        </a>
@@ -205,29 +268,56 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     <h2 class="titulo">🍝 Receitas Salgadas</h2>
     <div class="lista">
         <a href="receita.php?id=6" class="card">
-            <img src="ratatouille.png">
+            <img src="ratatouille.png" alt="Ratatouille">
             <div class="tag salgado">SALGADO</div>
             <p>🐭 Ratatouille</p>
         </a>
         <a href="receita.php?id=7" class="card">
-            <img src="arepas_encanto.png">
+            <img src="arepas_encanto.png" alt="Arepas">
             <div class="tag salgado">SALGADO</div>
             <p>🌽 Arepas con queso de Encanto</p>
         </a>
         <a href="receita.php?id=8" class="card">
-            <img src="macarrao_pesto_luca.png">
+            <img src="macarrao_pesto_luca.png" alt="Macarrão Pesto">
             <div class="tag salgado">SALGADO</div>
             <p>🍃 Macarrão ao molho pesto de Luca</p>
         </a>
         <a href="receita.php?id=9" class="card">
-            <img src="espaguete_almondegas.png">
+            <img src="espaguete_almondegas.png" alt="Espaguete com Almôndegas">
             <div class="tag salgado">SALGADO</div>
             <p>🍝 Espaguete com Almôndegas da Dama e o Vagabundo</p>
         </a>
+        
+        <p id="msgSemResultado">Poxa, não encontrámos nenhuma magia com esse nome... 🪄</p>
     </div>
 </div>
 
 <script>
+// --- FUNÇÃO DE PESQUISA (LIVE SEARCH) ---
+function pesquisarReceitas() {
+    let input = document.getElementById('inputPesquisa').value.toLowerCase();
+    let cards = document.getElementsByClassName('card');
+    let encontrouAlguma = false;
+
+    for (let i = 0; i < cards.length; i++) {
+        let tituloReceita = cards[i].querySelector('p').innerText.toLowerCase();
+
+        if (tituloReceita.includes(input)) {
+            cards[i].style.display = "flex"; 
+            encontrouAlguma = true;
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
+
+    let msgSemResultado = document.getElementById('msgSemResultado');
+    if (!encontrouAlguma && input !== "") {
+        msgSemResultado.style.display = "block";
+    } else {
+        msgSemResultado.style.display = "none";
+    }
+}
+
 // --- CONTROLO DOS MODAIS ---
 function fecharTodosModais() {
     document.getElementById('modalOverlay').style.display = 'none';
@@ -238,7 +328,7 @@ function fecharTodosModais() {
 
 function fecharStatus() {
     fecharTodosModais();
-    window.history.replaceState({}, document.title, "index.php"); // Limpa a URL
+    window.history.replaceState({}, document.title, "index.php"); 
 }
 
 function alternarModais(tipo) {
@@ -248,47 +338,41 @@ function alternarModais(tipo) {
     if(tipo === 'login') document.getElementById('modalLogin').style.display = 'block';
 }
 
-// --- CONTROLO DO SLIDER (Manual e Automático) ---
+// --- CONTROLO DO SLIDER ---
 const hero = document.querySelector(".hero");
+const dots = document.querySelectorAll(".dot"); 
 const banners = ["cookies_banner.png", "beignet_banner.png"];
 let idx = 0;
 let tempoSlider;
 
-// Função para atualizar a imagem de fundo
 function atualizarBanner() {
     hero.style.backgroundImage = `url(${banners[idx]})`;
+    dots.forEach(dot => dot.classList.remove("active"));
+    dots[idx].classList.add("active");
 }
 
-// Função executada quando clicamos nas setas
 function mudarSlide(direcao) {
     idx += direcao;
-    
-    // Lógica para voltar ao início se passar do limite ou ir para o final se recuar demasiado
-    if (idx < 0) {
-        idx = banners.length - 1;
-    } else if (idx >= banners.length) {
-        idx = 0;
-    }
-    
+    if (idx < 0) { idx = banners.length - 1; } 
+    else if (idx >= banners.length) { idx = 0; }
     atualizarBanner();
-    resetarTimer(); // Reinicia o relógio para que não mude automaticamente logo após clicar
+    resetarTimer();
 }
 
-// Função que passa os slides automaticamente
-function autoSlide() {
-    mudarSlide(1);
+function irParaSlide(posicao) {
+    idx = posicao;
+    atualizarBanner();
+    resetarTimer();
 }
 
-// Função para recriar o intervalo (evita que o slider fique descontrolado)
+function autoSlide() { mudarSlide(1); }
 function resetarTimer() {
     clearInterval(tempoSlider);
-    tempoSlider = setInterval(autoSlide, 5000); // 5000 ms = 5 segundos
+    tempoSlider = setInterval(autoSlide, 5000); 
 }
 
-// Arranca o slider ao abrir a página
 atualizarBanner();
 tempoSlider = setInterval(autoSlide, 5000);
-
 </script>
 </body>
 </html>
