@@ -1,195 +1,146 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Magical Bites | Cadastro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magical Bites | Cadastro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        body {
+            background: linear-gradient(135deg, #060220, #1f4396);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins', sans-serif;
-}
+        .card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
 
-.container{
-    display:flex;
-    height:100vh;
-}
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
 
-/* LADO ESQUERDO */
-.left{
-    width:50%;
-    background: linear-gradient(135deg, #060220, #1f4396);
-    display:flex;
-    align-items:center;          /* centraliza vertical */
-    justify-content:flex-start;  /* mantém no lado esquerdo */
-    padding-left:250px;           /* distância da borda */
-    
-}
+        h2 {
+            color: #1f4396;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
 
-.logo{
-    max-width:85%;
-    height:auto;
-}
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
 
-/* LADO DIREITO */
-.right{
-    width:50%;
-    background:#2e4a92;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: left;
+        }
 
-.form-box{
-    width:75%;
-    max-width:420px;
-    color:white;
-}
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #1f4396;
+        }
 
-.form-box h2{
-    font-size:32px;
-    margin-bottom:5px;
-}
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            outline: none;
+            transition: 0.3s;
+        }
 
-.form-box p{
-    font-size:15px;
-    margin-bottom:35px;
-    opacity:0.8;
-}
+        .input-group input:focus {
+            border-color: #1f4396;
+            box-shadow: 0 0 8px rgba(31, 67, 150, 0.2);
+        }
 
-/* INPUTS */
-.input-group{
-    background:rgba(255,255,255,0.2);
-    border-radius:40px;
-    margin-bottom:22px;
-    padding:14px 18px;
-    display:flex;
-    align-items:center;
-}
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #1f4396;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
 
-.input-group i{
-    margin-right:12px;
-}
+        button:hover {
+            background: #162f6b;
+            transform: scale(1.02);
+        }
 
-.input-group input{
-    border:none;
-    background:none;
-    outline:none;
-    color:white;
-    width:100%;
-    font-size:15px;
-}
+        .footer-text {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #666;
+        }
 
-.input-group input::placeholder{
-    color:#e0e0e0;
-}
+        .footer-text a {
+            color: #1f4396;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-/* BOTÃO */
-button{
-    width:100%;
-    padding:16px;
-    border:none;
-    border-radius:40px;
-    background:#1c3f94;
-    color:white;
-    font-size:20px;
-    font-weight:600;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-button:hover{
-    background:#162f6b;
-    transform:scale(1.04);
-}
-
-/* LINK LOGIN */
-.login{
-    margin-top:22px;
-    font-size:14px;
-    text-align:center;
-}
-
-.login a{
-    color:white;
-    font-weight:600;
-    text-decoration:none;
-}
-
-/* RESPONSIVO */
-@media(max-width:900px){
-    .container{
-        flex-direction:column;
-    }
-
-    .left, .right{
-        width:100%;
-        height:50vh;
-    }
-
-    .left{
-        justify-content:center;
-        padding-left:0;
-    }
-
-    .logo{
-        max-width:60%;
-    }
-}
-</style>
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
-
 <body>
+    <div class="card">
+        <img src="logo.png" alt="Magical Bites" class="logo">
+        <h2>Crie sua conta</h2>
+        <p>Junte-se à nossa comunidade mágica!</p>
 
-<div class="container">
-
-    <!-- LADO ESQUERDO COM IMAGEM -->
-    <div class="left">
-        <img src="logo.png"alt="Magical Bites Logo" class="logo">
-        <img src="" alt="">
-    </div>
-
-    <!-- LADO DIREITO COM FORMULÁRIO -->
-    <div class="right">
-        <div class="form-box">
-            <h2>Crie sua conta</h2>
-            <p>Preencha o formulário</p>
-
-            <form action="cadastrar.php" method="POST">
-
-                <div class="input-group">
-                    <i class="fa fa-user"></i>
-                    <input type="text" name="nome" placeholder="Nome" required>
-                </div>
-
-                <div class="input-group">
-                    <i class="fa fa-envelope"></i>
-                    <input type="email" name="email" placeholder="Email" required>
-                </div>
-
-                <div class="input-group">
-                    <i class="fa fa-lock"></i>
-                    <input type="password" name="senha" placeholder="Senha" required>
-                </div>
-
-                <button type="submit">CADASTRAR</button>
-
-            </form>
-
-            <div class="login">
-                Já tem alguma conta? <a href="entrar.html">Entrar</a>
+        <form action="cadastrar.php" method="POST">
+            <div class="input-group">
+                <i class="fa fa-user"></i>
+                <input type="text" name="nome" placeholder="Nome completo" required>
             </div>
 
+            <div class="input-group">
+                <i class="fa fa-envelope"></i>
+                <input type="email" name="email" placeholder="Seu melhor e-mail" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa fa-lock"></i>
+                <input type="password" name="senha" placeholder="Crie uma senha" required>
+            </div>
+
+            <button type="submit">Cadastrar ✨</button>
+        </form>
+
+        <div class="footer-text">
+            Já tem uma conta? <a href="login.html">Faça login</a>
         </div>
     </div>
-
-</div>
-
 </body>
 </html>
