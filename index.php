@@ -457,7 +457,7 @@ body{
             <p>☕ Beignet da Princesa e o Sapo</p>
         </a>
 
-        <a href="receita.php?" class="card">
+        <a href="receita.php?id=5" class="card">
             <img src="biscoitos_alice.png">
             <div class="tag doce">DOCE</div>
             <p>♠️ Biscoitos de Alice no País das Maravilhas</p>
@@ -470,25 +470,25 @@ body{
 
     <div class="lista">
 
-        <a href="receita.php?id=5" class="card">
+        <a href="receita.php?id=6" class="card">
             <img src="ratatouille.png">
             <div class="tag salgado">SALGADO</div>
             <p>🐭 Ratatouille</p>
         </a>
 
-        <a href="receita.php?id=6" class="card">
+        <a href="receita.php?id=7" class="card">
             <img src="arepas_encanto.png">
             <div class="tag salgado">SALGADO</div>
             <p>🌽 Arepas con queso de Encanto</p>
         </a>
 
-        <a href="receita.php?id=7" class="card">
+        <a href="receita.php?id=8" class="card">
             <img src="macarrao_pesto_luca.png">
             <div class="tag salgado">SALGADO</div>
             <p>🍃 Macarrão ao molho pesto de Luca</p>
         </a>
 
-        <a href="receita.html" class="card">
+        <a href="receita.php?id=9" class="card">
             <img src="espaguete_almondegas.png">
             <div class="tag salgado">SALGADO</div>
             <p>🍝 Espaguete com Almôndegas da Dama e o Vagabundo</p>
