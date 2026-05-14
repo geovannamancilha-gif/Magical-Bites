@@ -42,10 +42,31 @@ try {
     
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins', sans-serif;}
-        body{background:#3d4f8f;color:white;}
-        .header{background:linear-gradient(135deg,#060220,#2d3f87);padding:24px;text-align:center;font-size:32px;font-weight:700;letter-spacing:1px;box-shadow:0 4px 20px rgba(0,0,0,0.25);}
-        .container{width:88%;margin:45px auto;}
-        .receita-card{background:white;border-radius:28px;overflow:hidden;display:grid;grid-template-columns:1.1fr 1fr;box-shadow:0 12px 30px rgba(0,0,0,0.25);}
+        body{
+            background:#3d4f8f;
+            color:white;
+        }
+
+        /* Apague a classe .header e cole isso no lugar: */
+.navbar { width:100%; background:#1f4396; padding:8px 25px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 18px rgba(0,0,0,0.20); position:sticky; top:0; z-index:100; }
+.logo img { height:60px; width:auto; margin-top: 1px; }
+.menu { display:flex; align-items:center; gap:35px; }
+.menu a { color:white; text-decoration:none; font-size:15px; font-weight:500; transition:0.3s; cursor: pointer; }
+.menu a:hover { color:#ffe45c; }
+
+        .container{
+            width:88%;
+            margin:45px auto;
+          }  
+          
+        .receita-card{
+            background:white;
+            border-radius:28px;
+            overflow:hidden;
+            display:grid;
+            grid-template-columns:1.1fr 1fr;
+            box-shadow:0 12px 30px rgba(0,0,0,0.25);
+        }
         .imagem img{width:100%;height:100%;object-fit:cover;}
         .conteudo{padding:40px;color:#1f1f1f;}
         .voltar-topo{display:inline-block;margin-bottom:22px;text-decoration:none;color:#5a5a5a;font-weight:600;transition:0.3s;}
@@ -70,9 +91,16 @@ try {
 </head>
 <body>
 
-
-
-<div class="header">Magical Bites ✨</div>
+<div class="navbar">
+    <div class="logo">
+        <a href="index.php"><img src="logo_menu.png" alt="Magical Bites"></a>
+    </div>
+    <div class="menu">
+        <a href="index.php">Início</a>
+        <a href="index.php">Receitas</a>
+        <a href="index.php" onclick="alternarModais('login')">👤 Perfil</a>
+    </div>
+</div>
 
 <div class="container">
     <div class="receita-card">
