@@ -25,8 +25,8 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         body{ background:#f3f1ff; color:#333; overflow-x: hidden; }
         
         /* --- NAVBAR --- */
-        .navbar{ width:100%; background:#1f4396; padding:14px 25px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 18px rgba(0,0,0,0.20); position:sticky; top:0; z-index:100; }
-        .logo img{ height:60px; width:auto; margin-top: -10px; }
+       .navbar { width:100%; background:#1f4396; padding:8px 25px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 18px rgba(0,0,0,0.20); position:sticky; top:0; z-index:100; }
+.logo img { height:60px; width:auto; margin-top: 1px; }
         .menu{ display:flex; align-items:center; gap:35px; }
         .menu a{ color:white; text-decoration:none; font-size:15px; font-weight:500; transition:0.3s; cursor: pointer; }
         .menu a:hover{ color:#ffe45c; }
