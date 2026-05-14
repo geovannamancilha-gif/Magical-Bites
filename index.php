@@ -1,434 +1,174 @@
 <?php
-// Conexão com o banco (igual ao do receita.php)
+// Conexão com o banco
 $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
 
-// Busca todas as receitas doces
+// Busca receitas doces
 $stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
 $receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
+
+// Lógica para detectar se veio de um cadastro (cadastrar.php redirecionando de volta)
+$status = isset($_GET['status']) ? $_GET['status'] : "";
+$erro_msg = isset($_GET['erro']) ? $_GET['erro'] : "";
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Magical Bites | Receitas Disney ✨</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
+/* --- ESTILOS ORIGINAIS --- */
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+body{ background:#f3f1ff; color:white; overflow-x: hidden; }
+.navbar{ width:100%; background:#1f4396; padding:14px 25px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 18px rgba(0,0,0,0.20); position:sticky; top:0; z-index:100; }
+.logo img{ height:60px; width:auto; margin-top: -10px; }
+.menu{ display:flex; align-items:center; gap:35px; }
+.menu a{ color:white; text-decoration:none; font-size:15px; font-weight:500; transition:0.3s; cursor: pointer; }
+.menu a:hover{ color:#ffe45c; }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins', sans-serif;
+.hero{ width:100%; height:620px; overflow:hidden; position:relative; background-size:cover; background-position:center; transition:background-image 0.6s ease-in-out; }
+.hero-content{ position:absolute; left:90px; top:50%; transform:translateY(-50%); max-width:470px; }
+.hero-content h1{ font-size:72px; line-height:1.05; margin-bottom:22px; font-weight:700; }
+.hero-content p{ font-size:22px; line-height:1.6; color:#ededed; margin-bottom:32px; }
+.hero-btn{ display:inline-block; padding:18px 30px; background:#ffe45c; color:#1e0061; border-radius:14px; text-decoration:none; font-weight:700; transition:0.3s; font-size:16px; }
+
+.search-box{ display:flex; justify-content:center; align-items:center; gap:12px; margin:45px 20px 40px; }
+.search-box input{ padding:14px 18px; width:340px; border:none; border-radius:30px; outline:none; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
+.search-box button{ padding:14px 24px; border:none; border-radius:30px; background:#2d4fd7; color:white; cursor:pointer; font-weight:600; }
+
+.container{ width:88%; margin:auto; }
+.titulo{ margin:40px 0 25px; font-size:30px; font-weight:700; color:#ffd369; display:flex; align-items:center; gap:10px; }
+.lista{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:28px; margin-bottom:50px; }
+.card{ background:white; color:black; border-radius:22px; overflow:hidden; text-decoration:none; transition:0.35s; box-shadow:0 8px 22px rgba(0,0,0,0.20); }
+.card img{ width:100%; height:220px; object-fit:cover; }
+.tag{ width:fit-content; margin:15px auto 10px; padding:6px 14px; border-radius:20px; color:white; font-size:11px; font-weight:700; }
+.doce{ background:#ff69b4; }
+.salgado{ background:#4CAF50; }
+.card p{ padding:0 18px 22px; text-align:center; font-weight:600; }
+
+/* --- SISTEMA DE MODAIS (CARDS) --- */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 999;
 }
 
-body{
-    background:#f3f1ff;
-    color:white;
+.card-flutuante {
+    display: none;
+    position: fixed;
+    top: 85px;
+    right: 25px;
+    width: 360px;
+    background: white;
+    border-radius: 28px;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+    padding: 30px;
+    z-index: 1000;
+    color: #333;
+    animation: fadeInSlide 0.3s ease-out;
 }
 
-/* NAVBAR */
-.navbar{
-    width:100%;
-    background:#1f4396;
-    padding:14px 25px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    box-shadow:0 4px 18px rgba(0,0,0,0.20);
-    position:sticky;
-    top:0;
-    z-index:100;
+@keyframes fadeInSlide {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-.logo{
-    position:relative;
-    width:180px;
-    height:40px;
-}
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.btn-fechar { background: none; border: none; font-size: 26px; cursor: pointer; color: #999; }
 
-.logo img{
-    position:absolute;
-    top:-8px;
-    left:0;
-    height:60px;
-    width:auto;
-}
+.input-group-modal { position: relative; margin-bottom: 15px; }
+.input-group-modal i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #1f4396; }
+.input-group-modal input { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #ddd; border-radius: 12px; outline: none; }
 
-.menu{
-    display:flex;
-    align-items:center;
-    gap:35px;
-}
+.btn-acao { width: 100%; padding: 14px; background: #1f4396; color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+.btn-acao:hover { background: #162f6b; transform: scale(1.02); }
 
-.menu a{
-    color:white;
-    text-decoration:none;
-    font-size:15px;
-    font-weight:500;
-    transition:0.3s;
-}
-
-.menu a:hover{
-    color:#ffe45c;
-}
-
-/* HERO SLIDER */
-.hero{
-    width:100%;
-    height:620px;
-    margin:0;
-    border-radius:0;
-    overflow:hidden;
-    position:relative;
-
-    background-size:cover;
-    background-position:center;
-    background-repeat:no-repeat;
-
-    transition:background-image 0.6s ease-in-out;
-}
-
-/* TEXTO DO BANNER */
-.hero-content{
-    position:absolute;
-    left:90px;
-    top:50%;
-    transform:translateY(-50%);
-    max-width:470px;
-}
-
-.hero-content h1{
-    font-size:72px;
-    line-height:1.05;
-    margin-bottom:22px;
-    font-weight:700;
-}
-
-.hero-content p{
-    font-size:22px;
-    line-height:1.6;
-    color:#ededed;
-    margin-bottom:32px;
-}
-
-.hero-btn{
-    display:inline-block;
-    padding:18px 30px;
-    background:#ffe45c;
-    color:#1e0061;
-    border-radius:14px;
-    text-decoration:none;
-    font-weight:700;
-    transition:0.3s;
-    font-size:16px;
-}
-
-.hero-btn:hover{
-    transform:translateY(-3px);
-    background:#fff08f;
-}
-
-/* BOLINHAS */
-.dots{
-    position:absolute;
-    bottom:24px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:10px;
-}
-
-.dot{
-    width:11px;
-    height:11px;
-    border-radius:50%;
-    background:rgba(255,255,255,0.45);
-    transition:0.3s;
-}
-
-.dot.active{
-    background:white;
-    transform:scale(1.2);
-}
-
-/* BUSCA */
-.search-box{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:12px;
-    margin:45px 20px 40px;
-    flex-wrap:wrap;
-}
-
-.search-box input{
-    padding:14px 18px;
-    width:340px;
-    border:none;
-    border-radius:30px;
-    outline:none;
-    background:white;
-    box-shadow:0 4px 12px rgba(0,0,0,0.15);
-    font-size:14px;
-    color:black;
-}
-
-.search-box input::placeholder{
-    color:#777;
-}
-
-.search-box button{
-    padding:14px 24px;
-    border:none;
-    border-radius:30px;
-    background:#2d4fd7;
-    color:white;
-    cursor:pointer;
-    transition:0.3s;
-    font-weight:600;
-    box-shadow:0 4px 12px rgba(0,0,0,0.2);
-}
-
-.search-box button:hover{
-    background:#1f3bb3;
-    transform:translateY(-2px);
-}
-
-/* CONTAINER */
-.container{
-    width:88%;
-    margin:auto;
-}
-
-/* TÍTULOS */
-.titulo{
-    margin:40px 0 25px;
-    font-size:30px;
-    font-weight:700;
-    color:#ffd369;
-    display:flex;
-    align-items:center;
-    gap:10px;
-}
-
-/* GRID */
-.lista{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:28px;
-    margin-bottom:50px;
-}
-
-/* CARDS */
-.card{
-    background:white;
-    color:black;
-    border-radius:22px;
-    overflow:hidden;
-    text-decoration:none;
-    transition:0.35s;
-    box-shadow:0 8px 22px rgba(0,0,0,0.20);
-    position:relative;
-}
-
-.card:hover{
-    transform:translateY(-8px);
-    box-shadow:0 14px 28px rgba(0,0,0,0.28);
-}
-
-.card img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
-    transition:0.3s;
-}
-
-.card:hover img{
-    transform:scale(1.03);
-}
-
-/* TAG */
-.tag{
-    width:fit-content;
-    margin:15px auto 10px;
-    padding:6px 14px;
-    border-radius:20px;
-    color:white;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:0.5px;
-}
-
-.doce{
-    background:#ff69b4;
-}
-
-.salgado{
-    background:#4CAF50;
-}
-
-/* TEXTO */
-.card p{
-    padding:0 18px 22px;
-    text-align:center;
-    font-weight:600;
-    font-size:15px;
-    line-height:1.4;
-}
-
-/* RESPONSIVO */
-@media(max-width:900px){
-
-    .navbar{
-        padding:16px 20px;
-        flex-direction:column;
-        gap:15px;
-    }
-
-    .menu{
-        gap:18px;
-        flex-wrap:wrap;
-        justify-content:center;
-    }
-
-    .hero{
-        height:500px;
-    }
-
-    .hero-content{
-        left:40px;
-        max-width:320px;
-    }
-
-    .hero-content h1{
-        font-size:46px;
-    }
-
-    .hero-content p{
-        font-size:17px;
-    }
-}
-
-@media(max-width:700px){
-
-    .titulo{
-        font-size:24px;
-    }
-
-    .search-box input{
-        width:100%;
-    }
-
-    .container{
-        width:92%;
-    }
-
-    .card img{
-        height:200px;
-    }
-
-    .hero{
-        height:400px;
-    }
-
-    .hero-content{
-        left:25px;
-        max-width:260px;
-    }
-
-    .hero-content h1{
-        font-size:34px;
-    }
-
-    .hero-content p{
-        font-size:14px;
-    }
-
-    .hero-btn{
-        padding:13px 20px;
-        font-size:14px;
-    }
-
-    .profile-icon{
-        font-size:22px;
-        text-decoration:none;
-        transition:0.3s;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-    }
-
-    .profile-icon:hover{
-        transform:scale(1.1);
-    }
-}
-
+.status-icon { font-size: 50px; margin-bottom: 15px; text-align: center; }
+.footer-modal { margin-top: 20px; font-size: 13px; text-align: center; color: #666; }
+.footer-modal a { color: #1f4396; text-decoration: none; font-weight: 600; cursor: pointer; }
 </style>
-
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <div class="navbar">
-
-    <div class="logo">
-        <img src="logo_menu.png" alt="Magical Bites">  
-    </div>
-
+    <div class="logo"><img src="logo_menu.png" alt="Magical Bites"></div>
     <div class="menu">
-        <a href="#">Início</a>
+        <a href="index.php">Início</a>
         <a href="#">Receitas</a>
-        <a href="#">Sobre</a>
-        <a href="#">Favoritos</a>
-
-        <a href="login.html" class="profile-icon">
-            👤
-        </a>
+        <a href="javascript:void(0)" onclick="alternarModais('login')">👤 Perfil</a>
     </div>
-
 </div>
 
-<!-- HERO -->
+<div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
+
+<div id="modalCadastro" class="card-flutuante">
+    <div class="card-header">
+        <img src="logo.png" style="width: 100px;">
+        <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+    </div>
+    <h2 style="color:#1f4396">Crie sua conta</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:20px">Junte-se à nossa comunidade!</p>
+    <form action="cadastrar.php" method="POST">
+        <div class="input-group-modal"><i class="fa fa-user"></i><input type="text" name="nome" placeholder="Nome completo" required></div>
+        <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+        <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
+        <button type="submit" class="btn-acao">Cadastrar ✨</button>
+    </form>
+    <div class="footer-modal">Já tem conta? <a onclick="alternarModais('login')">Faça login</a></div>
+</div>
+
+<div id="modalLogin" class="card-flutuante">
+    <div class="card-header">
+        <img src="logo.png" style="width: 100px;">
+        <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+    </div>
+    <h2 style="color:#1f4396">Bem-vindo!</h2>
+    <p style="font-size:14px; color:#666; margin-bottom:20px">Acesse sua conta mágica.</p>
+    <form action="index.php" method="POST">
+        <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+        <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
+        <button type="submit" class="btn-acao">Entrar ✨</button>
+    </form>
+    <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
+</div>
+
+<?php if ($status != ""): ?>
+<div id="modalStatus" class="card-flutuante" style="display: block; text-align: center;">
+    <div class="card-header">
+        <span></span> <button class="btn-fechar" onclick="window.location.href='index.php'">&times;</button>
+    </div>
+    <?php if ($status == "sucesso"): ?>
+        <div class="status-icon">✅</div>
+        <h2 style="color:#28a745">Sucesso!</h2>
+        <p>Sua conta foi criada. Agora é só brilhar na cozinha!</p>
+        <button class="btn-acao" onclick="alternarModais('login')">Ir para Login</button>
+    <?php else: ?>
+        <div class="status-icon">❌</div>
+        <h2 style="color:#dc3545">Ops!</h2>
+        <p>Erro: <?php echo htmlspecialchars($erro_msg); ?></p>
+        <button class="btn-acao" onclick="alternarModais('cadastro')">Tentar novamente</button>
+    <?php endif; ?>
+</div>
+<script>document.getElementById('modalOverlay').style.display = 'block';</script>
+<?php endif; ?>
+
 <div class="hero">
-
     <div class="hero-content">
-
-        <h1>
-            Receitas mágicas inspiradas na Disney
-        </h1>
-
-        <p>
-            Descubra pratos incríveis direto dos filmes que amamos!
-        </p>
-
-        <a href="#" class="hero-btn">
-            Explorar receitas ✨
-        </a>
-
+        <h1>Receitas mágicas inspiradas na Disney</h1>
+        <p>Descubra pratos incríveis direto dos filmes!</p>
+        <a href="#" class="hero-btn">Explorar ✨</a>
     </div>
-
-    <div class="dots">
-        <div class="dot active"></div>
-        <div class="dot"></div>
-    </div>
-
 </div>
 
-<!-- BUSCA -->
-<div class="search-box">
-    <input type="text" placeholder="🔍 Procure uma receita mágica...">
-    <button>Buscar</button>
-</div>
-
-<div class="container">
-
-    <!-- DOCES -->
+ <!-- DOCES -->
     <h2 class="titulo">🍰 Receitas Doces</h2>
 
     <div class="lista">
@@ -457,7 +197,7 @@ body{
             <p>☕ Beignet da Princesa e o Sapo</p>
         </a>
 
-        <a href="receita.php?id=5" class="card">
+        <a href="receita.php?" class="card">
             <img src="biscoitos_alice.png">
             <div class="tag doce">DOCE</div>
             <p>♠️ Biscoitos de Alice no País das Maravilhas</p>
@@ -470,25 +210,25 @@ body{
 
     <div class="lista">
 
-        <a href="receita.php?id=6" class="card">
+        <a href="receita.php?id=5" class="card">
             <img src="ratatouille.png">
             <div class="tag salgado">SALGADO</div>
             <p>🐭 Ratatouille</p>
         </a>
 
-        <a href="receita.php?id=7" class="card">
+        <a href="receita.php?id=6" class="card">
             <img src="arepas_encanto.png">
             <div class="tag salgado">SALGADO</div>
             <p>🌽 Arepas con queso de Encanto</p>
         </a>
 
-        <a href="receita.php?id=8" class="card">
+        <a href="receita.php?id=7" class="card">
             <img src="macarrao_pesto_luca.png">
             <div class="tag salgado">SALGADO</div>
             <p>🍃 Macarrão ao molho pesto de Luca</p>
         </a>
 
-        <a href="receita.php?id=9" class="card">
+        <a href="receita.html" class="card">
             <img src="espaguete_almondegas.png">
             <div class="tag salgado">SALGADO</div>
             <p>🍝 Espaguete com Almôndegas da Dama e o Vagabundo</p>
@@ -498,41 +238,30 @@ body{
 
 </div>
 
-<!-- SCRIPT SLIDER -->
 <script>
-
-const hero = document.querySelector(".hero");
-const dots = document.querySelectorAll(".dot");
-
-const banners = [
-    "cookies_banner.png",
-    "beignet_banner.png"
-];
-
-let index = 0;
-
-function trocarBanner(){
-
-    hero.style.backgroundImage = `url(${banners[index]})`;
-
-    dots.forEach(dot => {
-        dot.classList.remove("active");
-    });
-
-    dots[index].classList.add("active");
-
-    index++;
-
-    if(index >= banners.length){
-        index = 0;
-    }
+function fecharTodosModais() {
+    document.getElementById('modalOverlay').style.display = 'none';
+    document.getElementById('modalCadastro').style.display = 'none';
+    document.getElementById('modalLogin').style.display = 'none';
+    if(document.getElementById('modalStatus')) document.getElementById('modalStatus').style.display = 'none';
 }
 
-trocarBanner();
+function alternarModais(tipo) {
+    fecharTodosModais();
+    document.getElementById('modalOverlay').style.display = 'block';
+    if(tipo === 'cadastro') document.getElementById('modalCadastro').style.display = 'block';
+    if(tipo === 'login') document.getElementById('modalLogin').style.display = 'block';
+}
 
-setInterval(trocarBanner, 4000);
-
+// Banner rotativo
+const hero = document.querySelector(".hero");
+const banners = ["cookies_banner.png", "beignet_banner.png"];
+let idx = 0;
+setInterval(() => {
+    idx = (idx + 1) % banners.length;
+    hero.style.backgroundImage = `url(${banners[idx]})`;
+}, 4000);
+hero.style.backgroundImage = `url(${banners[0]})`;
 </script>
-
 </body>
 </html>
