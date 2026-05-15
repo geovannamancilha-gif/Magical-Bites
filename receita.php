@@ -3,8 +3,8 @@
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; // Coloque seu usuário do banco
-//$pass = 'Home@spSENAI2025!';     // Coloque sua senha do banco
-$pass = '';     // Coloque sua senha do banco
+$pass = 'Home@spSENAI2025!';     // Coloque sua senha do banco
+//$pass = '';     // Coloque sua senha do banco
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -47,12 +47,12 @@ try {
             color:white;
         }
 
-        /* Apague a classe .header e cole isso no lugar: */
-.navbar { width:100%; background:#1f4396; padding:8px 25px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 18px rgba(0,0,0,0.20); position:sticky; top:0; z-index:100; }
-.logo img { height:60px; width:auto; margin-top: 1px; }
-.menu { display:flex; align-items:center; gap:35px; }
-.menu a { color:white; text-decoration:none; font-size:15px; font-weight:500; transition:0.3s; cursor: pointer; }
-.menu a:hover { color:#ffe45c; }
+        /* Navbar Estilos */
+        .navbar { width:100%; background:#1f4396; padding:8px 25px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 18px rgba(0,0,0,0.20); position:sticky; top:0; z-index:100; }
+        .logo img { height:60px; width:auto; margin-top: 1px; }
+        .menu { display:flex; align-items:center; gap:35px; }
+        .menu a { color:white; text-decoration:none; font-size:15px; font-weight:500; transition:0.3s; cursor: pointer; }
+        .menu a:hover { color:#ffe45c; }
 
         .container{
             width:88%;
@@ -76,15 +76,24 @@ try {
         .descricao{color:#666;line-height:1.7;margin-bottom:28px;}
         .info{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:30px;}
         .info span{background:#f3f3f3;padding:10px 15px;border-radius:14px;font-size:14px;font-weight:600;color:#444;}
+        
+        /* Estilos das Abas */
         .abas{display:flex;gap:25px;margin-bottom:25px;border-bottom:2px solid #ececec;padding-bottom:14px;}
-        .abas div{font-weight:600;color:#777;cursor:pointer;}
+        .abas div{font-weight:600;color:#777;cursor:pointer; transition: 0.3s;}
+        .abas div:hover{color:#ff69b4;}
         .abas .ativa{color:#ff69b4;border-bottom:3px solid #ff69b4;padding-bottom:10px;}
+        
+        /* Oculta os conteúdos das abas inativas por padrão */
+        .conteudo-aba { display: none; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
         h2{color:#2d4fd7;margin-bottom:16px;font-size:24px;}
         ul{margin-left:20px;margin-bottom:30px;}
         li{margin-bottom:12px;line-height:1.6;color:#444;}
         .preparo{line-height:1.9;color:#444;}
         .botao{display:inline-block;margin-top:35px;padding:14px 24px;border-radius:18px;background:#ff69b4;color:white;text-decoration:none;font-weight:700;transition:0.3s;}
         .botao:hover{background:#ff4fa6;transform:translateY(-2px);}
+        
         @media(max-width:950px){.receita-card{grid-template-columns:1fr;}.imagem img{height:320px;}.titulo{font-size:34px;}}
         @media(max-width:700px){.container{width:92%;}.conteudo{padding:28px;}.titulo{font-size:28px;}.abas{gap:15px;font-size:14px;}.info{flex-direction:column;}}
     </style>
@@ -98,6 +107,8 @@ try {
     <div class="menu">
         <a href="index.php">Início</a>
         <a href="index.php">Receitas</a>
+        <a href="index.php">Favoritos</a>
+        <a href="index.php">Filmes</a>
         <a href="index.php" onclick="alternarModais('login')">👤 Perfil</a>
     </div>
 </div>
@@ -110,7 +121,7 @@ try {
         </div>
 
         <div class="conteudo">
-            <a href="principal.html" class="voltar-topo">← Voltar</a>
+            <a href="index.php" class="voltar-topo">← Voltar</a>
 
             <h1 class="titulo"><?= htmlspecialchars($receita['nome_receita']) ?></h1>
 
@@ -125,22 +136,33 @@ try {
             </div>
 
             <div class="abas">
-                <div class="ativa">Ingredientes</div>
-                <div>Modo de preparo</div>
-                <div>Dicas</div>
+                <div class="aba ativa" onclick="mudarAba('tab-ingredientes', this)">Ingredientes</div>
+                <div class="aba" onclick="mudarAba('tab-preparo', this)">Modo de preparo</div>
+                <div class="aba" onclick="mudarAba('tab-dicas', this)">Dicas</div>
             </div>
 
-            <h2>Ingredientes</h2>
-            <ul>
-                <?php foreach($lista_ingredientes as $ingrediente): ?>
-                    <li><?= htmlspecialchars(trim($ingrediente)) ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <div id="tab-ingredientes" class="conteudo-aba" style="display: block;">
+                <h2>Ingredientes</h2>
+                <ul>
+                    <?php foreach($lista_ingredientes as $ingrediente): ?>
+                        <li><?= htmlspecialchars(trim($ingrediente)) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
 
-            <h2>Modo de preparo</h2>
-            <p class="preparo">
-                <?= nl2br(htmlspecialchars($receita['modo_preparo'])) ?>
-            </p>
+            <div id="tab-preparo" class="conteudo-aba">
+                <h2>Modo de preparo</h2>
+                <p class="preparo">
+                    <?= nl2br(htmlspecialchars($receita['modo_preparo'])) ?>
+                </p>
+            </div>
+
+            <div id="tab-dicas" class="conteudo-aba">
+                <h2>Dicas Mágicas</h2>
+                <p class="preparo">
+                    Para deixar essa receita com ainda mais magia, coloque um pouco de amor e compartilhe com quem você gosta! ✨
+                </p>
+            </div>
 
             <a href="favoritar.php?id=<?= $receita['id_receita'] ?>" class="botao">
                 ❤️ Adicionar aos favoritos
@@ -150,8 +172,28 @@ try {
     </div>
 </div>
 
+<script>
+// Função Sênior para alternar as abas
+function mudarAba(idDestino, elementoClicado) {
+    // 1. Esconde todos os conteúdos que têm a classe 'conteudo-aba'
+    let conteudos = document.querySelectorAll('.conteudo-aba');
+    conteudos.forEach(function(div) {
+        div.style.display = 'none';
+    });
 
+    // 2. Remove a marcação 'ativa' (a cordinha rosa) de todas as abas
+    let abas = document.querySelectorAll('.abas div');
+    abas.forEach(function(aba) {
+        aba.classList.remove('ativa');
+    });
 
+    // 3. Mostra apenas o conteúdo da aba clicada
+    document.getElementById(idDestino).style.display = 'block';
+
+    // 4. Adiciona a marcação 'ativa' na aba que o utilizador acabou de clicar
+    elementoClicado.classList.add('ativa');
+}
+</script>
 
 </body>
 </html>

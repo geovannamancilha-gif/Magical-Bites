@@ -1,6 +1,6 @@
 <?php
 // Conexão com a base de dados
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", ""); // Ajuste a password se necessário
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!"); // Ajuste a password se necessário
 
 // Busca receitas doces
 $stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
