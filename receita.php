@@ -1,89 +1,82 @@
 <?php
-// Configurações de conexão com o banco de dados
+// Configurações de conexão com a base de dados
 $host = 'localhost';
 $dbname = 'magical_bites';
-$user = 'root'; // Coloque seu usuário do banco
-$pass = 'Home@spSENAI2025!';     // Coloque sua senha do banco
-//$pass = '';     // Coloque sua senha do banco
+$user = 'root'; 
+$pass = 'Home@spSENAI2025!';     
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // CORREÇÃO: Mudado de 0 para 1 para garantir que ele ache a primeira receita no teste
     $id_receita = isset($_GET['id']) ? (int)$_GET['id'] : 1;
 
-    // Busca as informações da receita no banco de dados
     $stmt = $pdo->prepare("SELECT * FROM receitas WHERE id_receita = :id");
     $stmt->bindParam(':id', $id_receita, PDO::PARAM_INT);
     $stmt->execute();
     $receita = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Se a receita não existir, para a execução
     if (!$receita) {
-        die("<h1>Receita não encontrada no banco de dados para o ID: $id_receita!</h1>");
+        die("<h1>Receita não encontrada na base de dados para o ID: $id_receita!</h1>");
     }
 
-    // Transforma o texto de ingredientes "item1;item2" em uma lista/array
     $lista_ingredientes = explode(";", $receita['ingredientes']);
 
+    // LÓGICA SÉNIOR: Definir a classe CSS da cor com base no tipo da receita
+    $classe_tag = 'tag-doce'; // Rosa por padrão
+    if ($receita['tipo'] == 'SALGADO') {
+        $classe_tag = 'tag-salgado'; // Verde
+    } elseif ($receita['tipo'] == 'BEBIDA') {
+        $classe_tag = 'tag-bebida'; // Azul
+    }
+
 } catch(PDOException $e) {
-    die("Erro na conexão com o banco de dados: " . $e->getMessage());
+    die("Erro na conexão com a base de dados: " . $e->getMessage());
 }
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($receita['nome_receita']) ?> | Magical Bites ✨</title>
+    <title><?= htmlspecialchars($receita['nome_receita']) ?> | Magical Bites</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins', sans-serif;}
-        body{
-            background:#3d4f8f;
-            color:white;
-        }
+        body{ background:#3d4f8f; color:white; }
 
-        /* Navbar Estilos */
         .navbar { width:100%; background:#1f4396; padding:8px 25px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 4px 18px rgba(0,0,0,0.20); position:sticky; top:0; z-index:100; }
         .logo img { height:60px; width:auto; margin-top: 1px; }
         .menu { display:flex; align-items:center; gap:35px; }
         .menu a { color:white; text-decoration:none; font-size:15px; font-weight:500; transition:0.3s; cursor: pointer; }
         .menu a:hover { color:#ffe45c; }
 
-        .container{
-            width:88%;
-            margin:45px auto;
-          }  
+        .container{ width:88%; margin:45px auto; }  
           
-        .receita-card{
-            background:white;
-            border-radius:28px;
-            overflow:hidden;
-            display:grid;
-            grid-template-columns:1.1fr 1fr;
-            box-shadow:0 12px 30px rgba(0,0,0,0.25);
-        }
+        .receita-card{ background:white; border-radius:28px; overflow:hidden; display:grid; grid-template-columns:1.1fr 1fr; box-shadow:0 12px 30px rgba(0,0,0,0.25); }
         .imagem img{width:100%;height:100%;object-fit:cover;}
         .conteudo{padding:40px;color:#1f1f1f;}
         .voltar-topo{display:inline-block;margin-bottom:22px;text-decoration:none;color:#5a5a5a;font-weight:600;transition:0.3s;}
         .voltar-topo:hover{color:#2d4fd7;}
         .titulo{font-size:42px;line-height:1.1;margin-bottom:15px;color:#171717;}
-        .tag{width:fit-content;padding:7px 16px;border-radius:20px;background:#ff69b4;color:white;font-size:12px;font-weight:700;margin-bottom:25px;}
+        
+        /* ESTILOS DINÂMICOS DAS TAGS */
+        .tag{width:fit-content;padding:7px 16px;border-radius:20px;color:white;font-size:12px;font-weight:700;margin-bottom:25px; letter-spacing: 0.5px;}
+        .tag-doce { background: #ff69b4; }
+        .tag-salgado { background: #4CAF50; }
+        .tag-bebida { background: #00bcd4; }
+
         .descricao{color:#666;line-height:1.7;margin-bottom:28px;}
         .info{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:30px;}
         .info span{background:#f3f3f3;padding:10px 15px;border-radius:14px;font-size:14px;font-weight:600;color:#444;}
         
-        /* Estilos das Abas */
         .abas{display:flex;gap:25px;margin-bottom:25px;border-bottom:2px solid #ececec;padding-bottom:14px;}
         .abas div{font-weight:600;color:#777;cursor:pointer; transition: 0.3s;}
         .abas div:hover{color:#ff69b4;}
         .abas .ativa{color:#ff69b4;border-bottom:3px solid #ff69b4;padding-bottom:10px;}
         
-        /* Oculta os conteúdos das abas inativas por padrão */
         .conteudo-aba { display: none; animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -106,10 +99,10 @@ try {
     </div>
     <div class="menu">
         <a href="index.php">Início</a>
-        <a href="index.php">Receitas</a>
-        <a href="index.php">Favoritos</a>
-        <a href="index.php">Filmes</a>
-        <a href="index.php" onclick="alternarModais('login')">👤 Perfil</a>
+        <a href="index.php#containerReceitas">Receitas</a>
+        <a href="#">Favoritos</a>
+        <a href="#">Filmes</a>
+        <a href="javascript:void(0)" onclick="alternarModais('login')">👤 Perfil</a>
     </div>
 </div>
 
@@ -117,7 +110,7 @@ try {
     <div class="receita-card">
 
         <div class="imagem">
-            <img src="<?= htmlspecialchars($receita['imagem']) ?>" alt="<?= htmlspecialchars($receita['nome_receita']) ?>">
+            <img src="<?= htmlspecialchars($receita['imagem']) ?>" alt="<?= htmlspecialchars($receita['nome_receita']) ?>" onerror="this.src='logo_menu.png'">
         </div>
 
         <div class="conteudo">
@@ -125,14 +118,14 @@ try {
 
             <h1 class="titulo"><?= htmlspecialchars($receita['nome_receita']) ?></h1>
 
-            <div class="tag"><?= htmlspecialchars($receita['tipo']) ?></div>
+            <div class="tag <?= $classe_tag ?>"><?= htmlspecialchars($receita['tipo']) ?></div>
 
             <p class="descricao"><?= htmlspecialchars($receita['descricao']) ?></p>
 
             <div class="info">
-                <span>⭐ <?= htmlspecialchars($receita['avaliacao']) ?></span>
-                <span>⏱️ <?= htmlspecialchars($receita['tempo_preparo']) ?></span>
-                <span>👩‍🍳 <?= htmlspecialchars($receita['dificuldade']) ?></span>
+                <span>Avaliação: <?= htmlspecialchars($receita['avaliacao']) ?></span>
+                <span>Tempo: <?= htmlspecialchars($receita['tempo_preparo']) ?></span>
+                <span>Dificuldade: <?= htmlspecialchars($receita['dificuldade']) ?></span>
             </div>
 
             <div class="abas">
@@ -160,12 +153,12 @@ try {
             <div id="tab-dicas" class="conteudo-aba">
                 <h2>Dicas Mágicas</h2>
                 <p class="preparo">
-                    Para deixar essa receita com ainda mais magia, coloque um pouco de amor e compartilhe com quem você gosta! ✨
+                    Para deixar esta receita com ainda mais magia, coloque um pouco de amor e partilhe com quem mais gosta!
                 </p>
             </div>
 
             <a href="favoritar.php?id=<?= $receita['id_receita'] ?>" class="botao">
-                ❤️ Adicionar aos favoritos
+                Adicionar aos favoritos
             </a>
 
         </div>
@@ -173,24 +166,18 @@ try {
 </div>
 
 <script>
-// Função Sênior para alternar as abas
 function mudarAba(idDestino, elementoClicado) {
-    // 1. Esconde todos os conteúdos que têm a classe 'conteudo-aba'
     let conteudos = document.querySelectorAll('.conteudo-aba');
     conteudos.forEach(function(div) {
         div.style.display = 'none';
     });
 
-    // 2. Remove a marcação 'ativa' (a cordinha rosa) de todas as abas
     let abas = document.querySelectorAll('.abas div');
     abas.forEach(function(aba) {
         aba.classList.remove('ativa');
     });
 
-    // 3. Mostra apenas o conteúdo da aba clicada
     document.getElementById(idDestino).style.display = 'block';
-
-    // 4. Adiciona a marcação 'ativa' na aba que o utilizador acabou de clicar
     elementoClicado.classList.add('ativa');
 }
 </script>
