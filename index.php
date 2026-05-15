@@ -107,6 +107,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     <div class="menu">
         <a href="index.php">Início</a>
         <a href="#containerReceitas">Receitas</a>
+        <a href="#">Favoritos</a>
         <a href="#">Filmes</a>
         <a href="javascript:void(0)" onclick="alternarModais('login')">👤 Entrar</a>
     </div>
@@ -136,8 +137,8 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
     </div>
     <h2 style="color:#1f4396">Bem-vindo!</h2>
-    <p style="font-size:14px; color:#666; margin-bottom:20px">Aceda à sua conta mágica.</p>
-    <form action="login_processo.php" method="POST">
+    <p style="font-size:14px; color:#666; margin-bottom:20px">Acesse sua conta mágica.</p>
+    <form action="index.php" method="POST">
         <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
         <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
         <button type="submit" class="btn-acao">Entrar</button>
