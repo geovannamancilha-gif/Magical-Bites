@@ -108,7 +108,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <a href="index.php">Início</a>
         <a href="#containerReceitas">Receitas</a>
         <a href="#">Favoritos</a>
-        <a href="#">Filmes</a>
+        <a href="filmes.php">Filmes</a>
         <a href="javascript:void(0)" onclick="alternarModais('login')">👤 Entrar</a>
     </div>
 </div>
