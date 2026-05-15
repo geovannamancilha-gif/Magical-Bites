@@ -76,10 +76,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         .card img { width: 100%; height: 220px; object-fit: cover; }
         .tag { width: fit-content; margin: 20px auto 10px; padding: 6px 16px; border-radius: 20px; color: white; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
         
-        /* Cores das Tags do Banco */
         .doce { background: #ff69b4; }
         .salgado { background: #4CAF50; }
-        .bebida { background: #00bcd4; } 
+        .bebida { background: #00bcd4; }
         
         .card p { padding: 0 20px 25px; text-align: center; font-weight: 600; font-size: 16px; color: #333; }
         #msgSemResultado { display: none; text-align: center; font-size: 18px; color: #666; margin: 40px 0; font-weight: 500; width: 100%; grid-column: 1 / -1; }
@@ -108,9 +107,8 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     <div class="menu">
         <a href="index.php">Início</a>
         <a href="#containerReceitas">Receitas</a>
-        <a href="#">Favoritos</a>
         <a href="#">Filmes</a>
-        <a href="javascript:void(0)" onclick="alternarModais('login')">👤 Perfil</a>
+        <a href="javascript:void(0)" onclick="alternarModais('login')">👤 Entrar</a>
     </div>
 </div>
 
@@ -146,6 +144,38 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     </form>
     <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
 </div>
+
+<?php if ($status != ""): ?>
+<div id="modalStatus" class="card-flutuante" style="display: block; z-index: 1001;">
+    <div class="card-header">
+        <button class="btn-fechar" onclick="fecharStatus()">&times;</button>
+    </div>
+    
+    <?php if ($status == 'sucesso'): ?>
+        <div class="status-icon" style="color: #4CAF50;">✅</div>
+        <h2 style="color:#1f4396; text-align:center;">Sucesso!</h2>
+        <p style="font-size:15px; color:#666; text-align:center; margin-bottom:20px;">
+            A sua conta foi criada com magia!<br>Faça login para continuar.
+        </p>
+        <button class="btn-acao" onclick="fecharStatus(); alternarModais('login');">Fazer Login</button>
+        
+    <?php elseif ($status == 'erro'): ?>
+        <div class="status-icon" style="color: #f44336;">❌</div>
+        <h2 style="color:#1f4396; text-align:center;">Oops!</h2>
+        <p style="font-size:15px; color:#666; text-align:center; margin-bottom:20px;">
+            <?= htmlspecialchars($erro_msg) ?>
+        </p>
+        <button class="btn-acao" onclick="fecharStatus(); alternarModais('cadastro');">Tentar Novamente</button>
+    <?php endif; ?>
+</div>
+
+<script>
+    // Se existir o modal de status, o fundo escuro aparece automaticamente
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('modalOverlay').style.display = 'block';
+    });
+</script>
+<?php endif; ?>
 
 <div class="hero">
     <button class="slider-btn prev" onclick="mudarSlide(-1)"><i class="fa fa-chevron-left"></i></button>
@@ -244,6 +274,7 @@ function fecharTodosModais() {
 
 function fecharStatus() {
     fecharTodosModais();
+    // Limpa a URL para não ficar a mostrar '?status=sucesso' toda vez que atualizar a página
     window.history.replaceState({}, document.title, "index.php"); 
 }
 
