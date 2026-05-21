@@ -1,6 +1,7 @@
 <?php
 // Conexão com a base de dados
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
 
 // Busca os filmes e suas receitas
 $sql = "

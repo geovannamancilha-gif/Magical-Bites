@@ -1,4 +1,4 @@
-- 1. PREPARAÇÃO DO AMBIENTE
+-- 1. PREPARAÇÃO DO AMBIENTE
 DROP DATABASE IF EXISTS magical_bites;
 CREATE DATABASE magical_bites;
 USE magical_bites;
@@ -76,14 +76,14 @@ INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao
 ('Cookies de Enrolados', 'DOCE', 3, 'Os biscoitos favoritos do Rapunzel e Pascal.', 'cookies_enrolados.png', 4.7, '40min', 'Fácil', 'Farinha;Açúcar;Gotas de chocolate;Manteiga', 'Misture a massa e asse a 180 graus.'),
 ('Beignet da Princesa e o Sapo', 'DOCE', 4, 'Os famosos beignets da Tiana de Nova Orleans.', 'beignet_princesa_sapo.png', 5.0, '1h', 'Média', 'Farinha;Fermento;Açúcar de confeiteiro;Óleo', 'Frite a massa e polvilhe muito açúcar!'),
 ('Biscoitos de Alice no País das Maravilhas', 'DOCE', 5, 'Biscoitos que vão te fazer crescer de sabor!', 'biscoitos_alice.png', 4.6, '45min', 'Média', 'Farinha;Manteiga;Açúcar;Glacê real', 'Corte, asse e decore com glacê.'),
-('Bolo de Lilo & Stitch', 'DOCE', 7, 'Bolo tropical com muito ohana.', 'placeholder.png', 5.0, '1h', 'Média', 'Farinha;Açúcar;Ovos;Abacaxi', 'Misture tudo e asse com muito amor.'),
-('Crisp de Frutas Vermelhas da Aurora', 'DOCE', 8, 'A sobremesa perfeita para um sono de beleza.', 'placeholder.png', 4.8, '40min', 'Fácil', 'Frutas vermelhas;Açúcar;Aveia', 'Asse até ficar crocante e dourado.'),
-('Mousse Crocante do Russell', 'DOCE', 9, 'A sobremesa de um verdadeiro explorador!', 'placeholder.png', 4.9, '30min', 'Fácil', 'Chocolate;Creme de leite;Biscoitos', 'Derreta o chocolate, misture e gele.'),
-('Mousse de Banana e Manga do Mogli', 'DOCE', 10, 'Somente o necessário para ser feliz.', 'placeholder.png', 4.7, '20min', 'Fácil', 'Banana;Manga;Iogurte', 'Bata no liquidificador e sirva gelado.'),
-('Palmiers da Minnie', 'DOCE', 11, 'Biscoitos doces em formato de orelhinhas.', 'placeholder.png', 4.9, '45min', 'Média', 'Massa folhada;Açúcar', 'Dobre em formato de orelhas e asse.'),
+('Bolo de Lilo & Stitch', 'DOCE', 7, 'Bolo tropical com muito ohana.', 'bolo_lilo.png', 5.0, '1h', 'Média', 'Farinha;Açúcar;Ovos;Abacaxi', 'Misture tudo e asse com muito amor.'),
+('Crisp de Frutas Vermelhas da Aurora', 'DOCE', 8, 'A sobremesa perfeita para um sono de beleza.', 'Crisp_de_Frutas.png', 4.8, '40min', 'Fácil', 'Frutas vermelhas;Açúcar;Aveia', 'Asse até ficar crocante e dourado.'),
+('Mousse Crocante do Russell', 'DOCE', 9, 'A sobremesa de um verdadeiro explorador!', 'mousse_de_chocolate.png', 4.9, '30min', 'Fácil', 'Chocolate;Creme de leite;Biscoitos', 'Derreta o chocolate, misture e gele.'),
+('Mousse de Banana e Manga do Mogli', 'DOCE', 10, 'Somente o necessário para ser feliz.', 'mousse_banana.png', 4.7, '20min', 'Fácil', 'Banana;Manga;Iogurte', 'Bata no liquidificador e sirva gelado.'),
+('Palmiers da Minnie', 'DOCE', 11, 'Biscoitos doces em formato de orelhinhas.', 'palmire_minnie.png', 4.9, '45min', 'Média', 'Massa folhada;Açúcar', 'Dobre em formato de orelhas e asse.'),
 ('As Trutas da Mérida', 'DOCE', 12, 'Massa doce em formato de peixe das terras escocesas.', 'placeholder.png', 4.6, '50min', 'Média', 'Massa doce;Recheio de maçã', 'Modele como peixes e asse até dourar.'),
 ('Os Palmiers da Clarabela', 'DOCE', 11, 'Biscoito folhado de açúcar tradicional.', 'placeholder.png', 4.5, '35min', 'Fácil', 'Massa folhada;Açúcar cristal', 'Enrole, corte e asse.'),
-('Madeleines do Pooh', 'DOCE', 13, 'Bolinhos franceses mergulhados no mel.', 'placeholder.png', 5.0, '30min', 'Média', 'Farinha;Ovos;Manteiga;Mel', 'Asse em forminhas especiais e regue com mel.');
+('Madeleines do Pooh', 'DOCE', 13, 'Bolinhos franceses mergulhados no mel.', 'ursinho_pu.png', 5.0, '30min', 'Média', 'Farinha;Ovos;Manteiga;Mel', 'Asse em forminhas especiais e regue com mel.');
 
 -- SALGADOS
 INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao, tempo_preparo, dificuldade, ingredientes, modo_preparo) VALUES
@@ -109,3 +109,5 @@ INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao
 -- BEBIDAS
 INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao, tempo_preparo, dificuldade, ingredientes, modo_preparo) VALUES
 ('Super Suco para dar Energia', 'BEBIDA', 24, 'Vitamina revigorante do Sr. Incrível.', 'placeholder.png', 5.0, '10min', 'Fácil', 'Laranja;Cenoura;Beterraba;Gelo', 'Bata tudo no liquidificador.');
+
+

@@ -1,6 +1,7 @@
 <?php
 // Conexão com a base de dados
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!"); // Ajuste a password se necessário
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", ""); // Ajuste a password se necessário
+//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!"); // Ajuste a password se necessário
 
 // BUSCAS DINÂMICAS: O poder da POO para trazer tudo do banco de uma vez!
 $stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
