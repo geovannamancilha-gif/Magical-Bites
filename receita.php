@@ -3,8 +3,13 @@
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
+<<<<<<< HEAD
 //$pass = 'Home@spSENAI2025!';     
 $pass = "";     
+=======
+//$pass = 'Home@spSENAI2025!';  
+$pass = ""; //quando trocar de sala, reativar a senha
+>>>>>>> 3c4b2e5550c53afbcbdb4dfdd724e812fb587651
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
