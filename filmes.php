@@ -1,6 +1,7 @@
 <?php
 // Conexão com a base de dados
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root");
+//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
 
 // Busca os filmes e suas receitas
 $sql = "
@@ -59,8 +60,8 @@ function obterTemaFilme($nomeFilme) {
         'Branca de Neve' => ['cor' => '#d62828', 'img' => 'brancadeneve.png'],
         'Frozen' => ['cor' => '#90e0ef', 'img' => 'frozen.png'],
         'Enrolados' => ['cor' => '#e0aaff', 'img' => 'enrolados.png'],
-        'A Princesa e o Sapo' => ['cor' => '#2a9d8f', 'img' => 'princesaesapo.png'],
-        'Alice no País das Maravilhas' => ['cor' => '#0077b6', 'img' => 'capa_alice.jpg'],
+        'A Princesa e o Sapo' => ['cor' => '#2a9d8f', 'img' => 'princesaeosapo.png'],
+        'Alice no País das Maravilhas' => ['cor' => '#0077b6', 'img' => 'alice.png'],
         'Ratatouille' => ['cor' => '#f77f00', 'img' => 'ratatouille.png'],
         'Lilo & Stitch' => ['cor' => '#0077b6', 'img' => 'stitch.png'],
         'A Bela Adormecida' => ['cor' => '#ff006e', 'img' => 'belaadormecida.png'],
@@ -68,7 +69,7 @@ function obterTemaFilme($nomeFilme) {
         // AQUI ESTÁ A ALTERAÇÃO: Nome exato da sua imagem para o UP!
         'Up: Altas Aventuras' => ['cor' => '#4ea8de', 'img' => 'UPfilme.png'],
         
-        'Mogli' => ['cor' => '#2d6a4f', 'img' => 'capa_mogli.jpg'],
+        'Mogli' => ['cor' => '#2d6a4f', 'img' => 'mogli.png'],
         'Turma do Mickey' => ['cor' => '#d00000', 'img' => 'minnie.png'],
         'Valente' => ['cor' => '#e85d04', 'img' => 'valente.png'],
         'Ursinho Pooh' => ['cor' => '#ffb703', 'img' => 'pooh.png'],
@@ -77,13 +78,13 @@ function obterTemaFilme($nomeFilme) {
         'A Dama e o Vagabundo' => ['cor' => '#780000', 'img' => 'damaevagabundo.png'],
         'Zootopia' => ['cor' => '#fb8500', 'img' => 'zootopia.png'],
         'Viva' => ['cor' => '#f48c06', 'img' => 'vivalavida.png'],
-        'Aristogatas' => ['cor' => '#ffb5a7', 'img' => 'capa_aristogatas.jpg'],
+        'Aristogatas' => ['cor' => '#ffb5a7', 'img' => 'aristogatas.png'],
         'Moana' => ['cor' => '#00f5d4', 'img' => 'moana.png'],
         'Pinóquio' => ['cor' => '#9c6644', 'img' => 'pinoquio.png'],
-        '101 Dálmatas' => ['cor' => '#343a40', 'img' => 'capa_dalmatas.jpg'],
+        '101 Dálmatas' => ['cor' => '#343a40', 'img' => '101dalmatas.png'],
         'Aladdin' => ['cor' => '#3c096c', 'img' => 'aladim.png'],
         'Os Incríveis' => ['cor' => '#e63946', 'img' => 'incriveis.png'],
-        'Mulan' => ['cor' => '#bc4749', 'img' => 'capa_mulan.jpg']
+        'Mulan' => ['cor' => '#bc4749', 'img' => 'mulan.webp']
     ];
 
     foreach ($temas as $chave => $dados) {
