@@ -2,10 +2,39 @@
 // Conexão com a base de dados
 $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
 //$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
-
 //$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root");
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
- 
+
+// ==========================================
+// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
+// ==========================================
+function buscarImagem($nomeImagem) {
+    if (empty($nomeImagem)) {
+        return "img/logo/logo_menu.png";
+    }
+
+    // Pastas onde as imagens podem estar organizadas
+    $pastas = ['pratos', 'filme', 'logo', 'slider'];
+    
+    // Extensões de imagem suportadas
+    $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
+
+    foreach ($pastas as $pasta) {
+        foreach ($extensoes as $ext) {
+            $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminhoCompleto)) {
+                return $caminhoCompleto;
+            }
+        }
+    }
+
+    // Se estiver solta direto na pasta img/
+    if (file_exists("img/" . $nomeImagem)) {
+        return "img/" . $nomeImagem;
+    }
+
+    // Retorno padrão caso não ache nada
+    return "img/logo/logo_menu.png";
+}
 
 // Busca os filmes e suas receitas
 $sql = "
@@ -69,10 +98,7 @@ function obterTemaFilme($nomeFilme) {
         'Ratatouille' => ['cor' => '#f77f00', 'img' => 'ratatouille.png'],
         'Lilo & Stitch' => ['cor' => '#0077b6', 'img' => 'stitch.png'],
         'A Bela Adormecida' => ['cor' => '#ff006e', 'img' => 'belaadormecida.png'],
-        
-        // AQUI ESTÁ A ALTERAÇÃO: Nome exato da sua imagem para o UP!
         'Up: Altas Aventuras' => ['cor' => '#4ea8de', 'img' => 'UPfilme.png'],
-        
         'Mogli' => ['cor' => '#2d6a4f', 'img' => 'mogli.png'],
         'Turma do Mickey' => ['cor' => '#d00000', 'img' => 'minnie.png'],
         'Valente' => ['cor' => '#e85d04', 'img' => 'valente.png'],
@@ -106,8 +132,7 @@ function obterTemaFilme($nomeFilme) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filmes | Magical Bites</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -200,7 +225,6 @@ function obterTemaFilme($nomeFilme) {
         margin-bottom: 20px;
     }
 
-    /* ESTILO PARA O BOX E A IMAGEM */
     .box-filme {
         position: relative;
         height: 180px;
@@ -269,7 +293,6 @@ function obterTemaFilme($nomeFilme) {
         backdrop-filter: blur(5px);
     }
 
-    /* MODAL */
     .modal-filme-overlay {
         display: none;
         position: fixed;
@@ -417,17 +440,9 @@ function obterTemaFilme($nomeFilme) {
         text-transform: uppercase;
     }
 
-    .doce {
-        background: #ff69b4;
-    }
-
-    .salgado {
-        background: #4CAF50;
-    }
-
-    .bebida {
-        background: #00bcd4;
-    }
+    .doce { background: #ff69b4; }
+    .salgado { background: #4CAF50; }
+    .bebida { background: #00bcd4; }
 
     .card p {
         padding: 0 15px 20px;
@@ -450,7 +465,7 @@ function obterTemaFilme($nomeFilme) {
 <body>
 
     <div class="navbar">
-        <div class="logo"><a href="index.php"><img src="logo_menu.png" alt="Magical Bites"></a></div>
+        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="index.php#containerReceitas">Receitas</a>
@@ -466,15 +481,15 @@ function obterTemaFilme($nomeFilme) {
 
     <div class="container">
         <?php 
-    $temFilmes = false;
-    foreach($categorias as $nomeCategoria => $filmesCategoria) {
-        if (!empty($filmesCategoria)) {
-            $temFilmes = true;
-            break;
+        $temFilmes = false;
+        foreach($categorias as $nomeCategoria => $filmesCategoria) {
+            if (!empty($filmesCategoria)) {
+                $temFilmes = true;
+                break;
+            }
         }
-    }
 
-    if(!$temFilmes): ?>
+        if(!$temFilmes): ?>
         <div class="estado-vazio">
             <i class="fa fa-film" style="font-size: 40px; color: #ccc; margin-bottom:15px; display:block;"></i>
             Nenhum filme com receitas cadastrado no momento.
@@ -488,13 +503,11 @@ function obterTemaFilme($nomeFilme) {
 
         <div class="grid-filmes">
             <?php foreach($filmesCategoria as $id => $filme): 
-                        $tema = obterTemaFilme($filme['nome_filme']);
-                    ?>
-            <div class="box-filme" style="--cor-tema: <?= $tema['cor'] ?>;"
-                onclick="abrirModalFilme('modal-filme-<?= $id ?>')">
+                $tema = obterTemaFilme($filme['nome_filme']);
+            ?>
+            <div class="box-filme" style="--cor-tema: <?= $tema['cor'] ?>;" onclick="abrirModalFilme('modal-filme-<?= $id ?>')">
 
-                <img src="<?= $tema['img'] ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>"
-                    class="img-capa-filme" onerror="this.style.opacity='0';">
+                <img src="<?= buscarImagem($tema['img']) ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>" class="img-capa-filme" onerror="this.style.opacity='0';">
 
                 <div class="box-overlay">
                     <h3><?= htmlspecialchars($filme['nome_filme']) ?></h3>
@@ -505,11 +518,9 @@ function obterTemaFilme($nomeFilme) {
             <div id="modal-filme-<?= $id ?>" class="modal-filme-overlay">
                 <div class="modal-filme-content">
                     <div class="modal-header" style="--cor-tema: <?= $tema['cor'] ?>;">
-                        <img src="<?= $tema['img'] ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>"
-                            onerror="this.style.opacity='0';">
+                        <img src="<?= buscarImagem($tema['img']) ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>" onerror="this.style.opacity='0';">
                         <div class="modal-header-overlay"></div>
-                        <button onclick="fecharModalFilme('modal-filme-<?= $id ?>', event)"
-                            class="btn-fechar">&times;</button>
+                        <button onclick="fecharModalFilme('modal-filme-<?= $id ?>', event)" class="btn-fechar">&times;</button>
                         <h2><?= htmlspecialchars($filme['nome_filme']) ?></h2>
                     </div>
 
@@ -517,9 +528,10 @@ function obterTemaFilme($nomeFilme) {
                         <div class="lista-receitas">
                             <?php foreach($filme['receitas'] as $r): ?>
                             <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
-                                <img src="<?= htmlspecialchars($r['imagem']) ?>" onerror="this.src='logo_menu.png'">
+                                <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='<?= buscarImagem('logo_menu.png') ?>'">
                                 <div class="tag <?= strtolower(htmlspecialchars($r['tipo'])) ?>">
-                                    <?= htmlspecialchars($r['tipo']) ?></div>
+                                    <?= htmlspecialchars($r['tipo']) ?>
+                                </div>
                                 <p><?= htmlspecialchars($r['nome_receita']) ?></p>
                             </a>
                             <?php endforeach; ?>
@@ -557,5 +569,4 @@ function obterTemaFilme($nomeFilme) {
     </script>
 
 </body>
-
 </html>

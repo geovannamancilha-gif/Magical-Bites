@@ -8,6 +8,37 @@ $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root",
 //$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root",""); // Ajuste a password se necessário
 
 
+// =========================================================================
+// FUNÇÃO AUTOMÁTICA QUE PROCURA A IMAGEM EM QUALQUER SUBPASTA DE IMG
+// =========================================================================
+function buscarImagem($nomeImagem) {
+    if (empty($nomeImagem)) {
+        return "img/logo/logo_menu.png";
+    }
+
+    $pastas = ['pratos', 'filme', 'logo', 'slider'];
+    $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
+
+    foreach ($pastas as $pasta) {
+        foreach ($extensoes as $ext) {
+            $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminhoCompleto)) {
+                return $caminhoCompleto;
+            }
+        }
+    }
+
+    // Se não achar nada, tenta ver se está na raiz da pasta img/
+    if (file_exists("img/" . $nomeImagem)) {
+        return "img/" . $nomeImagem;
+    }
+
+    // Imagem de segurança caso não exista em lugar nenhum
+    return "img/logo/logo_menu.png";
+}
+// =========================================================================
+
+
 // BUSCAS DINÂMICAS: O poder da POO para trazer tudo do banco de uma vez!
 $stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
 $receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
@@ -480,7 +511,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
 <body>
 
     <div class="navbar">
-        <div class="logo"><img src="logo_menu.png" alt="Magical Bites"></div>
+        <div class="logo"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="#containerReceitas">Receitas</a>
@@ -494,7 +525,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
 
     <div id="modalCadastro" class="card-flutuante">
         <div class="card-header">
-            <img src="logo.png" style="width: 100px;">
+            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
             <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
         </div>
         <h2 style="color:#1f4396">Crie a sua conta</h2>
@@ -513,7 +544,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
 
     <div id="modalLogin" class="card-flutuante">
         <div class="card-header">
-            <img src="logo.png" style="width: 100px;">
+            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
             <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
         </div>
         <h2 style="color:#1f4396">Bem-vindo!</h2>
@@ -538,7 +569,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <div class="status-icon" style="color: #4CAF50;">✅</div>
         <h2 style="color:#1f4396; text-align:center;">Sucesso!</h2>
         <p style="font-size:15px; color:#666; text-align:center; margin-bottom:20px;">
-            A sua conta foi criada com magia!<br>Faça login para continuar.
+            A sua conta foi criada com magia!<br>Faça login para continuing.
         </p>
         <button class="btn-acao" onclick="fecharStatus(); alternarModais('login');">Fazer Login</button>
 
@@ -588,7 +619,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <div class="lista">
             <?php foreach($receitasDoces as $r): ?>
             <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
-                <img src="<?= htmlspecialchars($r['imagem']) ?>" onerror="this.src='logo_menu.png'">
+                <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                 <div class="tag doce"><?= htmlspecialchars($r['tipo']) ?></div>
                 <p><?= htmlspecialchars($r['nome_receita']) ?></p>
             </a>
@@ -599,7 +630,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <div class="lista">
             <?php foreach($receitasSalgados as $r): ?>
             <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
-                <img src="<?= htmlspecialchars($r['imagem']) ?>" onerror="this.src='logo_menu.png'">
+                <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                 <div class="tag salgado"><?= htmlspecialchars($r['tipo']) ?></div>
                 <p><?= htmlspecialchars($r['nome_receita']) ?></p>
             </a>
@@ -611,7 +642,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <div class="lista">
             <?php foreach($receitasBebidas as $r): ?>
             <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
-                <img src="<?= htmlspecialchars($r['imagem']) ?>" onerror="this.src='logo_menu.png'">
+                <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                 <div class="tag bebida"><?= htmlspecialchars($r['tipo']) ?></div>
                 <p><?= htmlspecialchars($r['nome_receita']) ?></p>
             </a>
@@ -656,9 +687,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         if (document.getElementById('modalStatus')) document.getElementById('modalStatus').style.display = 'none';
     }
 
+    // Limpa a URL para não ficar a mostrar '?status=sucesso' toda vez que atualizar a página
     function fecharStatus() {
         fecharTodosModais();
-        // Limpa a URL para não ficar a mostrar '?status=sucesso' toda vez que atualizar a página
         window.history.replaceState({}, document.title, "index.php");
     }
 
@@ -672,7 +703,12 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     // --- CONTROLO DO SLIDER ---
     const hero = document.querySelector(".hero");
     const dots = document.querySelectorAll(".dot");
-    const banners = ["cookies_banner.png", "beignet_banner.png"];
+    
+    // Ajustado caminhos dos banners do JavaScript para usar também a função dinâmica em segundo plano
+    const banners = [
+        "<?= buscarImagem('cookies_banner.png') ?>", 
+        "<?= buscarImagem('beignet_banner.png') ?>"
+    ];
     let idx = 0;
     let tempoSlider;
 
