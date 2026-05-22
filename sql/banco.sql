@@ -235,3 +235,15 @@ INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao
 
 ('Smoothie de Cenoura do Diego', 'BEBIDA', 29, 'Smoothie alaranjado e vibrante com sabor refrescante de frutas e cenoura.', 'smoothie_cenoura_diego.png', 4.7, '10min', 'Fácil', 'Suco de 1/2 limão; 1 cenoura média picada; 200ml de suco de maçã; 170g de iogurte de baunilha; 1 xícara de lascas de gelo.', '1. Coloque no liquidificador o suco de limão, cenoura, suco de maçã, iogurte e gelo. 2. Bata por 1-2 minutos até obter uma mistura cremosa. 3. Coe se preferir mais liso e sirva decorado com fatias finas de maçã e cenoura.');
 
+-- =======================================================
+-- 1. ADICIONANDO O FILME HÉRCULES
+-- =======================================================
+INSERT INTO filme (id_filme, nome_filme) VALUES 
+(37, 'Hércules');
+
+-- =======================================================
+-- 2. INSERINDO A NOVA RECEITA
+-- =======================================================
+INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao, tempo_preparo, dificuldade, ingredientes, modo_preparo) VALUES
+
+('Copinhos de Salada de Frango Defumado', 'SALGADO', 37, 'Copinhos refrescantes de alface romana com salada cremosa de frango defumado e amêndoas, dignos do Olimpo.', 'copinhos _de_salada', 4.9, '20min', 'Fácil', '2 xícaras de peito de frango assado e desfiado; 3 colheres (sopa) de maionese; 1 talo de aipo cortado em fatias finas; 2 colheres (sopa) de cebolinho picado; 1/2 pimentão vermelho assado e picado; 1/4 de xícara de amêndoas defumadas picadas; 1 colher (chá) de páprica defumada; Sal e Pimenta-do-reino; 8 folhas inteiras de alface romana.', '1. Em uma tigela grande, misture o frango desfiado, a maionese, o aipo, o cebolinho e o pimentão assado. 2. Acrescente as amêndoas defumadas e a páprica defumada. 3. Tempere com sal e pimenta a gosto e misture bem até incorporar todos os ingredientes. 4. Lave e seque cuidadosamente as folhas de alface romana. 5. Coloque porções da salada dentro das folhas, formando pequenos copinhos. 6. Finalize com cebolinho extra, amêndoas picadas e uma leve pitada de páprica defumada. Sirva gelado.');
