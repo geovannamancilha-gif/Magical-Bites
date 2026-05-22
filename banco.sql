@@ -87,27 +87,25 @@ INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao
 
 -- SALGADOS
 INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao, tempo_preparo, dificuldade, ingredientes, modo_preparo) VALUES
-('Ratatouille', 'SALGADO', 6, 'O clássico prato camponês que derreteu o coração do crítico.', 'ratatouille.png', 5.0, '1h 30min', 'Difícil', 'Berinjela;Abobrinha;Tomate;Molho de tomate;Ervas', 'Corte em rodelas finas, monte e asse.'),
+('Ratatouille', 'SALGADO', 6, 'O clássico prato camponês que derreteu o coração do crítico.', 'beringela_ratatouille.png', 5.0, '1h 30min', 'Difícil', 'Berinjela;Abobrinha;Tomate;Molho de tomate;Ervas', 'Corte em rodelas finas, monte e asse.'),
 ('Arepas con queso de Encanto', 'SALGADO', 14, 'Arepas curativas feitas com amor pela Julieta Madrigal.', 'arepas_encanto.png', 4.9, '30min', 'Fácil', 'Farinha de milho;Água;Sal;Queijo', 'Faça a massa, recheie com queijo e grelhe.'),
 ('Macarrão ao molho pesto de Luca', 'SALGADO', 15, 'Trenette al pesto, perfeito para um dia em Portorosso.', 'macarrao_pesto_luca.png', 4.8, '25min', 'Fácil', 'Macarrão Trenette;Manjericão;Alho;Parmesão;Azeite;Batata', 'Faça o molho pesto, cozinhe a massa e misture tudo.'),
 ('Espaguete com Almôndegas da Dama e o Vagabundo', 'SALGADO', 16, 'O prato mais romântico da Itália canina.', 'espaguete_almondegas.png', 4.9, '50min', 'Média', 'Espaguete;Carne moída;Molho de tomate;Temperos', 'Faça as almôndegas, cozinhe no molho e sirva sobre a massa.'),
-('Cenouras com Molho de Laranja da Judy Hopps', 'SALGADO', 17, 'Rápido e prático para policiais de Zootopia.', 'placeholder.png', 4.8, '20min', 'Fácil', 'Cenoura;Suco de laranja;Mel;Manteiga', 'Cozinhe as cenouras e glaceie no molho.'),
-('Beringelas Recheadas à Ratatouille', 'SALGADO', 6, 'Uma variação vegetariana do prato do Remy.', 'placeholder.png', 4.9, '50min', 'Média', 'Beringela;Tomate;Queijo;Ervas', 'Asse as beringelas recheadas no forno.'),
-('Chorizo Refogado do Hector', 'SALGADO', 18, 'Um aperitivo que vai te fazer lembrar de mim.', 'placeholder.png', 4.8, '25min', 'Fácil', 'Chorizo;Cebola;Pimentão', 'Frite o chorizo com os legumes.'),
-('Cogumelos Recheados do Pateta', 'SALGADO', 11, 'Um aperitivo delicioso e divertido.', 'placeholder.png', 4.5, '30min', 'Média', 'Cogumelos grandes;Queijo;Alho', 'Recheie e asse até gratinar.'),
-('Jantar Leve da Duquesa', 'SALGADO', 19, 'Uma terrine de atum elegante para gatos da alta sociedade.', 'placeholder.png', 4.7, '40min', 'Média', 'Atum;Creme de ricota;Temperos', 'Misture tudo e sirva com torradas.'),
-('Sopa da Floresta do Dunga', 'SALGADO', 1, 'Caldo quentinho perfeito para depois do trabalho.', 'placeholder.png', 4.6, '1h', 'Fácil', 'Legumes variados;Batata;Caldo de carne', 'Cozinhe tudo na panela de pressão.'),
-('Peixe à Tropical da Moana', 'SALGADO', 20, 'Ceviche marinado com o frescor do oceano.', 'placeholder.png', 5.0, '20min', 'Média', 'Peixe branco fresco;Limão;Cebola roxa;Coentro', 'Marine o peixe no limão e sirva fresco.'),
-('Saltimboccas do Pinóquio', 'SALGADO', 21, 'Prato italiano de verdade para um menino de verdade.', 'placeholder.png', 4.9, '35min', 'Média', 'Bife fino;Presunto;Queijo;Sálvia', 'Enrole a carne com os frios e frite na manteiga.'),
-('Petiscos do Pongo', 'SALGADO', 22, 'Rolinhos de carne moída irresistíveis.', 'placeholder.png', 4.8, '45min', 'Fácil', 'Carne moída;Temperos;Massa de pastel', 'Modele, asse e sirva para os 101.'),
-('A Caçarola do Patinho Fofinho', 'SALGADO', 3, 'Prato rústico direto da taverna.', 'placeholder.png', 4.7, '1h 20min', 'Difícil', 'Carne;Batata;Cenoura;Caldo', 'Asse lentamente na caçarola de ferro.'),
-('Enroladinhos de Tapete Mágico', 'SALGADO', 23, 'Aperitivos das arábias com a Princesa Jasmine.', 'placeholder.png', 4.8, '30min', 'Fácil', 'Massa de wrap;Frango desfiado;Queijo', 'Recheie, enrole e toste na frigideira.'),
-('Super Bife da Família Parr', 'SALGADO', 24, 'Apenas para super-heróis com muita fome.', 'placeholder.png', 5.0, '25min', 'Fácil', 'Bife Ancho;Sal grosso;Manteiga', 'Grelhe em fogo alto até o ponto desejado.'),
-('Chips Crocantes da Mulan', 'SALGADO', 25, 'Lanchinho rápido para quem vai salvar o dia.', 'placeholder.png', 4.6, '20min', 'Fácil', 'Batata doce;Azeite;Páprica', 'Corte fino e asse até ficar super crocante.'),
-('Espaguete dos Aristogatas', 'SALGADO', 19, 'Macarrão com muito queijo, monsieur.', 'placeholder.png', 4.9, '30min', 'Fácil', 'Espaguete;Creme de leite;Queijo gruyère', 'Cozinhe a massa e envolva no creme de queijo.');
+('Cenouras com Molho de Laranja da Judy Hopps', 'SALGADO', 17, 'Rápido e prático para policiais de Zootopia.', 'cenoura_zootopia.png', 4.8, '20min', 'Fácil', 'Cenoura;Suco de laranja;Mel;Manteiga', 'Cozinhe as cenouras e glaceie no molho.'),
+('Beringelas Recheadas à Ratatouille', 'SALGADO', 6, 'Uma variação vegetariana do prato do Remy.', 'beringela_ratatouille.png', 4.9, '50min', 'Média', 'Beringela;Tomate;Queijo;Ervas', 'Asse as beringelas recheadas no forno.'),
+('Chorizo Refogado do Hector', 'SALGADO', 18, 'Um aperitivo que vai te fazer lembrar de mim.', 'chorizo_hector.png', 4.8, '25min', 'Fácil', 'Chorizo;Cebola;Pimentão', 'Frite o chorizo com os legumes.'),
+('Cogumelos Recheados do Pateta', 'SALGADO', 11, 'Um aperitivo delicioso e divertido.', 'cogumelo_pateta.png', 4.5, '30min', 'Média', 'Cogumelos grandes;Queijo;Alho', 'Recheie e asse até gratinar.'),
+('Jantar Leve da Duquesa', 'SALGADO', 19, 'Uma terrine de atum elegante para gatos da alta sociedade.', 'terrineatum_duquesa.png', 4.7, '40min', 'Média', 'Atum;Creme de ricota;Temperos', 'Misture tudo e sirva com torradas.'),
+('Sopa da Floresta do Dunga', 'SALGADO', 1, 'Caldo quentinho perfeito para depois do trabalho.', 'sopa_floresta.png', 4.6, '1h', 'Fácil', 'Legumes variados;Batata;Caldo de carne', 'Cozinhe tudo na panela de pressão.'),
+('Peixe à Tropical da Moana', 'SALGADO', 20, 'Ceviche marinado com o frescor do oceano.', 'peixe_moana.png', 5.0, '20min', 'Média', 'Peixe branco fresco;Limão;Cebola roxa;Coentro', 'Marine o peixe no limão e sirva fresco.'),
+('Saltimboccas do Pinóquio', 'SALGADO', 21, 'Prato italiano de verdade para um menino de verdade.', 'saltimboccas_pinoquio.png', 4.9, '35min', 'Média', 'Bife fino;Presunto;Queijo;Sálvia', 'Enrole a carne com os frios e frite na manteiga.'),
+('Petiscos do Pongo', 'SALGADO', 22, 'Rolinhos de carne moída irresistíveis.', 'petisco_pongo.png', 4.8, '45min', 'Fácil', 'Carne moída;Temperos;Massa de pastel', 'Modele, asse e sirva para os 101.'),
+('A Caçarola do Patinho Fofinho', 'SALGADO', 3, 'Prato rústico direto da taverna.', 'cassarola_enrolados.png', 4.7, '1h 20min', 'Difícil', 'Carne;Batata;Cenoura;Caldo', 'Asse lentamente na caçarola de ferro.'),
+('Enroladinhos de Tapete Mágico', 'SALGADO', 23, 'Aperitivos das arábias com a Princesa Jasmine.', 'tapetes_magicos.png', 4.8, '30min', 'Fácil', 'Massa de wrap;Frango desfiado;Queijo', 'Recheie, enrole e toste na frigideira.'),
+('Super Bife da Família Parr', 'SALGADO', 24, 'Apenas para super-heróis com muita fome.', 'super_bife.png', 5.0, '25min', 'Fácil', 'Bife Ancho;Sal grosso;Manteiga', 'Grelhe em fogo alto até o ponto desejado.'),
+('Chips Crocantes da Mulan', 'SALGADO', 25, 'Lanchinho rápido para quem vai salvar o dia.', 'chips_mulan.png', 4.6, '20min', 'Fácil', 'Batata doce;Azeite;Páprica', 'Corte fino e asse até ficar super crocante.'),
+('Espaguete dos Aristogatas', 'SALGADO', 19, 'Macarrão com muito queijo, monsieur.', 'espaguetes_aristogatas.png', 4.9, '30min', 'Fácil', 'Espaguete;Creme de leite;Queijo gruyère', 'Cozinhe a massa e envolva no creme de queijo.');
 
 -- BEBIDAS
 INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao, tempo_preparo, dificuldade, ingredientes, modo_preparo) VALUES
-('Super Suco para dar Energia', 'BEBIDA', 24, 'Vitamina revigorante do Sr. Incrível.', 'placeholder.png', 5.0, '10min', 'Fácil', 'Laranja;Cenoura;Beterraba;Gelo', 'Bata tudo no liquidificador.');
-
-
+('Super Suco para dar Energia', 'BEBIDA', 24, 'Vitamina revigorante do Sr. Incrível.', 'suco_energia.png', 5.0, '10min', 'Fácil', 'Laranja;Cenoura;Beterraba;Gelo', 'Bata tudo no liquidificador.');
