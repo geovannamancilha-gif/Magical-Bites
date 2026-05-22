@@ -31,6 +31,12 @@ try {
         $classe_tag = 'tag-bebida'; // Azul
     }
 
+    // NOVA LÓGICA: Buscar outras receitas doces para o bloco inferior (limite de 4)
+    $stmtDoces = $pdo->prepare("SELECT * FROM receitas WHERE tipo = 'DOCE' AND id_receita != :id LIMIT 4");
+    $stmtDoces->bindParam(':id', $id_receita, PDO::PARAM_INT);
+    $stmtDoces->execute();
+    $receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
+
 } catch(PDOException $e) {
     die("Erro na conexão com a base de dados: " . $e->getMessage());
 }
@@ -47,264 +53,323 @@ try {
         rel="stylesheet">
 
     <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-        background: #3d4f8f;
-        color: white;
-    }
-
-    .navbar {
-        width: 100%;
-        background: #1f4396;
-        padding: 8px 25px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-
-    .logo img {
-        height: 60px;
-        width: auto;
-        margin-top: 1px;
-    }
-
-    .menu {
-        display: flex;
-        align-items: center;
-        gap: 35px;
-    }
-
-    .menu a {
-        color: white;
-        text-decoration: none;
-        font-size: 15px;
-        font-weight: 500;
-        transition: 0.3s;
-        cursor: pointer;
-    }
-
-    .menu a:hover {
-        color: #ffe45c;
-    }
-
-    .container {
-        width: 88%;
-        margin: 45px auto;
-    }
-
-    .receita-card {
-        background: white;
-        border-radius: 28px;
-        overflow: hidden;
-        display: grid;
-        grid-template-columns: 1.1fr 1fr;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-    }
-
-    .imagem img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .conteudo {
-        padding: 40px;
-        color: #1f1f1f;
-    }
-
-    .voltar-topo {
-        display: inline-block;
-        margin-bottom: 22px;
-        text-decoration: none;
-        color: #5a5a5a;
-        font-weight: 600;
-        transition: 0.3s;
-    }
-
-    .voltar-topo:hover {
-        color: #2d4fd7;
-    }
-
-    .titulo {
-        font-size: 42px;
-        line-height: 1.1;
-        margin-bottom: 15px;
-        color: #171717;
-    }
-
-    /* ESTILOS DINÂMICOS DAS TAGS */
-    .tag {
-        width: fit-content;
-        padding: 7px 16px;
-        border-radius: 20px;
-        color: white;
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 25px;
-        letter-spacing: 0.5px;
-    }
-
-    .tag-doce {
-        background: #ff69b4;
-    }
-
-    .tag-salgado {
-        background: #4CAF50;
-    }
-
-    .tag-bebida {
-        background: #00bcd4;
-    }
-
-    .descricao {
-        color: #666;
-        line-height: 1.7;
-        margin-bottom: 28px;
-    }
-
-    .info {
-        display: flex;
-        gap: 18px;
-        flex-wrap: wrap;
-        margin-bottom: 30px;
-    }
-
-    .info span {
-        background: #f3f3f3;
-        padding: 10px 15px;
-        border-radius: 14px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #444;
-    }
-
-    .abas {
-        display: flex;
-        gap: 25px;
-        margin-bottom: 25px;
-        border-bottom: 2px solid #ececec;
-        padding-bottom: 14px;
-    }
-
-    .abas div {
-        font-weight: 600;
-        color: #777;
-        cursor: pointer;
-        transition: 0.3s;
-    }
-
-    .abas div:hover {
-        color: #ff69b4;
-    }
-
-    .abas .ativa {
-        color: #ff69b4;
-        border-bottom: 3px solid #ff69b4;
-        padding-bottom: 10px;
-    }
-
-    .conteudo-aba {
-        display: none;
-        animation: fadeIn 0.4s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(5px);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        body {
+            background: #3d4f8f;
+            color: white;
         }
-    }
 
-    h2 {
-        color: #2d4fd7;
-        margin-bottom: 16px;
-        font-size: 24px;
-    }
+        .navbar {
+            width: 100%;
+            background: #1f4396;
+            padding: 8px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-    ul {
-        margin-left: 20px;
-        margin-bottom: 30px;
-    }
+        .logo img {
+            height: 60px;
+            width: auto;
+            margin-top: 1px;
+        }
 
-    li {
-        margin-bottom: 12px;
-        line-height: 1.6;
-        color: #444;
-    }
+        .menu {
+            display: flex;
+            align-items: center;
+            gap: 35px;
+        }
 
-    .preparo {
-        line-height: 1.9;
-        color: #444;
-    }
+        .menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.3s;
+            cursor: pointer;
+        }
 
-    .botao {
-        display: inline-block;
-        margin-top: 35px;
-        padding: 14px 24px;
-        border-radius: 18px;
-        background: #ff69b4;
-        color: white;
-        text-decoration: none;
-        font-weight: 700;
-        transition: 0.3s;
-    }
+        .menu a:hover {
+            color: #ffe45c;
+        }
 
-    .botao:hover {
-        background: #ff4fa6;
-        transform: translateY(-2px);
-    }
+        .container {
+            width: 88%;
+            margin: 45px auto;
+        }
 
-    @media(max-width:950px) {
         .receita-card {
-            grid-template-columns: 1fr;
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
         }
 
         .imagem img {
-            height: 320px;
-        }
-
-        .titulo {
-            font-size: 34px;
-        }
-    }
-
-    @media(max-width:700px) {
-        .container {
-            width: 92%;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .conteudo {
-            padding: 28px;
+            padding: 40px;
+            color: #1f1f1f;
+        }
+
+        .voltar-topo {
+            display: inline-block;
+            margin-bottom: 22px;
+            text-decoration: none;
+            color: #5a5a5a;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .voltar-topo:hover {
+            color: #2d4fd7;
         }
 
         .titulo {
-            font-size: 28px;
+            font-size: 42px;
+            line-height: 1.1;
+            margin-bottom: 15px;
+            color: #171717;
         }
 
-        .abas {
-            gap: 15px;
-            font-size: 14px;
+        /* ESTILOS DINÂMICOS DAS TAGS */
+        .tag {
+            width: fit-content;
+            padding: 7px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-doce {
+            background: #ff69b4;
+        }
+
+        .tag-salgado {
+            background: #4CAF50;
+        }
+
+        .tag-bebida {
+            background: #00bcd4;
+        }
+
+        .descricao {
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 28px;
         }
 
         .info {
-            flex-direction: column;
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
         }
-    }
+
+        .info span {
+            background: #f3f3f3;
+            padding: 10px 15px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .abas {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #ececec;
+            padding-bottom: 14px;
+        }
+
+        .abas div {
+            font-weight: 600;
+            color: #777;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .abas div:hover {
+            color: #ff69b4;
+        }
+
+        .abas .ativa {
+            color: #ff69b4;
+            border-bottom: 3px solid #ff69b4;
+            padding-bottom: 10px;
+        }
+
+        .conteudo-aba {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #2d4fd7;
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-bottom: 30px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        .preparo {
+            line-height: 1.9;
+            color: #444;
+        }
+
+        .botao {
+            display: inline-block;
+            margin-top: 35px;
+            padding: 14px 24px;
+            border-radius: 18px;
+            background: #ff69b4;
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .botao:hover {
+            background: #ff4fa6;
+            transform: translateY(-2px);
+        }
+
+        /* ESTILOS PARA AS RECEITAS DOCES RELACIONADAS */
+        .secao-doces {
+            margin-top: 50px;
+        }
+
+        .secao-doces h2 {
+            color: white;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .grid-doces {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            text-decoration: none;
+            color: #1f1f1f;
+            width: 220px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 15px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            font-weight: 600;
+            text-align: center;
+            padding: 0 10px;
+            font-size: 15px;
+        }
+
+        .card .tag {
+            margin-bottom: 10px;
+            font-size: 10px;
+            padding: 4px 12px;
+        }
+
+        @media(max-width:950px) {
+            .receita-card {
+                grid-template-columns: 1fr;
+            }
+
+            .imagem img {
+                height: 320px;
+            }
+
+            .titulo {
+                font-size: 34px;
+            }
+        }
+
+        @media(max-width:700px) {
+            .container {
+                width: 92%;
+            }
+
+            .conteudo {
+                padding: 28px;
+            }
+
+            .titulo {
+                font-size: 28px;
+            }
+
+            .abas {
+                gap: 15px;
+                font-size: 14px;
+            }
+
+            .info {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 
@@ -312,7 +377,7 @@ try {
 
     <div class="navbar">
         <div class="logo">
-            <a href="index.php"><img src="logo_menu.png" alt="Magical Bites"></a>
+            <a href="index.php"><img src="img/logo/logo_menu.png" alt="Magical Bites"></a>
         </div>
         <div class="menu">
             <a href="index.php">Início</a>
@@ -327,8 +392,8 @@ try {
         <div class="receita-card">
 
             <div class="imagem">
-                <img src="<?= htmlspecialchars($receita['imagem']) ?>"
-                    alt="<?= htmlspecialchars($receita['nome_receita']) ?>" onerror="this.src='logo_menu.png'">
+                <img src="img/pratos/<?= htmlspecialchars($receita['imagem']) ?>"
+                    alt="<?= htmlspecialchars($receita['nome_receita']) ?>" onerror="this.src='img/logo/logo_menu.png'">
             </div>
 
             <div class="conteudo">
@@ -382,6 +447,22 @@ try {
 
             </div>
         </div>
+
+        <?php if (!empty($receitasDoces)): ?>
+        <div class="secao-doces">
+            <h2>Mais Receitas Doces</h2>
+            <div class="grid-doces">
+                <?php foreach($receitasDoces as $r): ?>
+                <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
+                    <img src="img/pratos/<?= htmlspecialchars($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
+                    <div class="tag tag-doce"><?= htmlspecialchars($r['tipo']) ?></div>
+                    <p><?= htmlspecialchars($r['nome_receita']) ?></p>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
     </div>
 
     <script>
