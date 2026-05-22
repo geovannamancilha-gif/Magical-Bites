@@ -124,6 +124,10 @@ function obterTemaFilme($nomeFilme) {
     }
     return ['cor' => '#1f4396', 'img' => 'capa_default.jpg']; 
 }
+
+// Lógica trazida do index para detetar retornos de registo ou login
+$status = isset($_GET['status']) ? $_GET['status'] : "";
+$erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET['msg'] : "");
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -181,11 +185,18 @@ function obterTemaFilme($nomeFilme) {
         font-weight: 500;
         transition: 0.3s;
         cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
     .menu a:hover,
     .menu a.ativo {
         color: #ffe45c;
+    }
+
+    .menu a i {
+        font-size: 16px;
     }
 
     .header-filmes {
@@ -293,6 +304,7 @@ function obterTemaFilme($nomeFilme) {
         backdrop-filter: blur(5px);
     }
 
+    /* --- LAYOUT DO MODAL DE DETALHES DO FILME --- */
     .modal-filme-overlay {
         display: none;
         position: fixed;
@@ -369,7 +381,8 @@ function obterTemaFilme($nomeFilme) {
         text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
     }
 
-    .btn-fechar {
+    /* Isolando o botão fechar do modal de filme para não quebrar */
+    .modal-filme-content .btn-fechar {
         position: absolute;
         top: 20px;
         right: 20px;
@@ -388,7 +401,7 @@ function obterTemaFilme($nomeFilme) {
         justify-content: center;
     }
 
-    .btn-fechar:hover {
+    .modal-filme-content .btn-fechar:hover {
         background: white;
         color: black;
         transform: scale(1.1);
@@ -459,6 +472,120 @@ function obterTemaFilme($nomeFilme) {
         font-size: 18px;
         width: 100%;
     }
+
+    /* --- ESTILOS DOS MODAIS FLUTUANTES (LOGIN/CADASTRO DO INDEX) --- */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+    }
+
+    .card-flutuante {
+        display: none;
+        position: fixed;
+        top: 85px;
+        right: 25px;
+        width: 360px;
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+        z-index: 1000;
+        color: #333;
+        animation: fadeInSlide 0.3s ease-out;
+    }
+
+    @keyframes fadeInSlide {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    /* Isolando o fechar do login */
+    .card-flutuante .btn-fechar {
+        background: none;
+        border: none;
+        font-size: 26px;
+        cursor: pointer;
+        color: #999;
+    }
+
+    .input-group-modal {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    .input-group-modal i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #1f4396;
+    }
+
+    .input-group-modal input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        outline: none;
+    }
+
+    .btn-acao {
+        width: 100%;
+        padding: 14px;
+        background: #1f4396;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+
+    .btn-acao:hover {
+        background: #162f6b;
+        transform: scale(1.02);
+    }
+
+    .status-icon {
+        font-size: 50px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .footer-modal {
+        margin-top: 20px;
+        font-size: 13px;
+        text-align: center;
+        color: #666;
+    }
+
+    .footer-modal a {
+        color: #1f4396;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
     </style>
 </head>
 
@@ -471,9 +598,73 @@ function obterTemaFilme($nomeFilme) {
             <a href="index.php#containerReceitas">Receitas</a>
             <a href="#">Favoritos</a>
             <a href="filmes.php" class="ativo">Filmes</a>
+            <a href="javascript:void(0)" onclick="alternarModais('login')"><i class="fa-solid fa-user"></i> Perfil</a>
         </div>
     </div>
 
+    <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
+
+    <div id="modalCadastro" class="card-flutuante">
+        <div class="card-header">
+            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
+            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+        </div>
+        <h2 style="color:#1f4396">Crie a sua conta</h2>
+        <p style="font-size:14px; color:#666; margin-bottom:20px">Junte-se à nossa comunidade!</p>
+        <form action="cadastrar.php" method="POST">
+            <div class="input-group-modal"><i class="fa fa-user"></i><input type="text" name="nome" placeholder="Nome completo" required></div>
+            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
+            <button type="submit" class="btn-acao">Registar</button>
+        </form>
+        <div class="footer-modal">Já tem conta? <a onclick="alternarModais('login')">Faça login</a></div>
+    </div>
+
+    <div id="modalLogin" class="card-flutuante">
+        <div class="card-header">
+            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
+            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+        </div>
+        <h2 style="color:#1f4396">Bem-vindo!</h2>
+        <p style="font-size:14px; color:#666; margin-bottom:20px">Acesse sua conta mágica.</p>
+        <form action="index.php" method="POST">
+            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
+            <button type="submit" class="btn-acao">Entrar</button>
+        </form>
+        <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
+    </div>
+
+    <?php if ($status != ""): ?>
+    <div id="modalStatus" class="card-flutuante" style="display: block; z-index: 1001;">
+        <div class="card-header">
+            <button class="btn-fechar" onclick="fecharStatus()">&times;</button>
+        </div>
+
+        <?php if ($status == 'sucesso'): ?>
+        <div class="status-icon" style="color: #4CAF50;">✅</div>
+        <h2 style="color:#1f4396; text-align:center;">Sucesso!</h2>
+        <p style="font-size:15px; color:#666; text-align:center; margin-bottom:20px;">
+            A sua conta foi criada com magia!<br>Faça login para continuar.
+        </p>
+        <button class="btn-acao" onclick="fecharStatus(); alternarModais('login');">Fazer Login</button>
+
+        <?php elseif ($status == 'erro'): ?>
+        <div class="status-icon" style="color: #f44336;">❌</div>
+        <h2 style="color:#1f4396; text-align:center;">Oops!</h2>
+        <p style="font-size:15px; color:#666; text-align:center; margin-bottom:20px;">
+            <?= htmlspecialchars($erro_msg) ?>
+        </p>
+        <button class="btn-acao" onclick="fecharStatus(); alternarModais('cadastro');">Tentar Novamente</button>
+        <?php endif; ?>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('modalOverlay').style.display = 'block';
+    });
+    </script>
+    <?php endif; ?>
     <div class="header-filmes">
         <h1>Escolha o seu Universo</h1>
         <p>Selecione um filme e descubra todas as receitas mágicas dele!</p>
@@ -549,6 +740,7 @@ function obterTemaFilme($nomeFilme) {
     </div>
 
     <script>
+    // --- CONTROLO DOS MODAIS DE DETALHES DE FILMES ---
     function abrirModalFilme(idModal) {
         document.getElementById(idModal).classList.add('ativo');
         document.body.style.overflow = 'hidden';
@@ -560,6 +752,27 @@ function obterTemaFilme($nomeFilme) {
         document.body.style.overflow = 'auto';
     }
 
+    // --- CONTROLO DOS MODAIS FLUTUANTES (LOGIN / CADASTRO) ---
+    function fecharTodosModais() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('modalCadastro').style.display = 'none';
+        document.getElementById('modalLogin').style.display = 'none';
+        if (document.getElementById('modalStatus')) document.getElementById('modalStatus').style.display = 'none';
+    }
+
+    function fecharStatus() {
+        fecharTodosModais();
+        window.history.replaceState({}, document.title, "filmes.php");
+    }
+
+    function alternarModais(tipo) {
+        fecharTodosModais();
+        document.getElementById('modalOverlay').style.display = 'block';
+        if (tipo === 'cadastro') document.getElementById('modalCadastro').style.display = 'block';
+        if (tipo === 'login') document.getElementById('modalLogin').style.display = 'block';
+    }
+
+    // Gerenciador de cliques globais na janela
     window.onclick = function(event) {
         if (event.target.classList.contains('modal-filme-overlay')) {
             event.target.classList.remove('ativo');
