@@ -1,45 +1,117 @@
 <?php
+session_start();
+
 // Conexão com a base de dados
-
-//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", ""); // Ajuste a password se necessário
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!"); // Ajuste a password se necessário
-
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
-//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root",""); // Ajuste a password se necessário
+try {
+    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Erro na conexão: " . $e->getMessage());
+}
 
 
 // =========================================================================
-// FUNÇÃO AUTOMÁTICA QUE PROCURA A IMAGEM EM QUALQUER SUBPASTA DE IMG
+// 1. PROCESSAMENTO DO LOGIN
 // =========================================================================
-function buscarImagem($nomeImagem) {
-    if (empty($nomeImagem)) {
-        return "img/logo/logo_menu.png";
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_POST['senha']) && !isset($_POST['acao'])) {
+    $email = trim($_POST['email']);
+    $senha = trim($_POST['senha']);
+
+    $stmtUser = $pdo->prepare("SELECT * FROM usuario WHERE email = :email");
+    $stmtUser->execute([':email' => $email]);
+    $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+    if ($usuario && ($senha === $usuario['senha'] || password_verify($senha, $usuario['senha']))) {
+        $_SESSION['usuario'] = [
+            'id'    => $usuario['id_usuario'],
+            'nome'  => $usuario['nome_usuario'],
+            'email' => $usuario['email'],
+            'foto'  => !empty($usuario['foto_perfil']) ? $usuario['foto_perfil'] : 'logo_menu.png'
+        ];
+        header("Location: index.php");
+        exit;
+    } else {
+        header("Location: index.php?status=erro&msg=" . urlencode("E-mail ou senha incorretos!"));
+        exit;
+    }
+}
+
+
+// =========================================================================
+// 2. PROCESSAMENTO DA ATUALIZAÇÃO DO PERFIL (MODAL)
+// =========================================================================
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'atualizar_perfil' && isset($_SESSION['usuario'])) {
+    $idUsuario = $_SESSION['usuario']['id'];
+    $novoNome = trim($_POST['nome']);
+    $fotoPerfil = $_SESSION['usuario']['foto']; // Mantém a antiga se não alterar
+
+    // Se escolheu um avatar pré-definido
+    if (!empty($_POST['avatar_predefinido'])) {
+        $fotoPerfil = trim($_POST['avatar_predefinido']);
     }
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider'];
+    // Se fez upload de foto
+    if (isset($_FILES['foto_upload']) && $_FILES['foto_upload']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['foto_upload']['name'], PATHINFO_EXTENSION));
+        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
+
+        if (in_array($ext, $extensoesPermitidas)) {
+            $novoNomeFoto = "user_" . $idUsuario . "_" . time() . "." . $ext;
+            $destino = "img/perfis/" . $novoNomeFoto;
+
+            if (!is_dir('img/perfis')) {
+                mkdir('img/perfis', 0777, true);
+            }
+
+            if (move_uploaded_file($_FILES['foto_upload']['tmp_name'], $destino)) {
+                $fotoPerfil = $novoNomeFoto;
+            }
+        }
+    }
+
+    // Atualiza base de dados
+    $stmtUpdate = $pdo->prepare("UPDATE usuario SET nome_usuario = :nome, foto_perfil = :foto WHERE id_usuario = :id");
+    $stmtUpdate->execute([
+        ':nome' => $novoNome,
+        ':foto' => $fotoPerfil,
+        ':id'   => $idUsuario
+    ]);
+
+    // Atualiza a sessão
+    $_SESSION['usuario']['nome'] = $novoNome;
+    $_SESSION['usuario']['foto'] = $fotoPerfil;
+
+    header("Location: index.php?status=sucesso&msg=" . urlencode("Perfil atualizado com sucesso!"));
+    exit;
+}
+
+
+// =========================================================================
+// FUNÇÃO AUTOMÁTICA DE IMAGENS
+// =========================================================================
+function buscarImagem($nomeImagem) {
+    if (empty($nomeImagem)) return "img/logo/logo_menu.png";
+    if (file_exists($nomeImagem)) return $nomeImagem;
+
+    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];
     $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
 
     foreach ($pastas as $pasta) {
         foreach ($extensoes as $ext) {
             $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem . $ext;
-            if (file_exists($caminhoCompleto)) {
-                return $caminhoCompleto;
-            }
+            if (file_exists($caminhoCompleto)) return $caminhoCompleto;
+
+            $caminhoRaiz = $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminhoRaiz)) return $caminhoRaiz;
         }
     }
 
-    // Se não achar nada, tenta ver se está na raiz da pasta img/
-    if (file_exists("img/" . $nomeImagem)) {
-        return "img/" . $nomeImagem;
-    }
-
-    // Imagem de segurança caso não exista em lugar nenhum
+    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
     return "img/logo/logo_menu.png";
 }
-// =========================================================================
 
 
-// BUSCAS DINÂMICAS: O poder da POO para trazer tudo do banco de uma vez!
+// BUSCAS DAS RECEITAS
 $stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
 $receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
 
@@ -49,9 +121,10 @@ $receitasSalgados = $stmtSalgados->fetchAll(PDO::FETCH_ASSOC);
 $stmtBebidas = $pdo->query("SELECT * FROM receitas WHERE tipo = 'BEBIDA'");
 $receitasBebidas = $stmtBebidas->fetchAll(PDO::FETCH_ASSOC);
 
-// Lógica para detetar se veio de um registo ou login
 $status = isset($_GET['status']) ? $_GET['status'] : "";
-$erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET['msg'] : "");
+$msg = isset($_GET['msg']) ? $_GET['msg'] : (isset($_GET['erro']) ? $_GET['erro'] : "");
+
+$avataresPadrao = ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', 'avatar5.png'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -60,12 +133,10 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magical Bites | Receitas Disney</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-    /* --- RESET E ESTILOS GERAIS --- */
             * {
                 margin: 0;
                 padding: 0;
@@ -112,9 +183,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 font-weight: 500;
                 transition: 0.3s;
                 cursor: pointer;
-                display: flex; /* Garante que o ícone e o texto alinhem horizontalmente */
+                display: flex; 
                 align-items: center;
-                gap: 8px; /* Espaço entre o ícone e a palavra Perfil */
+                gap: 8px; 
             }
 
             .menu a:hover {
@@ -122,7 +193,15 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
             }
 
             .menu a i {
-                font-size: 16px; /* Ajusta o tamanho do ícone do bonequinho */
+                font-size: 16px; 
+            }
+
+            .nav-user-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid #ffe45c;
             }
 
             /* --- HERO & SLIDER --- */
@@ -162,7 +241,6 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
             }
 
-            /* --- DESIGN DO BOTÃO EXPLORAR --- */
             .hero-btn {
                 display: inline-flex;
                 align-items: center;
@@ -193,7 +271,6 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 border: 1.5px solid #ffe45c;
             }
 
-            /* --- BOTÕES DO SLIDER --- */
             .slider-btn {
                 position: absolute;
                 top: 50%;
@@ -220,15 +297,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 transform: translateY(-50%) scale(1.1);
             }
 
-            .slider-btn.prev {
-                left: 30px;
-            }
+            .slider-btn.prev { left: 30px; }
+            .slider-btn.next { right: 30px; }
 
-            .slider-btn.next {
-                right: 30px;
-            }
-
-            /* --- INDICADORES DO SLIDER --- */
             .slider-dots {
                 position: absolute;
                 bottom: 30px;
@@ -252,10 +323,6 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
             .dot.active {
                 background: #ffe45c;
                 transform: scale(1.3);
-            }
-
-            .dot:hover {
-                background: rgba(255, 228, 92, 0.8);
             }
 
             /* --- BARRA DE PESQUISA --- */
@@ -300,14 +367,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 outline: none;
                 width: 100%;
                 font-size: 16px;
-                font-family: 'Poppins', sans-serif;
             }
 
-            .search-container input::placeholder {
-                color: #999;
-            }
-
-            /* --- LAYOUT DOS CARDS --- */
+            /* --- LAYOUT RECEITAS --- */
             .container {
                 width: 100%;
                 max-width: 1250px;
@@ -365,20 +427,11 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 color: white;
                 font-size: 11px;
                 font-weight: 700;
-                letter-spacing: 0.5px;
             }
 
-            .doce {
-                background: #ff69b4;
-            }
-
-            .salgado {
-                background: #4CAF50;
-            }
-
-            .bebida {
-                background: #00bcd4;
-            }
+            .doce { background: #ff69b4; }
+            .salgado { background: #4CAF50; }
+            .bebida { background: #00bcd4; }
 
             .card p {
                 padding: 0 20px 25px;
@@ -394,9 +447,6 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 font-size: 18px;
                 color: #666;
                 margin: 40px 0;
-                font-weight: 500;
-                width: 100%;
-                grid-column: 1 / -1;
             }
 
             /* --- MODAIS FLUTUANTES --- */
@@ -415,28 +465,26 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
             .card-flutuante {
                 display: none;
                 position: fixed;
-                top: 85px;
+                top: 80px;
                 right: 25px;
-                width: 360px;
+                width: 380px;
+                max-height: calc(100vh - 100px);
+                overflow-y: auto;
                 background: white;
                 border-radius: 28px;
                 box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-                padding: 30px;
+                padding: 28px;
                 z-index: 1000;
                 color: #333;
                 animation: fadeInSlide 0.3s ease-out;
             }
 
-            @keyframes fadeInSlide {
-                from {
-                    opacity: 0;
-                    transform: translateX(30px);
-                }
+            .card-flutuante::-webkit-scrollbar { width: 6px; }
+            .card-flutuante::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
 
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
+            @keyframes fadeInSlide {
+                from { opacity: 0; transform: translateX(30px); }
+                to { opacity: 1; transform: translateX(0); }
             }
 
             .card-header {
@@ -512,11 +560,55 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 font-weight: 600;
                 cursor: pointer;
             }
+
+            /* ESTILOS ESPECÍFICOS DO PERFIL NO MODAL */
+            .perfil-avatar-header {
+                text-align: center;
+                margin-bottom: 15px;
+            }
+            .perfil-avatar-header img {
+                width: 85px;
+                height: 85px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 3px solid #1f4396;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            }
+            .grid-avatares-modal {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin: 10px 0;
+            }
+            .avatar-item {
+                width: 48px;
+                height: 48px;
+                border-radius: 50%;
+                border: 2px solid transparent;
+                cursor: pointer;
+                overflow: hidden;
+                transition: 0.2s;
+            }
+            .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
+            .avatar-item:hover, .avatar-item.selected {
+                border-color: #ffe45c;
+                transform: scale(1.1);
+            }
+            .btn-logout-modal {
+                display: block;
+                text-align: center;
+                margin-top: 15px;
+                color: #f44336;
+                text-decoration: none;
+                font-weight: 600;
+                font-size: 14px;
+            }
     </style>
 </head>
 
 <body>
 
+    <!-- NAVBAR -->
     <div class="navbar">
         <div class="logo"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></div>
         <div class="menu">
@@ -524,12 +616,22 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
             <a href="#containerReceitas">Receitas</a>
             <a href="#">Favoritos</a>
             <a href="filmes.php">Filmes</a>
-            <a href="javascript:void(0)" onclick="alternarModais('login')"><i class="fa-solid fa-user"></i> Perfil</a>
+
+            <!-- ABRE O MODAL DO PERFIL SE LOGADO, SE NÃO ABRE O LOGIN -->
+            <?php if (isset($_SESSION['usuario'])): ?>
+                <a href="javascript:void(0)" onclick="alternarModais('perfil')">
+                    <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
+                    <?= htmlspecialchars(explode(' ', $_SESSION['usuario']['nome'])[0]) ?>
+                </a>
+            <?php else: ?>
+                <a href="javascript:void(0)" onclick="alternarModais('login')"><i class="fa-solid fa-user"></i> Perfil</a>
+            <?php endif; ?>
         </div>
     </div>
 
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
 
+    <!-- 1. MODAL CADASTRO -->
     <div id="modalCadastro" class="card-flutuante">
         <div class="card-header">
             <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
@@ -538,17 +640,15 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <h2 style="color:#1f4396">Crie a sua conta</h2>
         <p style="font-size:14px; color:#666; margin-bottom:20px">Junte-se à nossa comunidade!</p>
         <form action="cadastrar.php" method="POST">
-            <div class="input-group-modal"><i class="fa fa-user"></i><input type="text" name="nome"
-                    placeholder="Nome completo" required></div>
-            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email"
-                    placeholder="E-mail" required></div>
-            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha"
-                    placeholder="Senha" required></div>
+            <div class="input-group-modal"><i class="fa fa-user"></i><input type="text" name="nome" placeholder="Nome completo" required></div>
+            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
             <button type="submit" class="btn-acao">Registar</button>
         </form>
         <div class="footer-modal">Já tem conta? <a onclick="alternarModais('login')">Faça login</a></div>
     </div>
 
+    <!-- 2. MODAL LOGIN -->
     <div id="modalLogin" class="card-flutuante">
         <div class="card-header">
             <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
@@ -557,15 +657,56 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <h2 style="color:#1f4396">Bem-vindo!</h2>
         <p style="font-size:14px; color:#666; margin-bottom:20px">Acesse sua conta mágica.</p>
         <form action="index.php" method="POST">
-            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email"
-                    placeholder="E-mail" required></div>
-            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha"
-                    placeholder="Senha" required></div>
+            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
             <button type="submit" class="btn-acao">Entrar</button>
         </form>
         <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
+    <!-- 3. MODAL PERFIL (NOVO) -->
+    <?php if (isset($_SESSION['usuario'])): ?>
+    <div id="modalPerfil" class="card-flutuante">
+        <div class="card-header">
+            <img src="<?= buscarImagem('logo.png') ?>" style="width: 90px;">
+            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+        </div>
+
+        <div class="perfil-avatar-header">
+            <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
+            <h3 style="color:#1f4396; margin-top:8px; font-size:18px;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
+            <p style="font-size:12px; color:#777;"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
+        </div>
+
+        <form action="index.php" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="acao" value="atualizar_perfil">
+            <input type="hidden" name="avatar_predefinido" id="modalInputAvatar" value="">
+
+            <div class="input-group-modal" style="margin-bottom: 10px;">
+                <i class="fa fa-user"></i>
+                <input type="text" name="nome" value="<?= htmlspecialchars($_SESSION['usuario']['nome']) ?>" required placeholder="Nome">
+            </div>
+
+            <label style="font-size:12px; font-weight:600; color:#1f4396;">Avatar Disney</label>
+            <div class="grid-avatares-modal">
+                <?php foreach ($avataresPadrao as $avatar): ?>
+                    <div class="avatar-item" onclick="selecionarAvatarModal('<?= $avatar ?>', this)">
+                        <img src="<?= buscarImagem($avatar) ?>" onerror="this.src='img/logo/logo_menu.png'">
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <label style="font-size:12px; font-weight:600; color:#1f4396; display:block; margin-top:10px;">Ou foto própria:</label>
+            <input type="file" name="foto_upload" accept="image/*" style="font-size:12px; margin-top:5px; width:100%;" onchange="limparAvatarModal()">
+
+            <button type="submit" class="btn-acao" style="margin-top:18px;">Salvar Alterações</button>
+        </form>
+
+        <a href="logout.php" class="btn-logout-modal"><i class="fa-solid fa-right-from-bracket"></i> Sair da Conta</a>
+    </div>
+    <?php endif; ?>
+
+    <!-- 4. MODAL STATUS / MENSAGENS -->
     <?php if ($status != ""): ?>
     <div id="modalStatus" class="card-flutuante" style="display: block; z-index: 1001;">
         <div class="card-header">
@@ -573,31 +714,30 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         </div>
 
         <?php if ($status == 'sucesso'): ?>
-        <div class="status-icon" style="color: #4CAF50;">✅</div>
-        <h2 style="color:#1f4396; text-align:center;">Sucesso!</h2>
-        <p style="font-size:15px; color:#666; text-align:center; margin-bottom:20px;">
-            A sua conta foi criada com magia!<br>Faça login para continuing.
-        </p>
-        <button class="btn-acao" onclick="fecharStatus(); alternarModais('login');">Fazer Login</button>
-
+            <div class="status-icon" style="color: #4CAF50;">✅</div>
+            <h2 style="color:#1f4396; text-align:center;">Prontinho!</h2>
+            <p style="font-size:14px; color:#666; text-align:center; margin-bottom:20px;">
+                <?= htmlspecialchars($msg) ?>
+            </p>
+            <button class="btn-acao" onclick="fecharStatus();">Continuar</button>
         <?php elseif ($status == 'erro'): ?>
-        <div class="status-icon" style="color: #f44336;">❌</div>
-        <h2 style="color:#1f4396; text-align:center;">Oops!</h2>
-        <p style="font-size:15px; color:#666; text-align:center; margin-bottom:20px;">
-            <?= htmlspecialchars($erro_msg) ?>
-        </p>
-        <button class="btn-acao" onclick="fecharStatus(); alternarModais('cadastro');">Tentar Novamente</button>
+            <div class="status-icon" style="color: #f44336;">❌</div>
+            <h2 style="color:#1f4396; text-align:center;">Oops!</h2>
+            <p style="font-size:14px; color:#666; text-align:center; margin-bottom:20px;">
+                <?= htmlspecialchars($msg) ?>
+            </p>
+            <button class="btn-acao" onclick="fecharStatus();">Tentar Novamente</button>
         <?php endif; ?>
     </div>
 
     <script>
-    // Se existir o modal de status, o fundo escuro aparece automaticamente
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('modalOverlay').style.display = 'block';
     });
     </script>
     <?php endif; ?>
 
+    <!-- HERO / BANNER -->
     <div class="hero">
         <button class="slider-btn prev" onclick="mudarSlide(-1)"><i class="fa fa-chevron-left"></i></button>
         <button class="slider-btn next" onclick="mudarSlide(1)"><i class="fa fa-chevron-right"></i></button>
@@ -612,14 +752,15 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         </div>
     </div>
 
+    <!-- PESQUISA -->
     <div class="search-wrapper">
         <div class="search-container">
             <i class="fa fa-search"></i>
-            <input type="text" id="inputPesquisa" placeholder="Procurar por receita ou filme..."
-                onkeyup="pesquisarReceitas()">
+            <input type="text" id="inputPesquisa" placeholder="Procurar por receita ou filme..." onkeyup="pesquisarReceitas()">
         </div>
     </div>
 
+    <!-- LISTA DE RECEITAS -->
     <div class="container" id="containerReceitas">
 
         <h2 class="titulo">Receitas Doces</h2>
@@ -661,7 +802,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     </div>
 
     <script>
-    // --- FUNÇÃO DE PESQUISA (LIVE SEARCH) ---
+    // PESQUISA EM TEMPO REAL
     function pesquisarReceitas() {
         let input = document.getElementById('inputPesquisa').value.toLowerCase();
         let cards = document.getElementsByClassName('card');
@@ -686,15 +827,15 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         }
     }
 
-    // --- CONTROLO DOS MODAIS ---
+    // MODAIS
     function fecharTodosModais() {
         document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('modalCadastro').style.display = 'none';
-        document.getElementById('modalLogin').style.display = 'none';
-        if (document.getElementById('modalStatus')) document.getElementById('modalStatus').style.display = 'none';
+        if(document.getElementById('modalCadastro')) document.getElementById('modalCadastro').style.display = 'none';
+        if(document.getElementById('modalLogin')) document.getElementById('modalLogin').style.display = 'none';
+        if(document.getElementById('modalPerfil')) document.getElementById('modalPerfil').style.display = 'none';
+        if(document.getElementById('modalStatus')) document.getElementById('modalStatus').style.display = 'none';
     }
 
-    // Limpa a URL para não ficar a mostrar '?status=sucesso' toda vez que atualizar a página
     function fecharStatus() {
         fecharTodosModais();
         window.history.replaceState({}, document.title, "index.php");
@@ -705,13 +846,26 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         document.getElementById('modalOverlay').style.display = 'block';
         if (tipo === 'cadastro') document.getElementById('modalCadastro').style.display = 'block';
         if (tipo === 'login') document.getElementById('modalLogin').style.display = 'block';
+        if (tipo === 'perfil') document.getElementById('modalPerfil').style.display = 'block';
     }
 
-    // --- CONTROLO DO SLIDER ---
+    function selecionarAvatarModal(nomeAvatar, elemento) {
+        document.getElementById('modalInputAvatar').value = nomeAvatar;
+        let avatares = document.querySelectorAll('.avatar-item');
+        avatares.forEach(el => el.classList.remove('selected'));
+        elemento.classList.add('selected');
+        document.getElementById('modalPreviewFoto').src = elemento.querySelector('img').src;
+    }
+
+    function limparAvatarModal() {
+        document.getElementById('modalInputAvatar').value = '';
+        let avatares = document.querySelectorAll('.avatar-item');
+        avatares.forEach(el => el.classList.remove('selected'));
+    }
+
+    // SLIDER
     const hero = document.querySelector(".hero");
     const dots = document.querySelectorAll(".dot");
-    
-    // Ajustado caminhos dos banners do JavaScript para usar também a função dinâmica em segundo plano
     const banners = [
         "<?= buscarImagem('cookies_banner.png') ?>", 
         "<?= buscarImagem('beignet_banner.png') ?>"
@@ -722,16 +876,13 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     function atualizarBanner() {
         hero.style.backgroundImage = `url(${banners[idx]})`;
         dots.forEach(dot => dot.classList.remove("active"));
-        dots[idx].classList.add("active");
+        if(dots[idx]) dots[idx].classList.add("active");
     }
 
     function mudarSlide(direcao) {
         idx += direcao;
-        if (idx < 0) {
-            idx = banners.length - 1;
-        } else if (idx >= banners.length) {
-            idx = 0;
-        }
+        if (idx < 0) idx = banners.length - 1;
+        if (idx >= banners.length) idx = 0;
         atualizarBanner();
         resetarTimer();
     }
@@ -742,10 +893,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         resetarTimer();
     }
 
-    function autoSlide() {
-        mudarSlide(1);
-    }
-
+    function autoSlide() { mudarSlide(1); }
     function resetarTimer() {
         clearInterval(tempoSlider);
         tempoSlider = setInterval(autoSlide, 5000);
@@ -755,5 +903,4 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     tempoSlider = setInterval(autoSlide, 5000);
     </script>
 </body>
-
 </html>
