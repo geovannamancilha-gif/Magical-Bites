@@ -30,7 +30,7 @@ CREATE TABLE usuario (
     nome_usuario VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    foto_perfil VARCHAR(255) DEFAULT 'avatar1.png'
+    foto_perfil VARCHAR(255) DEFAULT 'avatar1.webp'
 );
 
 -- TABELA DE AVATARES DISPONÍVEIS NO SISTEMA
@@ -50,36 +50,41 @@ CREATE TABLE favoritar (
 
 -- 3. INSERÇÃO DOS 30 AVATARES MÁGICOS NO BANCO DE DADOS
 INSERT INTO avatar_predefinido (nome_avatar, caminho_imagem) VALUES
-('Avatar 1', 'avatar1.png'),
-('Avatar 2', 'avatar2.png'),
-('Avatar 3', 'avatar3.png'),
-('Avatar 4', 'avatar4.png'),
-('Avatar 5', 'avatar5.png'),
-('Avatar 6', 'avatar6.png'),
-('Avatar 7', 'avatar7.png'),
-('Avatar 8', 'avatar8.png'),
-('Avatar 9', 'avatar9.png'),
-('Avatar 10', 'avatar10.png'),
-('Avatar 11', 'avatar11.png'),
-('Avatar 12', 'avatar12.png'),
-('Avatar 13', 'avatar13.png'),
-('Avatar 14', 'avatar14.png'),
-('Avatar 15', 'avatar15.png'),
-('Avatar 16', 'avatar16.png'),
-('Avatar 17', 'avatar17.png'),
-('Avatar 18', 'avatar18.png'),
-('Avatar 19', 'avatar19.png'),
-('Avatar 20', 'avatar20.png'),
-('Avatar 21', 'avatar21.png'),
-('Avatar 22', 'avatar22.png'),
-('Avatar 23', 'avatar23.png'),
-('Avatar 24', 'avatar24.png'),
-('Avatar 25', 'avatar25.png'),
-('Avatar 26', 'avatar26.png'),
-('Avatar 27', 'avatar27.png'),
-('Avatar 28', 'avatar28.png'),
-('Avatar 29', 'avatar29.png'),
-('Avatar 30', 'avatar30.png');
+('Avatar 1', 'avatar1.webp'),
+('Avatar 2', 'avatar2.webp'),
+('Avatar 3', 'avatar3.webp'),
+('Avatar 4', 'avatar4.webp'),
+('Avatar 5', 'avatar5.webp'),
+('Avatar 6', 'avatar6.webp'),
+('Avatar 7', 'avatar7.webp'),
+('Avatar 8', 'avatar8.webp'),
+('Avatar 9', 'avatar9.webp'),
+('Avatar 10', 'avatar10.webp'),
+('Avatar 11', 'avatar11.webp'),
+('Avatar 12', 'avatar12.webp'),
+('Avatar 13', 'avatar13.webp'),
+('Avatar 14', 'avatar14.webp'),
+('Avatar 15', 'avatar15.webp'),
+('Avatar 16', 'avatar16.webp'),
+('Avatar 17', 'avatar17.webp'),
+('Avatar 18', 'avatar18.webp'),
+('Avatar 19', 'avatar19.webp'),
+('Avatar 20', 'avatar20.webp'),
+('Avatar 21', 'avatar21.webp'),
+('Avatar 22', 'avatar22.webp'),
+('Avatar 23', 'avatar23.webp'),
+('Avatar 24', 'avatar24.webp'),
+('Avatar 25', 'avatar25.webp'),
+('Avatar 26', 'avatar26.webp'),
+('Avatar 27', 'avatar27.webp'),
+('Avatar 28', 'avatar28.webp'),
+('Avatar 29', 'avatar29.webp'),
+('Avatar 30', 'avatar30.webp');
+
+INSERT INTO avatar_predefinido (nome_avatar, caminho_imagem) VALUES 
+('Avatar 31', 'avatar31.webp'),
+('Avatar 32', 'avatar32.webp');
+
 
 -- 4. INSERÇÃO DOS FILMES
 INSERT INTO filme (id_filme, nome_filme) VALUES 

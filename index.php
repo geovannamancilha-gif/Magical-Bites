@@ -124,7 +124,9 @@ $receitasBebidas = $stmtBebidas->fetchAll(PDO::FETCH_ASSOC);
 $status = isset($_GET['status']) ? $_GET['status'] : "";
 $msg = isset($_GET['msg']) ? $_GET['msg'] : (isset($_GET['erro']) ? $_GET['erro'] : "");
 
-$avataresPadrao = ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', 'avatar5.png'];
+// BUSCA OS 30 AVATARES DIRECTO DA BASE DE DADOS
+$stmtAvatares = $pdo->query("SELECT * FROM avatar_predefinido");
+$avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -576,8 +578,12 @@ $avataresPadrao = ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', '
             }
             .grid-avatares-modal {
                 display: flex;
-                gap: 10px;
+                flex-wrap: wrap;
+                gap: 8px;
                 justify-content: center;
+                max-height: 140px;
+                overflow-y: auto;
+                padding: 5px;
                 margin: 10px 0;
             }
             .avatar-item {
@@ -664,7 +670,7 @@ $avataresPadrao = ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', '
         <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
-    <!-- 3. MODAL PERFIL (NOVO) -->
+    <!-- 3. MODAL PERFIL -->
     <?php if (isset($_SESSION['usuario'])): ?>
     <div id="modalPerfil" class="card-flutuante">
         <div class="card-header">
@@ -690,8 +696,8 @@ $avataresPadrao = ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', '
             <label style="font-size:12px; font-weight:600; color:#1f4396;">Avatar Disney</label>
             <div class="grid-avatares-modal">
                 <?php foreach ($avataresPadrao as $avatar): ?>
-                    <div class="avatar-item" onclick="selecionarAvatarModal('<?= $avatar ?>', this)">
-                        <img src="<?= buscarImagem($avatar) ?>" onerror="this.src='img/logo/logo_menu.png'">
+                    <div class="avatar-item" onclick="selecionarAvatarModal('<?= $avatar['caminho_imagem'] ?>', this)">
+                        <img src="<?= buscarImagem($avatar['caminho_imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -868,39 +874,33 @@ $avataresPadrao = ['avatar1.png', 'avatar2.png', 'avatar3.png', 'avatar4.png', '
     const dots = document.querySelectorAll(".dot");
     const banners = [
         "<?= buscarImagem('cookies_banner.png') ?>", 
-        "<?= buscarImagem('beignet_banner.png') ?>"
+        "<?= buscarImagem('beignets_banner.png') ?>"
     ];
-    let idx = 0;
-    let tempoSlider;
+    let slideAtual = 0;
 
-    function atualizarBanner() {
-        hero.style.backgroundImage = `url(${banners[idx]})`;
-        dots.forEach(dot => dot.classList.remove("active"));
-        if(dots[idx]) dots[idx].classList.add("active");
+    function atualizarSlide() {
+        if (banners.length > 0) {
+            hero.style.backgroundImage = `url('${banners[slideAtual]}')`;
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === slideAtual);
+            });
+        }
     }
 
     function mudarSlide(direcao) {
-        idx += direcao;
-        if (idx < 0) idx = banners.length - 1;
-        if (idx >= banners.length) idx = 0;
-        atualizarBanner();
-        resetarTimer();
+        slideAtual += direcao;
+        if (slideAtual >= banners.length) slideAtual = 0;
+        if (slideAtual < 0) slideAtual = banners.length - 1;
+        atualizarSlide();
     }
 
-    function irParaSlide(posicao) {
-        idx = posicao;
-        atualizarBanner();
-        resetarTimer();
+    function irParaSlide(index) {
+        slideAtual = index;
+        atualizarSlide();
     }
 
-    function autoSlide() { mudarSlide(1); }
-    function resetarTimer() {
-        clearInterval(tempoSlider);
-        tempoSlider = setInterval(autoSlide, 5000);
-    }
-
-    atualizarBanner();
-    tempoSlider = setInterval(autoSlide, 5000);
+    // Inicializa slider no carregamento
+    atualizarSlide();
     </script>
 </body>
 </html>
