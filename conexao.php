@@ -2,8 +2,8 @@
 // Dados do banco
 $servidor = "localhost";
 $usuario = "root";
-$senha = "Home@spSENAI2025!";
-//$senha = ""; //quando trocar de sala, reativar a senha
+//$senha = "Home@spSENAI2025!";
+$senha = ""; //quando trocar de sala, reativar a senha
 
 $banco = "magical_bites";
 

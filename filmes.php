@@ -1,8 +1,7 @@
 <?php
 // Conexão com a base de dados
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
-//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
-//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root");
+//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
 
 // ==========================================
 // FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
