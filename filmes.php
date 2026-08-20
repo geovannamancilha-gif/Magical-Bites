@@ -117,7 +117,21 @@ function obterCorFilme($nomeFilme) {
         '101 Dálmatas' => '#343a40',
         'Aladdin' => '#3c096c',
         'Os Incríveis' => '#e63946',
-        'Mulan' => '#bc4749'
+        'Mulan' => '#bc4749',
+        
+        // Cores personalizadas para os filmes que faltavam:
+        'A Era do Gelo' => '#3a86ff',             // Azul glacial
+        'A Espada Era a Lei' => '#d4a373',         // Ouro medieval
+        'A Nova Onda do Imperador' => '#ff006e',   // Púrpura/Rosa vibrante
+        'Carros' => '#d62828',                     // Vermelho Relâmpago McQueen
+        'Como Treinar o Seu Dragão' => '#212529',  // Cinza escuro/Banguela
+        'Hércules' => '#ffb703',                   // Dourado Olimpo
+        'Malévola' => '#3c096c',                   // Roxo vilã
+        'O Rei Leão' => '#d97706',                 // Laranja Savana
+        'Peter Pan' => '#2d6a4f',                  // Verde Terra do Nunca
+        'Pocahontas' => '#9e2a2b',                 // Vermelho terra/outono
+        'Tinker Bell' => '#87c747ff',                // Verde Sininho/Pó mágico
+        'Cinderela' => '#4cc9f0'                   // Azul vestido de baile
     ];
 
     foreach ($cores as $chave => $cor) {
