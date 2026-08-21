@@ -4,11 +4,18 @@ CREATE DATABASE magical_bites;
 USE magical_bites;
 
 -- 2. CRIAÇÃO DAS TABELAS
-CREATE TABLE filme (
-    id_filme INT AUTO_INCREMENT PRIMARY KEY,
-    nome_filme VARCHAR(255) NOT NULL
+CREATE TABLE categoria (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nome_categoria VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE filme (
+    id_filme INT AUTO_INCREMENT PRIMARY KEY,
+    nome_filme VARCHAR(255) NOT NULL,
+    imagem VARCHAR(255),
+    id_categoria INT NOT NULL,
+    FOREIGN KEY (id_categoria) REFERENCES categoria(id_categoria)
+);
 CREATE TABLE receitas (
     id_receita INT AUTO_INCREMENT PRIMARY KEY,
     nome_receita VARCHAR(255) NOT NULL,
@@ -24,13 +31,13 @@ CREATE TABLE receitas (
     FOREIGN KEY (id_filme) REFERENCES filme(id_filme)
 );
 
--- TABELA DE USUÁRIOS (com campo para a foto/avatar)
+-- TABELA DE USUÁRIOS
 CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome_usuario VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     senha VARCHAR(255) NOT NULL,
-    foto_perfil VARCHAR(255) DEFAULT 'avatar1.png'
+    foto_perfil VARCHAR(255) DEFAULT 'avatar1.webp'
 );
 
 -- TABELA DE AVATARES DISPONÍVEIS NO SISTEMA
@@ -48,80 +55,92 @@ CREATE TABLE favoritar (
     FOREIGN KEY (id_receita) REFERENCES receitas(id_receita)
 );
 
--- 3. INSERÇÃO DOS 30 AVATARES MÁGICOS NO BANCO DE DADOS
+-- 3. INSERÇÃO DAS CATEGORIAS
+INSERT INTO categoria (id_categoria, nome_categoria) VALUES
+(1, 'Princesas & Contos de Fadas'),
+(2, 'Universo Pixar'),
+(3, 'Turma do Mickey & Amigos'),
+(4, 'Clássicos & Aventuras');
+
+-- 4. INSERÇÃO DOS AVATARES
 INSERT INTO avatar_predefinido (nome_avatar, caminho_imagem) VALUES
-('Avatar 1', 'avatar1.png'),
-('Avatar 2', 'avatar2.png'),
-('Avatar 3', 'avatar3.png'),
-('Avatar 4', 'avatar4.png'),
-('Avatar 5', 'avatar5.png'),
-('Avatar 6', 'avatar6.png'),
-('Avatar 7', 'avatar7.png'),
-('Avatar 8', 'avatar8.png'),
-('Avatar 9', 'avatar9.png'),
-('Avatar 10', 'avatar10.png'),
-('Avatar 11', 'avatar11.png'),
-('Avatar 12', 'avatar12.png'),
-('Avatar 13', 'avatar13.png'),
-('Avatar 14', 'avatar14.png'),
-('Avatar 15', 'avatar15.png'),
-('Avatar 16', 'avatar16.png'),
-('Avatar 17', 'avatar17.png'),
-('Avatar 18', 'avatar18.png'),
-('Avatar 19', 'avatar19.png'),
-('Avatar 20', 'avatar20.png'),
-('Avatar 21', 'avatar21.png'),
-('Avatar 22', 'avatar22.png'),
-('Avatar 23', 'avatar23.png'),
-('Avatar 24', 'avatar24.png'),
-('Avatar 25', 'avatar25.png'),
-('Avatar 26', 'avatar26.png'),
-('Avatar 27', 'avatar27.png'),
-('Avatar 28', 'avatar28.png'),
-('Avatar 29', 'avatar29.png'),
-('Avatar 30', 'avatar30.png');
+('Avatar 1', 'avatar1.webp'),
+('Avatar 2', 'avatar2.webp'),
+('Avatar 3', 'avatar3.webp'),
+('Avatar 4', 'avatar4.webp'),
+('Avatar 5', 'avatar5.webp'),
+('Avatar 6', 'avatar6.webp'),
+('Avatar 7', 'avatar7.webp'),
+('Avatar 8', 'avatar8.webp'),
+('Avatar 9', 'avatar9.webp'),
+('Avatar 10', 'avatar10.webp'),
+('Avatar 11', 'avatar11.webp'),
+('Avatar 12', 'avatar12.webp'),
+('Avatar 13', 'avatar13.webp'),
+('Avatar 14', 'avatar14.webp'),
+('Avatar 15', 'avatar15.webp'),
+('Avatar 16', 'avatar16.webp'),
+('Avatar 17', 'avatar17.webp'),
+('Avatar 18', 'avatar18.webp'),
+('Avatar 19', 'avatar19.webp'),
+('Avatar 20', 'avatar20.webp'),
+('Avatar 21', 'avatar21.webp'),
+('Avatar 22', 'avatar22.webp'),
+('Avatar 23', 'avatar23.webp'),
+('Avatar 24', 'avatar24.webp'),
+('Avatar 25', 'avatar25.webp'),
+('Avatar 26', 'avatar26.webp'),
+('Avatar 27', 'avatar27.webp'),
+('Avatar 28', 'avatar28.webp'),
+('Avatar 29', 'avatar29.webp'),
+('Avatar 30', 'avatar30.webp');
 
--- 4. INSERÇÃO DOS FILMES
-INSERT INTO filme (id_filme, nome_filme) VALUES 
-(1, 'Branca de Neve'), 
-(2, 'Frozen'), 
-(3, 'Enrolados'), 
-(4, 'A Princesa e o Sapo'), 
-(5, 'Alice no País das Maravilhas'), 
-(6, 'Ratatouille'),
-(7, 'Lilo & Stitch'),
-(8, 'A Bela Adormecida'),
-(9, 'Up: Altas Aventuras'),
-(10, 'Mogli: O Menino Lobo'),
-(11, 'Turma do Mickey'),
-(12, 'Valente'),
-(13, 'Ursinho Pooh'),
-(14, 'Encanto'),
-(15, 'Luca'),
-(16, 'A Dama e o Vagabundo'),
-(17, 'Zootopia'),
-(18, 'Viva: A Vida é uma Festa'),
-(19, 'Aristogatas'),
-(20, 'Moana'),
-(21, 'Pinóquio'),
-(22, '101 Dálmatas'),
-(23, 'Aladdin'),
-(24, 'Os Incríveis'),
-(25, 'Mulan'),
-(26, 'Cinderela'),
-(27, 'O Rei Leão'),
-(28, 'Carros 3'),
-(29, 'A Era do Gelo: O Big Bang'),
-(30, 'Como Treinar o Seu Dragão'),
-(31, 'Malévola: Dona do Mal'),
-(32, 'Tinker Bell e o Tesouro Perdido'),
-(33, 'Pocahontas'),
-(34, 'A Espada Era a Lei'),
-(35, 'A Nova Onda do Imperador'),
-(36, 'Peter Pan'),
-(37, 'Hércules');
+INSERT INTO avatar_predefinido (nome_avatar, caminho_imagem) VALUES 
+('Avatar 31', 'avatar31.webp'),
+('Avatar 32', 'avatar32.webp');
 
--- 5. INSERÇÃO DE TODAS AS RECEITAS
+
+-- 5. INSERÇÃO DOS FILMES (VINCULADOS ÀS CATEGORIAS)
+INSERT INTO filme (id_filme, nome_filme, imagem, id_categoria) VALUES 
+(1, 'Branca de Neve', 'brancadeneve.webp', 1), 
+(2, 'Frozen', 'frozen.webp', 1), 
+(3, 'Enrolados', 'enrolados.webp', 1), 
+(4, 'A Princesa e o Sapo', 'princesaeosapo.webp', 1), 
+(5, 'Alice no País das Maravilhas', 'alice.webp', 4), 
+(6, 'Ratatouille', 'ratatouille.webp', 2),
+(7, 'Lilo & Stitch', 'stitch.webp', 4),
+(8, 'A Bela Adormecida', 'belaadormecida.webp', 1),
+(9, 'Up: Altas Aventuras', 'UPfilme.webp', 2),
+(10, 'Mogli: O Menino Lobo', 'mogli.webp', 4),
+(11, 'Turma do Mickey', 'minnie.webp', 3),
+(12, 'Valente', 'valente.webp', 1),
+(13, 'Ursinho Pooh', 'pooh.webp', 3),
+(14, 'Encanto', 'encanto.webp', 4),
+(15, 'Luca', 'lucca.webp', 2),
+(16, 'A Dama e o Vagabundo', 'damaevagabundo.webp', 4),
+(17, 'Zootopia', 'zootopia.webp', 4),
+(18, 'Viva: A Vida é uma Festa', 'vivalavida.webp', 2),
+(19, 'Aristogatas', 'aristogatas.webp', 4),
+(20, 'Moana', 'moana.webp', 1),
+(21, 'Pinóquio', 'pinoquio.webp', 4),
+(22, '101 Dálmatas', '101dalmatas.webp', 4),
+(23, 'Aladdin', 'aladim.webp', 1),
+(24, 'Os Incríveis', 'incriveis.webp', 2),
+(25, 'Mulan', 'mulan.webp', 1),
+(26, 'Cinderela', 'cinderela.webp', 4),
+(27, 'O Rei Leão', 'oreileao.webp', 4),
+(28, 'Carros 3', 'carros3.webp', 2),
+(29, 'A Era do Gelo: O Big Bang', 'aeradogelo.webp', 4),
+(30, 'Como Treinar o Seu Dragão', 'comotreinaroseudragao.webp', 4),
+(31, 'Malévola: Dona do Mal', 'malevola.webp', 4),
+(32, 'Tinker Bell e o Tesouro Perdido', 'tinkerbell.webp', 4),
+(33, 'Pocahontas', 'pocahontas.webp', 4),
+(34, 'A Espada Era a Lei', 'aespadaeraalei.webp', 4),
+(35, 'A Nova Onda do Imperador', 'anovaondadoimperador.webp', 4),
+(36, 'Peter Pan', 'peterpan.webp', 4),
+(37, 'Hércules', 'hercules.webp', 4);
+
+-- 6. INSERÇÃO DE TODAS AS RECEITAS
 -- DOCES
 INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao, tempo_preparo, dificuldade, ingredientes, modo_preparo) VALUES
 ('Torta de Maçã da Branca de Neve', 'DOCE', 1, 'A clássica torta de maçã, mas sem nenhum feitiço!', 'torta_maca_branca_neve.png', 4.9, '1h 15min', 'Média', 'Massa: 2 xícaras de farinha de trigo; 150g de manteiga gelada; 4 colheres (sopa) de açúcar; 1 ovo; 1 pitada de sal; Recheio: 5 maçãs vermelhas fatiadas; 1/2 xícara de açúcar mascavo; 1 colher (chá) de canela em pó; 1 colher (sopa) de suco de limão; 1 colher (sopa) de manteiga; Finalização: 1 gema para pincelar; Açúcar e canela para polvilhar', '1. Em uma tigela, misture a farinha, o açúcar e o sal. Acrescente a manteiga gelada e misture com as pontas dos dedos até formar uma farofa. Adicione o ovo e misture até obter uma massa homogênea. Embrulhe em plástico filme e leve à geladeira por 30 minutos. 2. Para o recheio, coloque as maçãs em uma panela com o açúcar mascavo, a canela, o suco de limão e a manteiga. Cozinhe por alguns minutos até as maçãs ficarem levemente macias. Reserve. 3. Abra metade da massa e forre uma forma de torta. Adicione o recheio de maçã já frio. Abra o restante da massa e faça tiras para decorar a torta em formato trançado. 4. Pincele a gema sobre a massa e polvilhe açúcar com canela por cima. Asse em forno preaquecido a 180°C por aproximadamente 40 minutos, ou até a torta ficar dourada. Sirva a torta ainda morna.'),
@@ -179,7 +198,7 @@ INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao
 ('Mac and Cheeseburger', 'SALGADO', 26, 'A fusão perfeita do macarrão com queijo e a suculência da carne.', 'mac_and_cheeseburguer.png', 4.9, '45min', 'Média', '300g de macarrão cotovelo; 300g de carne moída; Manteiga; Farinha; Leite; Queijo cheddar e parmesão.', '1. Cozinhe o macarrão e refogue a carne moída. 2. Faça um molho branco espesso e derreta os queijos. 3. Misture tudo, coloque numa travessa, cubra com mais queijo e gratine no forno.'),
 ('Frango da Wendy', 'SALGADO', 36, 'Um assado delicioso em uma cama de vegetais.', 'frango_wendy.png', 4.8, '1h15min', 'Média', '1 frango inteiro (1,5kg); Molho pesto; Azeite; Brócolis; Couve-romanesco; Cebola; Tomilho.', '1. Tempere o frango e pincele o molho pesto inclusive debaixo da pele. 2. Distribua os vegetais no fundo da assadeira. 3. Coloque o frango por cima e asse a 200°C até dourar e cozinhar bem.'),
 ('A Torta do Merlin', 'SALGADO', 34, 'Torta rústica com massa quebradiça e recheio robusto.','torta_merlin.jpg', 4.9, '1h', 'Média', 'Massa: Farinha, manteiga, água gelada. Recheio: Carne moída, linguiça, batatas picadas, tomilho.', '1. Prepare a massa esfarelando manteiga e farinha, misture com água gelada e reserve. 2. Refogue a carne, linguiça e batata com tomilho. 3. Recheie a torta, feche, pincele gema e asse.'),
-('Copinhos de Salada de Frango Defumado', 'SALGADO', 37, 'Copinhos refrescantes de alface romana com salada cremosa de frango defumado e amêndoas, dignos do Olimpo.', 'copinhos_de_salada.png', 4.9, '20min', 'Fácil', '2 xícaras de peito de frango assado e desfiado; 3 colheres (sopa) de maionese; 1 talo de aipo cortado em fatias finas; 2 colheres (sopa) de cebolinho picado; 1/2 pimentão vermelho assado e picado; 1/4 de xícara de amêndoas defumadas picadas; 1 colher (chá) de páprica defumada; Sal e Pimenta-do-reino; 8 folhas inteiras de alface romana.', '1. Em uma tigela grande, misture o frango desfiado, a maionese, o aipo, o cebolinho e o pimentão assado. 2. Acrescente as amêndoas defumadas e a páprica defumada. 3. Tempere com sal e pimenta a gosto e misture bem até incorporar todos os ingredientes. 4. Lave e seque cuidadosamente as folhas de alface romana. 5. Coloque porções da salada dentro das folhas, formando pequenos copinhos. 6. Finalize com cebolinho extra, amêndoas picadas e uma leve pitada de páprica defumada. Sirva gelado.');
+('Copinhos de Salada de Frango Defumado', 'SALGADO', 37, 'Copinhos refrescantes de alface romana com salada cremosa de frango defumado e amêndoas, dignos do Olimpo.', 'copinhos_de_salada.png', 4.9, '20min', 'Fácil', '2 xícaras de peito de frango assado e desfiado; 3 colheres (sopa) de maionese; 1 talo de aipo cortado em fatias finas; 2 colheres (sopa) de cebolinho picado; 1/2 pimentão vermelho assado e picado; 1/4 de xícara de amêndoas defumadas picadas; 1 colher (chá) de páprica defumada; Sal e Pimenta-do-reino; 8 folhas inteiras de alface romana.', '1. Em uma tigela grande, misture o frango desfiado, a maionese, o aipo, o cebolinho e o pimentão assado. 2. Acrescente as amêndoas defumadas e a páprica defumada. 3. Tempere com sal e pimenta a gosto e misture bem até incorporar todos os ingredientes. 4. Lave e seque cuidadosamente as folhas de alface romana. 5. Coloque porções da salada dentro das folhas, forming pequenos copinhos. 6. Finalize com cebolinho extra, amêndoas picadas e uma leve pitada de páprica defumada. Sirva gelado.');
 
 -- BEBIDAS
 INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao, tempo_preparo, dificuldade, ingredientes, modo_preparo) VALUES
@@ -199,3 +218,4 @@ INSERT INTO receitas (nome_receita, tipo, id_filme, descricao, imagem, avaliacao
 ('Smoothie Abacaxi e Manga do Mogli', 'BEBIDA', 10, 'Smoothie fresco e cheio de energia tropical explorando a selva.', 'smoothie_mogli.jpg', 4.8, '10min', 'Fácil', '1 xícara de manga congelada; 1 xícara de abacaxi congelado; 4 tâmaras sem caroço; 250ml de leite de coco; 1 xícara de gelo.', '1. Coloque todos os ingredientes no liquidificador. 2. Bata por cerca de 1 minuto até ficar cremoso. 3. Sirva imediatamente decorado com cubos de frutas e hortelã.'),
 ('Smoothie da Força do Julian', 'BEBIDA', 29, 'Smoothie encorpado, nutritivo e cheio de energia para recuperar as forças.', 'smoothie_força_julian.png', 4.9, '10min', 'Fácil', '1 folha de couve; 1 xícara de abacaxi; 2 colheres (sopa) de amêndoas; 1 banana; 1 colher (sopa) de mel; 170g de iogurte grego; 150ml de água gelada; 1 colher de pasta de amendoim; Gelo.', '1. Lave bem a folha de couve. 2. Coloque no liquidificador todos os ingredientes e bata por cerca de 1 minuto até ficar bem cremoso. Sirva em copos altos com amêndoas picadas.'),
 ('Smoothie de Cenoura do Diego', 'BEBIDA', 29, 'Smoothie alaranjado e vibrante com sabor refrescante de frutas e cenoura.', 'smoothie_cenoura_diego.png', 4.7, '10min', 'Fácil', 'Suco de 1/2 limão; 1 cenoura média picada; 200ml de suco de maçã; 170g de iogurte de baunilha; 1 xícara de lascas de gelo.', '1. Coloque no liquidificador o suco de limão, cenoura, suco de maçã, iogurte e gelo. 2. Bata por 1-2 minutos até obter uma mistura cremosa. 3. Coe se preferir mais liso e sirva decorado com fatias finas de maçã e cenoura.');
+
