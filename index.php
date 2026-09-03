@@ -3,7 +3,7 @@ session_start();
 
 // Conexão com a base de dados
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
+    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Erro na conexão: " . $e->getMessage());
@@ -153,10 +153,10 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             }
 
             /* --- NAVBAR --- */
-            .navbar {
+             .navbar {
                 width: 100%;
-                background: #1f4396;
-                padding: 14px 25px;
+                background: #294f88; /* Cor exata do fundo da foto (elimina a caixinha) */
+                padding: 10px 30px;
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
@@ -166,36 +166,37 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
                 z-index: 100;
             }
 
-            .logo img {
-                height: 60px;
+             .logo img {
+                height: 50px; 
                 width: auto;
-                margin-top: -10px;
+                display: block;
+                margin-top: 0;
             }
 
-            .menu {
+             .menu {
                 display: flex;
                 align-items: center;
-                gap: 35px;
+                gap: 30px;
             }
 
-            .menu a {
-                color: white;
+             .menu a {
+                color: #ffffff;
                 text-decoration: none;
-                font-size: 15px;
-                font-weight: 500;
+                font-size: 16px;
+                font-weight: 700; /* Aplica o negrito nas opções do menu */
                 transition: 0.3s;
                 cursor: pointer;
-                display: flex; 
+                display: flex;
                 align-items: center;
-                gap: 8px; 
+                gap: 8px;
             }
 
-            .menu a:hover {
-                color: #ffe45c;
+             .menu a:hover {
+                color: #fff6a9ff;
             }
 
-            .menu a i {
-                font-size: 16px; 
+             .menu a i {
+                font-size: 18px;
             }
 
             .nav-user-avatar {
@@ -203,75 +204,53 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
                 height: 32px;
                 border-radius: 50%;
                 object-fit: cover;
-                border: 2px solid #ffe45c;
+                border: 2px solid #fff6a9ff;
             }
 
             /* --- HERO & SLIDER --- */
-            .hero {
-                width: 100%;
-                height: 620px;
-                overflow: hidden;
-                position: relative;
-                background-size: cover;
-                background-position: center;
-                transition: background-image 0.6s ease-in-out;
-            }
+.hero {
+  width: 100%;
+  height: calc(100vh - 70px);
+  position: relative;
+  background-size: cover;
+  background-position: center 60%; /* Centraliza a imagem perfeitamente */
+  transition: background-image 0.6s ease-in-out;
+}
 
-            .hero-content {
-                position: absolute;
-                left: 90px;
-                top: 50%;
-                transform: translateY(-50%);
-                max-width: 470px;
-                color: white;
-                z-index: 5;
-            }
+.hero-content {
+  position: absolute;
+  left: 200px; /* Aumentado para empurrar o botão para a direita */
+  bottom: 110px;
+  z-index: 5;
+}
 
-            .hero-content h1 {
-                font-size: 72px;
-                line-height: 1.05;
-                margin-bottom: 22px;
-                font-weight: 700;
-                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-            }
+.hero-btn {
+display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 70px; /* Aumenta a altura e a largura do botão */
+  font-size: 18px;    /* Aumenta o tamanho do texto EXPLORAR */
+  background: #245089;
+  backdrop-filter: blur(8px);
+  color: #87a5bf;
+  border: 1px solid #245089;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  text-transform: uppercase;
+}
 
-            .hero-content p {
-                font-size: 22px;
-                line-height: 1.6;
-                color: #ededed;
-                margin-bottom: 15px;
-                text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-            }
-
-            .hero-btn {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                margin-top: 15px;
-                padding: 16px 40px;
-                background: rgba(255, 255, 255, 0.08);
-                backdrop-filter: blur(5px);
-                color: #ffe45c;
-                border: 1.5px solid rgba(255, 255, 255, 0.4);
-                border-radius: 50px;
-                text-decoration: none;
-                font-weight: 700;
-                font-size: 16px;
-                letter-spacing: 1px;
-                transition: all 0.3s ease;
-                cursor: pointer;
-                z-index: 10;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.20);
-                text-transform: uppercase;
-            }
-
-            .hero-btn:hover {
-                background: #ffe45c;
-                color: #1e0061;
-                box-shadow: 0 8px 30px rgba(255, 228, 92, 0.5);
-                transform: translateY(-4px) scale(1.03);
-                border: 1.5px solid #ffe45c;
-            }
+.hero-btn:hover {
+  background: #305e9bff;
+  color: #a8c3daff;
+  border-color: #245089;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px #214575ff;
+}
 
             .slider-btn {
                 position: absolute;
@@ -294,7 +273,7 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             }
 
             .slider-btn:hover {
-                background: rgba(255, 228, 92, 0.9);
+                background: #fff6a9ff;
                 color: #1e0061;
                 transform: translateY(-50%) scale(1.1);
             }
@@ -323,7 +302,7 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             }
 
             .dot.active {
-                background: #ffe45c;
+                background: #fff6a9ff;
                 transform: scale(1.3);
             }
 
@@ -616,7 +595,7 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></div>
+      <div class="logo"><img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites"></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="#containerReceitas">Receitas</a>
@@ -745,18 +724,17 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- HERO / BANNER -->
     <div class="hero">
-        <button class="slider-btn prev" onclick="mudarSlide(-1)"><i class="fa fa-chevron-left"></i></button>
-        <button class="slider-btn next" onclick="mudarSlide(1)"><i class="fa fa-chevron-right"></i></button>
-        <div class="slider-dots">
-            <span class="dot" onclick="irParaSlide(0)"></span>
-            <span class="dot" onclick="irParaSlide(1)"></span>
-        </div>
-        <div class="hero-content">
-            <h1>Receitas mágicas inspiradas na Disney</h1>
-            <p>Descubra pratos incríveis direto dos filmes que amamos!</p>
-            <a href="#containerReceitas" class="hero-btn">Explorar</a>
-        </div>
+    <button class="slider-btn next" onclick="mudarSlide(1)"><i class="fa fa-chevron-right"></i></button>
+    
+    <div class="slider-dots">
+        <span class="dot" onclick="irParaSlide(0)"></span>
+        <span class="dot" onclick="irParaSlide(1)"></span>
     </div>
+    
+    <div class="hero-content">
+        <a href="#containerReceitas" class="hero-btn">Explorar</a>
+    </div>
+</div>
 
     <!-- PESQUISA -->
     <div class="search-wrapper">
@@ -873,8 +851,8 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
     const hero = document.querySelector(".hero");
     const dots = document.querySelectorAll(".dot");
     const banners = [
-        "<?= buscarImagem('cookies_banner.png') ?>", 
-        "<?= buscarImagem('beignets_banner.png') ?>"
+   "<?= buscarImagem('cookies_banner.png') ?>",
+   "<?= buscarImagem('beignet_banner.png') ?>"
     ];
     let slideAtual = 0;
 
