@@ -3,8 +3,8 @@ session_start();
 
 // 1. Conexão com o banco de dados (ajuste a senha se necessário)
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
-    //$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+    //$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
+    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     header("Location: index.php?status=erro&msg=" . urlencode("Erro na conexão com a base de dados."));

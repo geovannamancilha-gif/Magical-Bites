@@ -9,7 +9,7 @@ try {
     die("Erro na conexão: " . $e->getMessage());
 }
 
-
+ 
 // =========================================================================
 // 1. PROCESSAMENTO DO LOGIN
 // =========================================================================
@@ -145,6 +145,186 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
                 box-sizing: border-box;
                 font-family: 'Poppins', sans-serif;
             }
+            html {
+    scroll-behavior: smooth;
+}
+
+/* BANNER PRINCIPAL (900PX) */
+.banner-destaque {
+    width: 100% !important;
+    height: 900px !important;
+    background-color: #fffcef !important;
+    background-image: url('img/slider/bg-destaque.webp') !important;
+    background-size: auto 100% !important; /* Ajusta o fundo para preencher exatamente os 900px de altura sem cortar nada */
+    background-position: right center !important;
+    background-repeat: no-repeat !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    overflow: hidden !important;
+}
+
+/* FORÇA O BOTÃO E O ÍCONE INTERNO COM AS SUAS CORES (SOBREPÕE QUALQUER CSS GLOBAL) */
+button.btn-seta-destaque,
+.btn-seta-destaque {
+    position: absolute !important;
+    left: 210px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+    
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    
+    /* Fundo Vermelho Sólido (#ab232a) */
+    background: #ab232a !important;
+    background-color: #fffcef !important;
+    
+    /* Cor da Seta Creme (#fffcef) */
+    color: #ab232a !important;
+    
+    border: none !important;
+    outline: none !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25) !important;
+    cursor: pointer !important;
+    
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    font-size: 15px !important;
+    transition: transform 0.2s ease, background-color 0.2s ease !important;
+}
+
+/* Trava a cor da seta dentro do botão */
+button.btn-seta-destaque i,
+.btn-seta-destaque i {
+    color: #ab232a !important;
+}
+
+/* QUANDO PASSA O MOUSE (Apenas escurece levemente o vermelho) */
+button.btn-seta-destaque:hover,
+.btn-seta-destaque:hover {
+    transform: translateY(-50%) scale(1.1) !important;
+    background: #8e1c22 !important;
+    background-color: #8e1c22 !important;
+}
+
+button.btn-seta-destaque:hover i,
+.btn-seta-destaque:hover i {
+    color: #fffcef !important;
+}
+
+/* EFEITO AO PASSAR O MOUSE */
+.btn-seta-destaque:hover {
+    transform: translateY(-50%) scale(1.1) !important;
+    background: #8e1c22 !important; /* Tom levemente mais escuro para dar destaque ao clique */
+}
+/* CONTAINER DOS PRATOS */
+.destaque-pratos-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    gap: 30px !important;
+    position: absolute !important;
+    left: -100px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 2 !important;
+}
+
+/* ESTRUTURA BASE DOS CARDS (TRANSIÇÃO NATIVA FLUIDA) */
+.card-prato {
+    height: 650px !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    transition: all 0.45s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.card-prato img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* CARD DA ESQUERDA (PEEK) */
+.card-prato.card-peek {
+    width: 320px !important;
+    border-radius: 40px !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
+    opacity: 1 !important;
+}
+
+/* CARD PRINCIPAL (ATIVO) */
+.card-prato.card-ativo {
+    width: 850px !important;
+    border-radius: 45px !important;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.2) !important;
+    opacity: 1 !important;
+}
+
+/* CARDS ESCONDIDOS (ESPERANDO A SUA VEZ) */
+.card-prato.card-escondido {
+    width: 0px !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    pointer-events: none !important;
+}
+
+.card-prato-ativo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: opacity 0.3s ease !important;
+}
+
+/* SETA BRANCA */
+.btn-seta-destaque {
+    position: absolute !important;
+    top: 50% !important;
+    right: 20px !important;
+    transform: translateY(-50%) !important;
+    width: 54px !important;
+    height: 54px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    color: #333333 !important;
+    border: none !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25) !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+    z-index: 10 !important;
+}
+
+.btn-seta-destaque:hover {
+    transform: translateY(-50%) scale(1.1);
+    background-color: #fff6a9;
+}
+
+/* Card principal do prato */
+.card-prato-ativo {
+    width: 430px;
+    height: 380px;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+.card-prato-ativo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+#containerReceitas {
+    scroll-margin-top: 80px;
+}
 
             body {
                 background: #f3f1ff;
@@ -213,8 +393,14 @@ $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
   height: calc(100vh - 70px);
   position: relative;
   background-size: cover;
-  background-position: center 60%; /* Centraliza a imagem perfeitamente */
+  background-position: center 65%; /* Centraliza a imagem perfeitamente */
   transition: background-image 0.6s ease-in-out;
+
+  /* Otimizações para nitidez e rendering */
+  image-rendering: -webkit-optimize-contrast;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 .hero-content {
@@ -274,7 +460,7 @@ display: inline-flex;
 
             .slider-btn:hover {
                 background: #fff6a9ff;
-                color: #1e0061;
+                color: #245089;
                 transform: translateY(-50%) scale(1.1);
             }
 
@@ -588,6 +774,26 @@ display: inline-flex;
                 font-weight: 600;
                 font-size: 14px;
             }
+
+/* ARRASTE PURO E LÍMPIDO (SEM TELA BRANCA / SEM FICAR TRANSPARENTE) */
+.card-prato-peek img,
+.card-prato-ativo img {
+    transition: transform 0.18s ease-in-out !important;
+    opacity: 1 !important; /* Força a foto a ficar 100% visível sempre */
+    will-change: transform;
+}
+
+/* Desloca levemente para a esquerda */
+.prato-saindo {
+    transform: translateX(-40px) !important;
+}
+
+/* Posiciona levemente à direita sem animação para encaixar */
+.prato-entrando {
+    transition: none !important;
+    transform: translateX(40px) !important;
+}
+
     </style>
 </head>
 
@@ -736,6 +942,29 @@ display: inline-flex;
     </div>
 </div>
 
+<!-- BANNER DESTAQUE -->
+<div class="banner-destaque">
+    <div class="destaque-pratos-wrapper" id="sliderPratos">
+        <div class="card-prato card-peek" style="order: 1;">
+            <img src="img/pratos/beignet_princesa_sapo.webp" alt="Beignets">
+        </div>
+        <div class="card-prato card-ativo" style="order: 2;">
+            <img src="img/pratos/espaguete_almondegas.webp" alt="Espaguete">
+        </div>
+        <div class="card-prato card-escondido" style="order: 3;">
+            <img src="img/pratos/ratatouille_prato.webp" alt="Ratatouille">
+        </div>
+        <div class="card-prato card-escondido" style="order: 4;">
+            <img src="img/pratos/torta_maca_branca_neve.webp" alt="Torta de Maçã">
+        </div>
+    </div>
+
+    <!-- Botão de Seta -->
+    <button class="btn-seta-destaque" onclick="mudarPratoDestaque()" title="Próximo prato">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+</div>
+
     <!-- PESQUISA -->
     <div class="search-wrapper">
         <div class="search-container">
@@ -879,6 +1108,44 @@ display: inline-flex;
 
     // Inicializa slider no carregamento
     atualizarSlide();
-    </script>
+// Inicializa slider no carregamento
+atualizarSlide();
+
+// LISTA DE PRATOS PARA ALTERNAR
+// LISTA DOS 4 PRATOS DA ROLETA
+// LISTA COM OS NOMES EXATOS DAS SUAS IMAGENS
+const listaPratos = [
+    "img/pratos/espaguete_almondegas.webp",
+    "img/pratos/beignet_princesa_sapo.webp",
+    "img/pratos/ratatouille_prato.webp",
+    "img/pratos/torta_maca_branca_neve.webp"
+];
+
+let indexAtivo = 1; // Começa no Espaguete (índice 1)
+
+function mudarPratoDestaque() {
+    const cards = document.querySelectorAll('#sliderPratos .card-prato');
+    if (!cards.length) return;
+
+    const total = cards.length;
+    indexAtivo = (indexAtivo + 1) % total;
+    const indexPeek = (indexAtivo - 1 + total) % total;
+
+    cards.forEach((card, i) => {
+        card.classList.remove('card-peek', 'card-ativo', 'card-escondido');
+
+        if (i === indexPeek) {
+            card.classList.add('card-peek');
+            card.style.order = "1";
+        } else if (i === indexAtivo) {
+            card.classList.add('card-ativo');
+            card.style.order = "2";
+        } else {
+            card.classList.add('card-escondido');
+            card.style.order = "3";
+        }
+    });
+}
+</script>
 </body>
 </html>
