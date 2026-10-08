@@ -16,8 +16,8 @@ function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];
-    $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
+    $pastas = ['slider', 'pratos', 'filme', 'logo', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];
+    $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg'];
 
     foreach ($pastas as $pasta) {
         foreach ($extensoes as $ext) {
@@ -101,7 +101,7 @@ function obterCorFilme($nomeFilme) {
         'Frozen' => '#90e0ef',
         'Enrolados' => '#e0aaff',
         'A Princesa e o Sapo' => '#2a9d8f',
-        'Alice no País das Maravilhas' => '#0077b6',
+        'Alice no País das Maravirhas' => '#0077b6',
         'Ratatouille' => '#f77f00',
         'Lilo & Stitch' => '#0077b6',
         'A Bela Adormecida' => '#ff006e',
@@ -122,7 +122,6 @@ function obterCorFilme($nomeFilme) {
         'Aladdin' => '#3c096c',
         'Os Incríveis' => '#e63946',
         'Mulan' => '#bc4749',
-        
         'A Era do Gelo' => '#3a86ff',
         'A Espada Era a Lei' => '#d4a373',
         'A Nova Onda do Imperador' => '#ff006e',
@@ -145,7 +144,7 @@ function obterCorFilme($nomeFilme) {
     return '#1f4396'; 
 }
 
-// BUSCA AVATARES CASO O UTILIZADOR ESTEJA LOGADO (PARA O MODAL DE PERFIL)
+// BUSCA AVATARES CASO O UTILIZADOR ESTEJA LOGADO
 $avataresPadrao = [];
 if (isset($_SESSION['usuario'])) {
     try {
@@ -155,9 +154,6 @@ if (isset($_SESSION['usuario'])) {
         $avataresPadrao = [];
     }
 }
-
-$status = isset($_GET['status']) ? $_GET['status'] : "";
-$erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET['msg'] : "");
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -173,7 +169,7 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { background: #f3f1ff; color: #333; overflow-x: hidden; }
 
-    /* --- NAVBAR (PADRONIZADA COM O INDEX) --- */
+    /* --- NAVBAR --- */
     .navbar {
         width: 100%;
         background: #294f88;
@@ -190,7 +186,6 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         height: 50px; 
         width: auto;
         display: block;
-        margin-top: 0;
     }
     .menu {
         display: flex;
@@ -222,7 +217,18 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         border: 2px solid #fff6a9ff;
     }
 
-    /* --- MODAIS FLUTUANTES (PADRONIZADOS COM O INDEX) --- */
+    /* --- IMAGEM DE TOPO (BANNER SEM CORTE) --- */
+    .banner-inicio {
+        width: 100%;
+        display: block;
+    }
+    .banner-inicio img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* --- MODAIS FLUTUANTES --- */
     .modal-overlay {
         display: none;
         position: fixed;
@@ -363,12 +369,9 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         font-size: 14px;
     }
 
-    /* --- FILMES (MANTIDOS INTACTOS CONFORME SOLICITADO) --- */
-    .header-filmes { text-align: center; padding: 40px 20px 20px; }
-    .header-filmes h1 { color: #1f4396; font-size: 38px; }
-
+    /* --- FILMES --- */
     .container { width: 100%; max-width: 1250px; margin: 0 auto; padding: 0 30px 50px; }
-    .categoria-titulo { width: 100%; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 3px solid #1f4396; color: #1f4396; font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .categoria-titulo { width: 100%; margin: 30px 0 20px; padding-bottom: 10px; border-bottom: 3px solid #1f4396; color: #1f4396; font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 
     .grid-filmes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; margin-bottom: 20px; }
     .box-filme { position: relative; height: 180px; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); transition: transform 0.3s ease, box-shadow 0.3s ease; background-color: var(--cor-tema); }
@@ -418,7 +421,6 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
             <a href="#">Favoritos</a>
             <a href="filmes.php" class="ativo">Filmes</a>
 
-            <!-- EXIBE FOTO E NOME DO PERFIL SE LOGADO, SE NÃO PERMITE Fazer LOGIN -->
             <?php if (isset($_SESSION['usuario'])): ?>
                 <a href="javascript:void(0)" onclick="alternarModais('perfil')">
                     <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
@@ -428,6 +430,11 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
                 <a href="javascript:void(0)" onclick="alternarModais('login')"><i class="fa-solid fa-user"></i> Perfil</a>
             <?php endif; ?>
         </div>
+    </div>
+
+    <!-- BANNER DE ENTRADA (MANTÉM PROPORÇÃO TOTAL) -->
+    <div class="banner-inicio">
+        <img src="img/slider/filme.webp" alt="Banner Filmes">
     </div>
 
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
@@ -508,11 +515,6 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     <?php endif; ?>
 
     <!-- SEÇÃO PRINCIPAL FILMES -->
-    <div class="header-filmes">
-        <h1>Escolha o seu Universo</h1>
-        <p>Selecione um filme e descubra todas as receitas mágicas dele!</p>
-    </div>
-
     <div class="container">
         <?php foreach($categorias as $nomeCategoria => $filmesCategoria): ?>
         <?php if(!empty($filmesCategoria)): ?>
