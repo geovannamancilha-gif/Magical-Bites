@@ -1,7 +1,7 @@
 <?php
 // Conexão com a base de dados
-//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
+//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
 
 // ==========================================
 // FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
@@ -11,8 +11,8 @@ function buscarImagem($nomeImagem) {
         return "img/logo/logo_menu.png";
     }
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider'];
-    $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
+    $pastas = ['slider', 'pratos', 'filme', 'logo', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];
+    $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg'];
 
     foreach ($pastas as $pasta) {
         foreach ($extensoes as $ext) {
@@ -98,7 +98,7 @@ function obterCorFilme($nomeFilme) {
         'Frozen' => '#90e0ef',
         'Enrolados' => '#e0aaff',
         'A Princesa e o Sapo' => '#2a9d8f',
-        'Alice no País das Maravilhas' => '#0077b6',
+        'Alice no País das Maravirhas' => '#0077b6',
         'Ratatouille' => '#f77f00',
         'Lilo & Stitch' => '#0077b6',
         'A Bela Adormecida' => '#ff006e',
@@ -119,7 +119,6 @@ function obterCorFilme($nomeFilme) {
         'Aladdin' => '#3c096c',
         'Os Incríveis' => '#e63946',
         'Mulan' => '#bc4749',
-        
         // Cores personalizadas para os filmes que faltavam:
         'A Era do Gelo' => '#3a86ff',             // Azul glacial
         'A Espada Era a Lei' => '#d4a373',         // Ouro medieval
@@ -145,6 +144,17 @@ function obterCorFilme($nomeFilme) {
 
 $status = isset($_GET['status']) ? $_GET['status'] : "";
 $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET['msg'] : "");
+
+// BUSCA AVATARES CASO O UTILIZADOR ESTEJA LOGADO
+$avataresPadrao = [];
+if (isset($_SESSION['usuario'])) {
+    try {
+        $stmtAvatares = $pdo->query("SELECT * FROM avatar_predefinido");
+        $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        $avataresPadrao = [];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -161,9 +171,17 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     body { background: #f3f1ff; color: #333; overflow-x: hidden; }
 
     .navbar {
-        width: 100%; background: #1f4396; padding: 14px 25px;
-        display: flex; align-items: center; justify-content: space-between;
-        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20); position: sticky; top: 0; z-index: 100;
+        width: 100%;
+        background: #1f4396;
+        padding: 14px 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.20);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
     }
     .logo img { height: 60px; width: auto; margin-top: -10px; }
     .menu { display: flex; align-items: center; gap: 35px; }
@@ -173,8 +191,161 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
     .header-filmes { text-align: center; padding: 40px 20px 20px; }
     .header-filmes h1 { color: #1f4396; font-size: 38px; }
 
+    /* --- IMAGEM DE TOPO (BANNER SEM CORTE) --- */
+    .banner-inicio {
+        width: 100%;
+        display: block;
+    }
+    .banner-inicio img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* --- MODAIS FLUTUANTES --- */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        z-index: 999;
+    }
+    .card-flutuante {
+        display: none;
+        position: fixed;
+        top: 80px;
+        right: 25px;
+        width: 380px;
+        max-height: calc(100vh - 100px);
+        overflow-y: auto;
+        background: white;
+        border-radius: 28px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+        padding: 28px;
+        z-index: 1000;
+        color: #333;
+        animation: fadeInSlide 0.3s ease-out;
+    }
+    .card-flutuante::-webkit-scrollbar { width: 6px; }
+    .card-flutuante::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+
+    @keyframes fadeInSlide {
+        from { opacity: 0; transform: translateX(30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    .card-flutuante .btn-fechar {
+        background: none;
+        border: none;
+        font-size: 26px;
+        cursor: pointer;
+        color: #999;
+    }
+    .input-group-modal {
+        position: relative;
+        margin-bottom: 15px;
+    }
+    .input-group-modal i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #1f4396;
+    }
+    .input-group-modal input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        outline: none;
+    }
+    .btn-acao {
+        width: 100%;
+        padding: 14px;
+        background: #1f4396;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+    }
+    .btn-acao:hover {
+        background: #162f6b;
+        transform: scale(1.02);
+    }
+    .footer-modal {
+        margin-top: 20px;
+        font-size: 13px;
+        text-align: center;
+        color: #666;
+    }
+    .footer-modal a {
+        color: #1f4396;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .perfil-avatar-header {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .perfil-avatar-header img {
+        width: 85px;
+        height: 85px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #1f4396;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    .grid-avatares-modal {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+        max-height: 140px;
+        overflow-y: auto;
+        padding: 5px;
+        margin: 10px 0;
+    }
+    .avatar-item {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer;
+        overflow: hidden;
+        transition: 0.2s;
+    }
+    .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-item:hover, .avatar-item.selected {
+        border-color: #ffe45c;
+        transform: scale(1.1);
+    }
+    .btn-logout-modal {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: #f44336;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+    /* --- FILMES --- */
     .container { width: 100%; max-width: 1250px; margin: 0 auto; padding: 0 30px 50px; }
-    .categoria-titulo { width: 100%; margin: 50px 0 20px; padding-bottom: 10px; border-bottom: 3px solid #1f4396; color: #1f4396; font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .categoria-titulo { width: 100%; margin: 30px 0 20px; padding-bottom: 10px; border-bottom: 3px solid #1f4396; color: #1f4396; font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 
     .grid-filmes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 30px; margin-bottom: 20px; }
     .box-filme { position: relative; height: 180px; border-radius: 20px; overflow: hidden; cursor: pointer; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); transition: transform 0.3s ease, box-shadow 0.3s ease; background-color: var(--cor-tema); }
@@ -233,8 +404,22 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
             <a href="index.php#containerReceitas">Receitas</a>
             <a href="#">Favoritos</a>
             <a href="filmes.php" class="ativo">Filmes</a>
-            <a href="javascript:void(0)" onclick="alternarModais('login')"><i class="fa-solid fa-user"></i> Perfil</a>
+
+            <?php if (isset($_SESSION['usuario'])): ?>
+                <a href="javascript:void(0)" onclick="alternarModais('perfil')">
+                    <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
+                    <?= htmlspecialchars(explode(' ', $_SESSION['usuario']['nome'])[0]) ?>
+                </a>
+            <?php else: ?>
+                <a href="javascript:void(0)" onclick="alternarModais('login')"><i class="fa-solid fa-user"></i> Perfil</a>
+            <?php endif; ?>
+
         </div>
+    </div>
+
+    <!-- BANNER DE ENTRADA (MANTÉM PROPORÇÃO TOTAL) -->
+    <div class="banner-inicio">
+        <img src="img/slider/filme.webp" alt="Banner Filmes">
     </div>
 
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
@@ -270,11 +455,54 @@ $erro_msg = isset($_GET['erro']) ? $_GET['erro'] : (isset($_GET['msg']) ? $_GET[
         <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
+    <!-- MODAL PERFIL -->
+    <?php if (isset($_SESSION['usuario'])): ?>
+    <div id="modalPerfil" class="card-flutuante">
+        <div class="card-header">
+            <img src="<?= buscarImagem('logo.png') ?>" style="width: 90px;">
+            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+        </div>
+
+        <div class="perfil-avatar-header">
+            <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
+            <h3 style="color:#1f4396; margin-top:8px; font-size:18px;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
+            <p style="font-size:12px; color:#777;"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
+        </div>
+
+        <form action="index.php" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="acao" value="atualizar_perfil">
+            <input type="hidden" name="avatar_predefinido" id="modalInputAvatar" value="">
+
+            <div class="input-group-modal" style="margin-bottom: 10px;">
+                <i class="fa fa-user"></i>
+                <input type="text" name="nome" value="<?= htmlspecialchars($_SESSION['usuario']['nome']) ?>" required placeholder="Nome">
+            </div>
+
+            <label style="font-size:12px; font-weight:600; color:#1f4396;">Avatar Disney</label>
+            <div class="grid-avatares-modal">
+                <?php foreach ($avataresPadrao as $avatar): ?>
+                    <div class="avatar-item" onclick="selecionarAvatarModal('<?= $avatar['caminho_imagem'] ?>', this)">
+                        <img src="<?= buscarImagem($avatar['caminho_imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
+                    </div>
+                <?php endforeach; ?>
+            </div>
+
+            <label style="font-size:12px; font-weight:600; color:#1f4396; display:block; margin-top:10px;">Ou foto própria:</label>
+            <input type="file" name="foto_upload" accept="image/*" style="font-size:12px; margin-top:5px; width:100%;" onchange="limparAvatarModal()">
+
+            <button type="submit" class="btn-acao" style="margin-top:18px;">Salvar Alterações</button>
+        </form>
+
+        <a href="logout.php" class="btn-logout-modal"><i class="fa-solid fa-right-from-bracket"></i> Sair da Conta</a>
+    </div>
+    <?php endif; ?>
+
     <div class="header-filmes">
         <h1>Escolha o seu Universo</h1>
         <p>Selecione um filme e descubra todas as receitas mágicas dele!</p>
     </div>
 
+    <!-- SEÇÃO PRINCIPAL FILMES -->
     <div class="container">
         <?php foreach($categorias as $nomeCategoria => $filmesCategoria): ?>
         <?php if(!empty($filmesCategoria)): ?>
