@@ -24,7 +24,7 @@ try {
 
     // Processamento de listas
     $lista_ingredientes = array_filter(array_map('trim', explode(";", $receita['ingredientes'])));
-    $passos_preparo = array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $receita['modo_preparo'])));
+    $passos_preparo = array_filter(array_map('trim', preg_split('/(?=\d+\.\s)/', $receita['modo_preparo'])));
 
     // Definição de cores por categoria
     $classe_tag = 'tag-doce';
