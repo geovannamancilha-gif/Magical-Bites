@@ -820,18 +820,6 @@ function buscarImagem($nomeImagem) {
                     </ol>
                 </div>
 
-                <!-- BOX DICA MÁGICA -->
-                <div class="dica-magica">
-                    <div class="dica-conteudo">
-                        <h4>Dica mágica</h4>
-                        <p>Sirva com uma bola de sorvete de creme para uma experiência ainda mais encantadora!</p>
-                    </div>
-                    <div class="dica-icone">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
         <!-- OUTRAS RECEITAS RELACIONADAS -->
