@@ -3,7 +3,7 @@ session_start();
 
 // Conexão com a base de dados
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
+    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Erro na conexão: " . $e->getMessage());
