@@ -19,7 +19,7 @@ try {
     $receita = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$receita) {
-        die("<h1>Receita não encontrada na base de dados para o ID: $id_receita!</h1>");
+        die("<h1 style='color:#fff; text-align:center; margin-top:50px;'>Receita não encontrada na base de dados para o ID: $id_receita!</h1>");
     }
 
     // Processamento de listas
@@ -70,14 +70,12 @@ if (isset($_SESSION['usuario'])) {
     }
 }
 
-// ==========================================
 // FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
-// ==========================================
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];
+    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'img/perfis', 'img/avatares', 'fundo'];
     $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
 
     foreach ($pastas as $pasta) {
@@ -94,16 +92,14 @@ function buscarImagem($nomeImagem) {
     return "img/logo/logo_menu.png";
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-pt">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($receita['nome_receita']) ?> | Magical Bites</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -114,14 +110,29 @@ function buscarImagem($nomeImagem) {
             font-family: 'Poppins', sans-serif;
         }
 
-        body {
-            background: linear-gradient(135deg, #f3f5fd 0%, #e8ecf8 100%);
-            color: #1e2448;
+        html { scroll-behavior: smooth; }
+
+        /* --- FUNDO DINÂMICO E RESPONSIVO MÁGICO --- */
+        body { 
+            background-color: #121829;
+            background-image: url('<?= buscarImagem("fundo_favoritos") ?>');
+            background-size: cover;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #ffffff; 
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* --- NAVBAR (PADRONIZADA COM O INDEX/FILMES) --- */
+        @media (max-width: 768px) {
+            body {
+                background-attachment: scroll;
+                background-size: cover;
+            }
+        }
+
+        /* --- NAVBAR (PADRONIZADA) --- */
         .navbar {
             width: 100%;
             background: #294f88;
@@ -176,7 +187,7 @@ function buscarImagem($nomeImagem) {
             border: 2px solid #fff6a9ff;
         }
 
-        /* --- MODAIS FLUTUANTES (PADRONIZADOS) --- */
+        /* --- MODAIS FLUTUANTES --- */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -184,8 +195,8 @@ function buscarImagem($nomeImagem) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
             z-index: 999;
         }
 
@@ -197,21 +208,12 @@ function buscarImagem($nomeImagem) {
             width: 380px;
             max-height: calc(100vh - 100px);
             overflow-y: auto;
-            background: white;
+            background: #ffffff;
             border-radius: 28px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
             padding: 28px;
             z-index: 1000;
             color: #333;
-            animation: fadeInSlide 0.3s ease-out;
-        }
-
-        .card-flutuante::-webkit-scrollbar { width: 6px; }
-        .card-flutuante::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
-
-        @keyframes fadeInSlide {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
         }
 
         .card-header {
@@ -221,7 +223,7 @@ function buscarImagem($nomeImagem) {
             margin-bottom: 15px;
         }
 
-        .card-flutuante .btn-fechar {
+        .btn-fechar {
             background: none;
             border: none;
             font-size: 26px;
@@ -263,11 +265,6 @@ function buscarImagem($nomeImagem) {
             margin-top: 10px;
         }
 
-        .btn-acao:hover {
-            background: #162f6b;
-            transform: scale(1.02);
-        }
-
         .footer-modal {
             margin-top: 20px;
             font-size: 13px;
@@ -293,7 +290,6 @@ function buscarImagem($nomeImagem) {
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #1f4396;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
 
         .grid-avatares-modal {
@@ -314,14 +310,9 @@ function buscarImagem($nomeImagem) {
             border: 2px solid transparent;
             cursor: pointer;
             overflow: hidden;
-            transition: 0.2s;
         }
 
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
-        .avatar-item:hover, .avatar-item.selected {
-            border-color: #ffe45c;
-            transform: scale(1.1);
-        }
 
         .btn-logout-modal {
             display: block;
@@ -333,67 +324,77 @@ function buscarImagem($nomeImagem) {
             font-size: 14px;
         }
 
-        /* --- LAYOUT DA RECEITA --- */
+        /* --- CONTAINER PRINCIPAL --- */
         .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 25px;
+            max-width: 1250px;
+            margin: 35px auto 70px;
+            padding: 0 30px;
         }
 
         .voltar-link {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            color: #1f4396;
+            color: #fff6a9;
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 25px;
-            transition: 0.2s;
+            transition: 0.2s ease;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .voltar-link:hover {
-            transform: translateX(-3px);
-            color: #162f6b;
+            transform: translateX(-4px);
+            color: #ffffff;
         }
 
-        /* HERO SECTION (INFO + IMAGEM) */
+        /* HERO RECEITA (VIDRO FOSCO / GLASSMORPHISM) */
         .hero-receita {
             display: grid;
             grid-template-columns: 1.1fr 0.9fr;
             gap: 40px;
             align-items: center;
             margin-bottom: 40px;
+            background: rgba(18, 24, 41, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 32px;
+            padding: 35px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
         }
 
         .hero-info .titulo {
             font-size: 38px;
-            font-weight: 700;
-            color: #172146;
+            font-weight: 800;
+            color: #ffffff;
             line-height: 1.2;
             margin-bottom: 15px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
         .tag {
             display: inline-block;
-            padding: 5px 16px;
+            padding: 6px 18px;
             border-radius: 20px;
             color: white;
             font-size: 12px;
             font-weight: 700;
             margin-bottom: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        .tag-doce { background: #ff528a; }
-        .tag-salgado { background: #22c55e; }
-        .tag-bebida { background: #06b6d4; }
+        .tag-doce { background: #ff528a; box-shadow: 0 4px 12px rgba(255, 82, 138, 0.35); }
+        .tag-salgado { background: #22c55e; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35); }
+        .tag-bebida { background: #06b6d4; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35); }
 
         .meta-info {
             display: flex;
             align-items: center;
             gap: 25px;
             font-size: 14px;
-            color: #505878;
+            color: #cbd5e1;
             font-weight: 500;
             margin-bottom: 20px;
         }
@@ -405,25 +406,27 @@ function buscarImagem($nomeImagem) {
         }
 
         .meta-item i {
-            color: #1f4396;
+            color: #fff6a9;
         }
 
         .meta-item i.fa-star {
-            color: #ffb800;
+            color: #fbbf24;
         }
 
         .descricao {
             font-size: 15px;
-            color: #636c8a;
+            color: #e2e8f0;
             line-height: 1.6;
             margin-bottom: 30px;
             max-width: 520px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
-        /* BOTOES DE AÇÃO */
+        /* BOTÕES DE AÇÃO */
         .acoes {
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .btn-favoritar {
@@ -432,27 +435,29 @@ function buscarImagem($nomeImagem) {
             gap: 8px;
             padding: 12px 28px;
             border-radius: 30px;
-            border: 1.5px solid #1f4396;
-            background: transparent;
-            color: #1f4396;
+            border: 1.5px solid #fff6a9;
+            background: rgba(255, 246, 169, 0.1);
+            color: #fff6a9;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
             text-decoration: none;
             transition: 0.3s;
+            backdrop-filter: blur(6px);
         }
 
         .btn-favoritar:hover {
-            background: rgba(31, 67, 150, 0.08);
+            background: #fff6a9;
+            color: #121829;
             transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 246, 169, 0.3);
         }
 
-        /* ESTILO QUANDO A RECEITA JÁ ESTÁ FAVORITADA */
         .btn-favoritar.favoritado {
             background: #ff528a;
             border-color: #ff528a;
             color: white;
-            box-shadow: 0 4px 14px rgba(255, 82, 138, 0.35);
+            box-shadow: 0 4px 14px rgba(255, 82, 138, 0.4);
         }
 
         .btn-favoritar.favoritado:hover {
@@ -468,20 +473,20 @@ function buscarImagem($nomeImagem) {
             padding: 12px 32px;
             border-radius: 30px;
             border: none;
-            background: #1f4396;
+            background: #245089;
             color: white;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
             text-decoration: none;
-            box-shadow: 0 6px 18px rgba(31, 67, 150, 0.35);
+            box-shadow: 0 6px 18px rgba(36, 80, 137, 0.4);
             transition: 0.3s;
         }
 
         .btn-fazer:hover {
-            background: #162f6b;
+            background: #305e9b;
             transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(31, 67, 150, 0.45);
+            box-shadow: 0 8px 22px rgba(48, 94, 155, 0.5);
         }
 
         /* CONTAINER DA IMAGEM PRINCIPAL */
@@ -489,9 +494,10 @@ function buscarImagem($nomeImagem) {
             position: relative;
             width: 100%;
             height: 380px;
-            border-radius: 32px;
+            border-radius: 28px;
             overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .hero-imagem img {
@@ -500,7 +506,7 @@ function buscarImagem($nomeImagem) {
             object-fit: cover;
         }
 
-        /* --- DETALHES DA RECEITA --- */
+        /* --- PAINÉIS DE INGREDIENTES E PREPARO --- */
         .detalhes-grid {
             display: grid;
             grid-template-columns: 1fr 1.3fr;
@@ -509,10 +515,12 @@ function buscarImagem($nomeImagem) {
         }
 
         .card-painel {
-            background: #ffffff;
+            background: rgba(18, 24, 41, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 28px;
             padding: 35px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -520,9 +528,10 @@ function buscarImagem($nomeImagem) {
 
         .card-painel h2 {
             font-size: 22px;
-            color: #172146;
+            color: #ffffff;
             margin-bottom: 22px;
             font-weight: 700;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
 
         /* LISTA DE INGREDIENTES */
@@ -534,7 +543,7 @@ function buscarImagem($nomeImagem) {
             position: relative;
             padding-left: 20px;
             margin-bottom: 14px;
-            color: #4b526d;
+            color: #cbd5e1;
             font-size: 14.5px;
             line-height: 1.5;
         }
@@ -543,7 +552,7 @@ function buscarImagem($nomeImagem) {
             content: "•";
             position: absolute;
             left: 0;
-            color: #1f4396;
+            color: #fff6a9;
             font-size: 18px;
             top: -2px;
         }
@@ -559,7 +568,7 @@ function buscarImagem($nomeImagem) {
             position: relative;
             padding-left: 28px;
             margin-bottom: 16px;
-            color: #4b526d;
+            color: #cbd5e1;
             font-size: 14.5px;
             line-height: 1.6;
         }
@@ -568,41 +577,11 @@ function buscarImagem($nomeImagem) {
             content: counter(passo-counter) ".";
             position: absolute;
             left: 0;
-            color: #1f4396;
+            color: #fff6a9;
             font-weight: 700;
         }
 
-        /* DICA MÁGICA BOX */
-        .dica-magica {
-            background: #f0edff;
-            border-radius: 20px;
-            padding: 20px 25px;
-            margin-top: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .dica-conteudo h4 {
-            color: #1f4396;
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .dica-conteudo p {
-            color: #43598d;
-            font-size: 13.5px;
-            line-height: 1.5;
-        }
-
-        .dica-icone {
-            font-size: 28px;
-            color: #1f4396;
-        }
-
-        /* SEÇÃO RELACIONADAS */
+        /* RECEITAS RELACIONADAS */
         .secao-relacionadas {
             margin-top: 60px;
             margin-bottom: 40px;
@@ -610,8 +589,9 @@ function buscarImagem($nomeImagem) {
 
         .secao-relacionadas h3 {
             font-size: 22px;
-            color: #172146;
+            color: #ffffff;
             margin-bottom: 25px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.5);
         }
 
         .grid-relacionadas {
@@ -621,11 +601,13 @@ function buscarImagem($nomeImagem) {
         }
 
         .card-relacionada {
-            background: white;
+            background: rgba(18, 24, 41, 0.65);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 20px;
             overflow: hidden;
             text-decoration: none;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
             transition: 0.3s;
             display: flex;
             flex-direction: column;
@@ -633,7 +615,8 @@ function buscarImagem($nomeImagem) {
 
         .card-relacionada:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.5);
+            border-color: rgba(255, 246, 169, 0.3);
         }
 
         .card-relacionada img {
@@ -650,17 +633,18 @@ function buscarImagem($nomeImagem) {
         .card-relacionada p {
             font-size: 14px;
             font-weight: 600;
-            color: #172146;
+            color: #ffffff;
         }
 
         /* RESPONSIVIDADE */
         @media (max-width: 900px) {
             .hero-receita {
                 grid-template-columns: 1fr;
+                padding: 25px;
             }
 
             .hero-imagem {
-                height: 300px;
+                height: 280px;
             }
 
             .detalhes-grid {
@@ -683,7 +667,6 @@ function buscarImagem($nomeImagem) {
             <a href="favoritos.php">Favoritos</a>
             <a href="filmes.php">Filmes</a>
 
-            <!-- EXIBE FOTO E NOME DO PERFIL SE LOGADO, SE NÃO PERMITE FAZER LOGIN -->
             <?php if (isset($_SESSION['usuario'])): ?>
                 <a href="javascript:void(0)" onclick="alternarModais('perfil')">
                     <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
