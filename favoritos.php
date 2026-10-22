@@ -1,18 +1,25 @@
 <?php
 session_start();
 
+// Exige utilizador logado
 if (!isset($_SESSION['usuario'])) {
     header("Location: index.php?status=erro&msg=" . urlencode("Inicie sessão para ver as suas receitas favoritas!"));
     exit;
 }
 
+$host = 'localhost';
+$dbname = 'magical_bites';
+$user = 'root'; 
+$pass = ""; 
+
 try {
-    $pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Erro na conexão: " . $e->getMessage());
+    die("Erro na conexão com a base de dados: " . $e->getMessage());
 }
 
+// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
@@ -24,23 +31,32 @@ function buscarImagem($nomeImagem) {
         foreach ($extensoes as $ext) {
             $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem . $ext;
             if (file_exists($caminhoCompleto)) return $caminhoCompleto;
+
+            $caminhoRaiz = $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminhoRaiz)) return $caminhoRaiz;
         }
     }
+
+    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
     return "img/logo/logo_menu.png";
 }
 
-$id_usuario = $_SESSION['usuario']['id'];
+// Suporte flexível para a chave de ID na sessão
+$id_usuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
 
 // Busca as receitas favoritadas do utilizador na tabela 'favoritar'
-$stmt = $pdo->prepare("
-    SELECT r.* 
-    FROM receitas r
-    INNER JOIN favoritar f ON r.id_receita = f.id_receita
-    WHERE f.id_usuario = :id_usuario
-    ORDER BY f.id_favoritos DESC
-");
-$stmt->execute([':id_usuario' => $id_usuario]);
-$receitasFavoritas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$receitasFavoritas = [];
+if ($id_usuario) {
+    $stmt = $pdo->prepare("
+        SELECT r.* 
+        FROM receitas r
+        INNER JOIN favoritar f ON r.id_receita = f.id_receita
+        WHERE f.id_usuario = :id_usuario
+        ORDER BY f.id_favoritos DESC
+    ");
+    $stmt->execute([':id_usuario' => $id_usuario]);
+    $receitasFavoritas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 $avataresPadrao = [];
 try {
@@ -122,7 +138,7 @@ try {
             <a href="filmes.php">Filmes</a>
 
             <a href="javascript:void(0)" onclick="alternarModais('perfil')">
-                <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
+                <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
                 <?= htmlspecialchars(explode(' ', $_SESSION['usuario']['nome'])[0]) ?>
             </a>
         </div>
@@ -136,7 +152,7 @@ try {
             <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
         </div>
         <div class="perfil-avatar-header">
-            <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
+            <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
             <h3 style="color:#1f4396; margin-top:8px; font-size:18px;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
             <p style="font-size:12px; color:#777;"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
         </div>

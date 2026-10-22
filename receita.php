@@ -34,6 +34,20 @@ try {
         $classe_tag = 'tag-bebida';
     }
 
+    // VERIFICAÇÃO SE A RECEITA ESTÁ FAVORITADA PELO USUÁRIO LOGADO
+    $isFavorito = false;
+    if (isset($_SESSION['usuario'])) {
+        $idUsuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
+        if ($idUsuario) {
+            $stmtFav = $pdo->prepare("SELECT id_favoritos FROM favoritar WHERE id_usuario = :user AND id_receita = :receita");
+            $stmtFav->execute([
+                ':user' => $idUsuario,
+                ':receita' => $id_receita
+            ]);
+            $isFavorito = (bool)$stmtFav->fetch();
+        }
+    }
+
     // Busca de receitas relacionadas
     $stmtDoces = $pdo->prepare("SELECT * FROM receitas WHERE tipo = :tipo AND id_receita != :id LIMIT 4");
     $stmtDoces->bindParam(':tipo', $receita['tipo'], PDO::PARAM_STR);
@@ -433,6 +447,20 @@ function buscarImagem($nomeImagem) {
             transform: translateY(-2px);
         }
 
+        /* ESTILO QUANDO A RECEITA JÁ ESTÁ FAVORITADA */
+        .btn-favoritar.favoritado {
+            background: #ff528a;
+            border-color: #ff528a;
+            color: white;
+            box-shadow: 0 4px 14px rgba(255, 82, 138, 0.35);
+        }
+
+        .btn-favoritar.favoritado:hover {
+            background: #e04377;
+            border-color: #e04377;
+            transform: translateY(-2px);
+        }
+
         .btn-fazer {
             display: inline-flex;
             align-items: center;
@@ -652,7 +680,7 @@ function buscarImagem($nomeImagem) {
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="index.php#containerReceitas" class="active">Receitas</a>
-            <a href="#">Favoritos</a>
+            <a href="favoritos.php">Favoritos</a>
             <a href="filmes.php">Filmes</a>
 
             <!-- EXIBE FOTO E NOME DO PERFIL SE LOGADO, SE NÃO PERMITE FAZER LOGIN -->
@@ -779,8 +807,9 @@ function buscarImagem($nomeImagem) {
                 <p class="descricao"><?= htmlspecialchars($receita['descricao']) ?></p>
 
                 <div class="acoes">
-                    <a href="favoritar.php?id=<?= $receita['id_receita'] ?>" class="btn-favoritar">
-                        <i class="fa-regular fa-heart"></i> Favoritar
+                    <a href="favoritar.php?id=<?= $receita['id_receita'] ?>" class="btn-favoritar <?= $isFavorito ? 'favoritado' : '' ?>">
+                        <i class="<?= $isFavorito ? 'fa-solid fa-heart' : 'fa-regular fa-heart' ?>"></i>
+                        <?= $isFavorito ? 'Favoritado' : 'Favoritar' ?>
                     </a>
                     <a href="#modo-preparo" class="btn-fazer">
                         <i class="fa-solid fa-utensils"></i> Fazer agora
@@ -819,6 +848,7 @@ function buscarImagem($nomeImagem) {
                         <?php endforeach; ?>
                     </ol>
                 </div>
+            </div>
 
         </div>
 

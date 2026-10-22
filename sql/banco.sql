@@ -49,11 +49,13 @@ CREATE TABLE avatar_predefinido (
 
 CREATE TABLE favoritar (
     id_favoritos INT AUTO_INCREMENT PRIMARY KEY,
-    id_usuario INT,
-    id_receita INT,
-    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
-    FOREIGN KEY (id_receita) REFERENCES receitas(id_receita)
-);
+    id_usuario INT NOT NULL,
+    id_receita INT NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (id_receita) REFERENCES receitas(id_receita) ON DELETE CASCADE,
+    UNIQUE KEY uq_usuario_receita (id_usuario, id_receita)
+    );
 
 -- 3. INSERÇÃO DAS CATEGORIAS
 INSERT INTO categoria (id_categoria, nome_categoria) VALUES
