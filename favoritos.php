@@ -78,15 +78,15 @@ try {
         
         html { scroll-behavior: smooth; }
 
-        /* FUNDO DINÂMICO E RESPONSIVO */
+        /* FUNDO CLARO DINÂMICO E RESPONSIVO COM FUNDO_FAVORITOS1 */
         body { 
-            background-color: #121829;
-            background-image: url('<?= buscarImagem("fundo_favoritos") ?>');
+            background-color: #ffffff;
+            background-image: url('<?= buscarImagem("fundo_favoritos1") ?>');
             background-size: cover;
             background-position: center top;
             background-repeat: no-repeat;
             background-attachment: fixed;
-            color: #ffffff; 
+            color: #1f4396; 
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -153,7 +153,7 @@ try {
             border: 2px solid #fff6a9ff;
         }
 
-        /* --- HERO BANNER 100% RESPONSIVO (PROPORÇÃO 16:9 SEM CORTE) --- */
+        /* --- HERO BANNER 100% RESPONSIVO --- */
         .hero {
             width: 100%;
             aspect-ratio: 16 / 9;
@@ -164,8 +164,8 @@ try {
             background-position: center;
             background-repeat: no-repeat;
             background-color: #121829;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            border-bottom: 2px solid rgba(255, 246, 169, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-bottom: 2px solid rgba(41, 79, 136, 0.2);
             image-rendering: -webkit-optimize-contrast;
             overflow: hidden;
         }
@@ -185,7 +185,7 @@ try {
             font-size: clamp(12px, 1.1vw, 18px);
             background: #245089;
             backdrop-filter: blur(8px);
-            color: #87a5bf;
+            color: #ffffff;
             border: 1px solid #245089;
             border-radius: 50px;
             text-decoration: none;
@@ -199,10 +199,9 @@ try {
 
         .hero-btn:hover {
             background: #305e9bff;
-            color: #a8c3daff;
-            border-color: #245089;
+            color: #fff6a9;
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px #214575ff;
+            box-shadow: 0 8px 25px rgba(33, 69, 117, 0.4);
         }
 
         @media (max-width: 600px) {
@@ -225,7 +224,7 @@ try {
             scroll-margin-top: 90px;
         }
         
-        /* --- ESTILO DO TÍTULO EDITORIAL COM COROA BRANCA VAZADA --- */
+        /* --- ESTILO DO TÍTULO EDITORIAL EM AZUL --- */
         .header-favoritos {
             margin-bottom: 45px;
             text-align: center;
@@ -234,34 +233,32 @@ try {
         .titulo-editorial { 
             font-size: 42px; 
             font-weight: 900; 
-            color: #ffffff; 
+            color: #1f4396; 
             text-transform: uppercase;
             letter-spacing: 1.5px;
             line-height: 1.15;
             position: relative;
             display: inline-block;
-            text-shadow: 0 4px 16px rgba(0,0,0,0.6);
             padding-right: 38px;
         }
 
-        /* COROA VAZADA E BRANCA */
+        /* COROA VAZADA EM AZUL */
         .titulo-editorial .icone-destaque {
             position: absolute;
             top: -16px;
             right: -8px;
             font-size: 38px;
             color: transparent;
-            -webkit-text-stroke: 2px #ffffff;
+            -webkit-text-stroke: 2px #1f4396;
             transform: rotate(22deg);
-            filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.35));
+            filter: drop-shadow(0 4px 12px rgba(31, 67, 150, 0.25));
         }
 
         .subtitulo-editorial {
-            color: #cbd5e1;
+            color: #294f88;
             font-size: 15px;
             margin-top: 12px;
-            font-weight: 400;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
@@ -273,7 +270,7 @@ try {
                 font-size: 28px;
                 top: -12px;
                 right: -4px;
-                -webkit-text-stroke: 1.5px #ffffff;
+                -webkit-text-stroke: 1.5px #1f4396;
             }
         }
 
@@ -305,7 +302,7 @@ try {
             height: 240px;
             border-radius: 22px;
             overflow: hidden;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
             margin-bottom: 16px;
         }
 
@@ -325,9 +322,9 @@ try {
             position: absolute; 
             top: 14px; 
             right: 14px; 
-            background: rgba(18, 24, 41, 0.75);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.2); 
+            border: 1px solid rgba(31, 67, 150, 0.2); 
             width: 38px; 
             height: 38px; 
             border-radius: 50%; 
@@ -336,7 +333,7 @@ try {
             align-items: center; 
             justify-content: center; 
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
             transition: 0.2s ease; 
             z-index: 5;
         }
@@ -347,7 +344,7 @@ try {
             border-color: #ff528a;
         }
 
-        /* TEXTO DO CARD */
+        /* TEXTO DO CARD EM AZUL NÍTIDO */
         .card-info {
             display: flex;
             flex-direction: column;
@@ -358,73 +355,71 @@ try {
         .card-titulo { 
             font-weight: 700; 
             font-size: 17px; 
-            color: #ffffff; 
+            color: #1f4396; 
             line-height: 1.35;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.6);
         }
 
         .card-descricao {
             font-size: 13px;
-            color: #cbd5e1;
+            color: #475569;
             line-height: 1.45;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.5);
         }
 
         .card-avaliacao {
             display: flex;
             align-items: center;
             gap: 4px;
-            color: #fbbf24;
+            color: #f59e0b;
             font-size: 13px;
             margin-top: 4px;
         }
 
         .card-avaliacao span {
-            color: #e2e8f0;
+            color: #475569;
             font-size: 12px;
             margin-left: 6px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        /* TELA VAZIA */
+        /* TELA VAZIA COM CONTRASTE CLARO */
         .sem-favoritos { 
             text-align: center; 
             padding: 90px 20px; 
-            background: rgba(18, 24, 41, 0.65);
+            background: rgba(41, 79, 136, 0.05);
             backdrop-filter: blur(8px);
             border-radius: 28px;
-            border: 1px dashed rgba(255, 255, 255, 0.18);
+            border: 2px dashed rgba(31, 67, 150, 0.2);
             max-width: 600px;
             margin: 20px auto;
         }
-        .sem-favoritos i { font-size: 60px; color: #fff6a9; margin-bottom: 20px; }
-        .sem-favoritos h3 { font-size: 22px; color: #ffffff; margin-bottom: 10px; font-weight: 700; }
-        .sem-favoritos p { color: #cbd5e1; font-size: 14px; margin-bottom: 25px; }
+        .sem-favoritos i { font-size: 60px; color: #1f4396; margin-bottom: 20px; }
+        .sem-favoritos h3 { font-size: 22px; color: #1f4396; margin-bottom: 10px; font-weight: 700; }
+        .sem-favoritos p { color: #475569; font-size: 14px; margin-bottom: 25px; }
 
         .btn-explorar {
             display: inline-block;
             padding: 12px 32px;
-            background: #ab232a;
+            background: #1f4396;
             color: #ffffff;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
             font-size: 14px;
             transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(171, 35, 42, 0.4);
+            box-shadow: 0 4px 15px rgba(31, 67, 150, 0.3);
         }
         .btn-explorar:hover {
-            background: #8e1c22;
+            background: #162f6b;
             transform: translateY(-2px);
         }
 
         /* MODAIS */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 999; }
-        .card-flutuante { display: none; position: fixed; top: 80px; right: 25px; width: 380px; max-height: calc(100vh - 100px); overflow-y: auto; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); padding: 28px; z-index: 1000; color: #333; }
+        .card-flutuante { display: none; position: fixed; top: 80px; right: 25px; width: 380px; max-height: calc(100vh - 100px); overflow-y: auto; background: #ffffff; border-radius: 28px; box-shadow: 0 15px 50px rgba(0,0,0,0.3); padding: 28px; z-index: 1000; color: #333; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .btn-fechar { background: none; border: none; font-size: 26px; cursor: pointer; color: #999; }
         .input-group-modal { position: relative; margin-bottom: 15px; }
