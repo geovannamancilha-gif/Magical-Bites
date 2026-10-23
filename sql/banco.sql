@@ -74,8 +74,17 @@ INSERT INTO avatar_predefinido (nome_avatar, caminho_imagem) VALUES
 ('Avatar 17', 'avatar17.webp'), ('Avatar 18', 'avatar18.webp'), ('Avatar 19', 'avatar19.webp'), ('Avatar 20', 'avatar20.webp'),
 ('Avatar 21', 'avatar21.webp'), ('Avatar 22', 'avatar22.webp'), ('Avatar 23', 'avatar23.webp'), ('Avatar 24', 'avatar24.webp'),
 ('Avatar 25', 'avatar25.webp'), ('Avatar 26', 'avatar26.webp'), ('Avatar 27', 'avatar27.webp'), ('Avatar 28', 'avatar28.webp'),
-('Avatar 29', 'avatar29.webp'), ('Avatar 30', 'avatar30.webp'), ('Avatar 31', 'avatar31.webp'), ('Avatar 32', 'avatar32.webp');
-
+('Avatar 29', 'avatar29.webp'), ('Avatar 30', 'avatar30.webp'), ('Avatar 31', 'avatar31.webp'), ('Avatar 32', 'avatar32.webp'),
+('Avatar 33', 'avatar33.webp'),('Avatar 34', 'avatar34.webp'),('Avatar 35', 'avatar35.webp'),('Avatar 36', 'avatar36.webp'),
+('Avatar 37', 'avatar37.webp'),('Avatar 39', 'avatar39.webp'),('Avatar 40', 'avatar40.webp'),
+('Avatar 41', 'avatar41.webp'),('Avatar 42', 'avatar42.webp'),('Avatar 43', 'avatar43.webp'),('Avatar 44', 'avatar44.webp'),
+('Avatar 45', 'avatar45.webp'),('Avatar 46', 'avatar46.webp'),('Avatar 47', 'avatar47.webp'),('Avatar 48', 'avatar48.webp'),
+('Avatar 49', 'avatar49.webp'),('Avatar 50', 'avatar50.webp'),('Avatar 51', 'avatar51.webp'),('Avatar 52', 'avatar52.webp'),
+('Avatar 53', 'avatar53.webp'),('Avatar 54', 'avatar54.webp'),('Avatar 55', 'avatar55.webp'),('Avatar 56', 'avatar56.webp'),
+('Avatar 57', 'avatar57.webp'),('Avatar 58', 'avatar58.webp'),('Avatar 59', 'avatar59.webp'),('Avatar 60', 'avatar60.webp'),
+('Avatar 61', 'avatar61.webp'),('Avatar 62', 'avatar62.webp'),('Avatar 63', 'avatar63.webp'),('Avatar 64', 'avatar64.webp'),
+('Avatar 65', 'avatar65.webp'),('Avatar 66', 'avatar66.webp'),('Avatar 67', 'avatar67.webp'),('Avatar 68', 'avatar68.webp'),
+('Avatar 69', 'avatar69.webp'),('Avatar 70', 'avatar70.webp');
 -- 5. INSERÇÃO DOS FILMES (VINCULADOS ÀS CATEGORIAS)
 INSERT INTO filme (id_filme, nome_filme, imagem, id_categoria) VALUES 
 (1, 'Branca de Neve', 'brancadeneve.webp', 1), 
