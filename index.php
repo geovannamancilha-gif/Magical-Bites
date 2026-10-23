@@ -916,6 +916,119 @@ try {
             display: block;
         }
 
+        /* --- RODAPÉ (FOOTER) - AZUL DO CABEÇALHO --- */
+        .site-footer {
+            background: #294f88;
+            color: #ffffff;
+            padding: 60px 0 25px;
+            border-top: 3px solid #ff9800;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-container {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 40px;
+        }
+
+        .footer-col h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff8bd;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            position: relative;
+        }
+
+        .footer-col h3::after {
+            content: '';
+            display: block;
+            width: 35px;
+            height: 3px;
+            background: #a62428;
+            margin-top: 8px;
+            border-radius: 2px;
+        }
+
+        .footer-about img {
+            height: 55px;
+            width: auto;
+            margin-bottom: 15px;
+        }
+
+        .footer-about p {
+            font-size: 13.5px;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease, padding-left 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: #fff8bd;
+            padding-left: 5px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: #a62428;
+            color: #fff8bd;
+            transform: translateY(-4px);
+        }
+
+        .footer-bottom {
+            max-width: 1150px;
+            margin: 40px auto 0;
+            padding: 20px 25px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .footer-bottom i {
+            color: #ff9800;
+        }
+
         /* MODAIS DISNEY */
         .modal-overlay {
             display: none;
@@ -1010,6 +1123,7 @@ try {
             .grid-3-categorias { grid-template-columns: 1fr; }
             .container-full-vermelho, .container-full-creme { grid-template-columns: 1fr; text-align: center; }
             .grid-home-receitas { grid-template-columns: 1fr; }
+            .footer-container { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
@@ -1023,6 +1137,10 @@ try {
                 height: 38px;
                 font-size: 15px;
             }
+        }
+
+        @media (max-width: 600px) {
+            .footer-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -1376,6 +1494,51 @@ try {
             </div>
         </div>
     </section>
+
+    <!-- 10. RODAPÉ MÁGICO DO SITE -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col footer-about">
+                <img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites" onerror="this.src='img/logo/logo_menu.png'">
+                <p>Traga a magia dos filmes Disney diretamente para a sua cozinha! No Magical Bites encontra as receitas mais encantadoras do cinema.</p>
+                <div class="footer-social">
+                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" title="Pinterest"><i class="fa-brands fa-pinterest"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3>Navegação</h3>
+                <ul class="footer-links">
+                    <li><a href="index.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Início</a></li>
+                    <li><a href="#containerReceitas"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Receitas</a></li>
+                    <li><a href="favoritos.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Favoritos</a></li>
+                    <li><a href="filmes.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Filmes</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Categorias</h3>
+                <ul class="footer-links">
+                    <li><a href="salgados.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Salgados</a></li>
+                    <li><a href="doces.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Doces</a></li>
+                    <li><a href="bebidas.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Bebidas</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Magia & Sabor</h3>
+                <p style="font-size: 13.5px; color: #e2e8f0; line-height: 1.6;">"Qualquer um pode cozinhar, mas apenas os destemidos podem ser grandes."</p>
+                <p style="font-size: 12px; color: #fff8bd; margin-top: 10px; font-weight: 700;">— Ratatouille</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; <?= date('Y') ?> Magical Bites. Todos os direitos reservados. Feito com <i class="fa-solid fa-heart"></i> e magia.</p>
+        </div>
+    </footer>
 
     <!-- JAVASCRIPT DOS SLIDERS E MODAIS -->
     <script>
