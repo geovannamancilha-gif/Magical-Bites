@@ -1,17 +1,27 @@
 <?php
-// Conexão com a base de dados
-$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "");
-//$pdo = new PDO("mysql:host=localhost;dbname=magical_bites;charset=utf8", "root", "Home@spSENAI2025!");
+session_start();
 
-// ==========================================
+// Conexão com a base de dados
+$host = 'localhost';
+$dbname = 'magical_bites';
+$user = 'root'; 
+$pass = ""; 
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Erro na conexão com a base de dados: " . $e->getMessage());
+}
+
 // FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
-// ==========================================
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) {
         return "img/logo/logo_menu.png";
     }
+    if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['slider', 'pratos', 'filme', 'logo', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];
+    $pastas = ['slider', 'pratos', 'filme', 'logo', 'perfis', 'avatares', 'img/perfis', 'img/avatares', 'fundo'];
     $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg'];
 
     foreach ($pastas as $pasta) {
@@ -20,6 +30,8 @@ function buscarImagem($nomeImagem) {
             if (file_exists($caminhoCompleto)) {
                 return $caminhoCompleto;
             }
+            $caminhoRaiz = $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminhoRaiz)) return $caminhoRaiz;
         }
     }
 
@@ -47,7 +59,7 @@ function obterCategoriaFilme($nomeFilme) {
     return 'Clássicos & Aventuras';
 }
 
-// SQL corrigida (sem a coluna f.categoria)
+// Consulta de Filmes e Receitas Relacionadas
 $sql = "
     SELECT 
         f.id_filme, 
@@ -66,7 +78,6 @@ $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Agrupa os filmes por categoria
 $categorias = [];
-
 foreach ($resultados as $row) {
     $id_filme = $row['id_filme'];
     $nome_filme = $row['nome_filme'];
@@ -119,19 +130,18 @@ function obterCorFilme($nomeFilme) {
         'Aladdin' => '#3c096c',
         'Os Incríveis' => '#e63946',
         'Mulan' => '#bc4749',
-        // Cores personalizadas para os filmes que faltavam:
-        'A Era do Gelo' => '#3a86ff',             // Azul glacial
-        'A Espada Era a Lei' => '#d4a373',         // Ouro medieval
-        'A Nova Onda do Imperador' => '#ff006e',   // Púrpura/Rosa vibrante
-        'Carros' => '#d62828',                     // Vermelho Relâmpago McQueen
-        'Como Treinar o Seu Dragão' => '#212529',  // Cinza escuro/Banguela
-        'Hércules' => '#ffb703',                   // Dourado Olimpo
-        'Malévola' => '#3c096c',                   // Roxo vilã
-        'O Rei Leão' => '#d97706',                 // Laranja Savana
-        'Peter Pan' => '#2d6a4f',                  // Verde Terra do Nunca
-        'Pocahontas' => '#9e2a2b',                 // Vermelho terra/outono
-        'Tinker Bell' => '#87c747ff',                // Verde Sininho/Pó mágico
-        'Cinderela' => '#4cc9f0'                   // Azul vestido de baile
+        'A Era do Gelo' => '#3a86ff',
+        'A Espada Era a Lei' => '#d4a373',
+        'A Nova Onda do Imperador' => '#ff006e',
+        'Carros' => '#d62828',
+        'Como Treinar o Seu Dragão' => '#212529',
+        'Hércules' => '#ffb703',
+        'Malévola' => '#3c096c',
+        'O Rei Leão' => '#d97706',
+        'Peter Pan' => '#2d6a4f',
+        'Pocahontas' => '#9e2a2b',
+        'Tinker Bell' => '#87c747ff',
+        'Cinderela' => '#4cc9f0'
     ];
 
     foreach ($cores as $chave => $cor) {
@@ -163,17 +173,19 @@ if (isset($_SESSION['usuario'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Filmes | Magical Bites</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
     body { background: #f3f1ff; color: #333; overflow-x: hidden; }
 
+    /* --- NAVBAR PADRONIZADA --- */
     .navbar {
         width: 100%;
-        background: #1f4396;
-        padding: 14px 25px;
+        background: #294f88;
+        padding: 10px 30px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -182,14 +194,50 @@ if (isset($_SESSION['usuario'])) {
         top: 0;
         z-index: 100;
     }
+
+    .logo img {
+        height: 50px; 
+        width: auto;
+        display: block;
     }
-    .logo img { height: 60px; width: auto; margin-top: -10px; }
-    .menu { display: flex; align-items: center; gap: 35px; }
-    .menu a { color: white; text-decoration: none; font-size: 15px; font-weight: 500; transition: 0.3s; cursor: pointer; display: flex; align-items: center; gap: 8px; }
-    .menu a:hover, .menu a.ativo { color: #ffe45c; }
+
+    .menu {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .menu a {
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 700;
+        transition: 0.3s;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .menu a:hover, .menu a.ativo {
+        color: #fff6a9ff;
+    }
+
+    .menu a i {
+        font-size: 18px;
+    }
+
+    .nav-user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #fff6a9ff;
+    }
 
     .header-filmes { text-align: center; padding: 40px 20px 20px; }
-    .header-filmes h1 { color: #1f4396; font-size: 38px; }
+    .header-filmes h1 { color: #1f4396; font-size: 38px; font-weight: 800; }
+    .header-filmes p { color: #556987; font-size: 15px; margin-top: 6px; }
 
     /* --- IMAGEM DE TOPO (BANNER SEM CORTE) --- */
     .banner-inicio {
@@ -202,7 +250,9 @@ if (isset($_SESSION['usuario'])) {
         display: block;
     }
 
-    /* --- MODAIS FLUTUANTES --- */
+    /* =========================================================================
+       MODAIS COM TEMA DISNEY (CARMIM & CREME)
+       ========================================================================= */
     .modal-overlay {
         display: none;
         position: fixed;
@@ -210,140 +260,224 @@ if (isset($_SESSION['usuario'])) {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(4px);
+        background: rgba(18, 24, 41, 0.65);
+        backdrop-filter: blur(8px);
         z-index: 999;
     }
+
     .card-flutuante {
         display: none;
         position: fixed;
-        top: 80px;
-        right: 25px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         width: 380px;
-        max-height: calc(100vh - 100px);
+        max-width: 90vw;
+        max-height: 90vh;
         overflow-y: auto;
-        background: white;
-        border-radius: 28px;
-        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-        padding: 28px;
+        border-radius: 36px;
+        padding: 35px 28px;
         z-index: 1000;
-        color: #333;
-        animation: fadeInSlide 0.3s ease-out;
-    }
-    .card-flutuante::-webkit-scrollbar { width: 6px; }
-    .card-flutuante::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
-
-    @keyframes fadeInSlide {
-        from { opacity: 0; transform: translateX(30px); }
-        to { opacity: 1; transform: translateX(0); }
+        animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
+    .card-flutuante::-webkit-scrollbar { width: 5px; }
+    .card-flutuante::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
+
+    @keyframes popUpModal {
+        from { opacity: 0; transform: translate(-50%, -45%) scale(0.92); }
+        to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
-    .card-flutuante .btn-fechar {
-        background: none;
-        border: none;
-        font-size: 26px;
-        cursor: pointer;
-        color: #999;
+
+    .card-vermelho {
+        background: #ab232a;
+        color: #ffffff;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+        border: 2px solid rgba(255, 255, 255, 0.15);
     }
-    .input-group-modal {
+
+    .card-vermelho .castelo-header {
+        text-align: center;
+        margin-bottom: 12px;
+    }
+
+    .card-vermelho .castelo-header i {
+        font-size: 38px;
+        color: #ffffff;
+    }
+
+    .card-vermelho h2.titulo-cursivo {
+        font-family: 'Caveat', cursive;
+        font-size: 38px;
+        color: #ffffff;
+        text-align: center;
+        line-height: 1;
+        margin-bottom: 2px;
+    }
+
+    .card-vermelho p.subtitulo-modal {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.9);
+        text-align: center;
+        margin-bottom: 22px;
+        font-weight: 500;
+    }
+
+    .card-vermelho .input-group-modal {
         position: relative;
-        margin-bottom: 15px;
+        margin-bottom: 14px;
     }
-    .input-group-modal i {
+
+    .card-vermelho .input-group-modal i {
         position: absolute;
-        left: 15px;
+        left: 18px;
         top: 50%;
         transform: translateY(-50%);
-        color: #1f4396;
-    }
-    .input-group-modal input {
-        width: 100%;
-        padding: 12px 15px 12px 45px;
-        border: 1px solid #ddd;
-        border-radius: 12px;
-        outline: none;
-    }
-    .btn-acao {
-        width: 100%;
-        padding: 14px;
-        background: #1f4396;
-        color: white;
-        border: none;
-        border-radius: 50px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: 0.3s;
-        margin-top: 10px;
-    }
-    .btn-acao:hover {
-        background: #162f6b;
-        transform: scale(1.02);
-    }
-    .footer-modal {
-        margin-top: 20px;
-        font-size: 13px;
-        text-align: center;
-        color: #666;
-    }
-    .footer-modal a {
-        color: #1f4396;
-        text-decoration: none;
-        font-weight: 600;
-        cursor: pointer;
-    }
-    .perfil-avatar-header {
-        text-align: center;
-        margin-bottom: 15px;
-    }
-    .perfil-avatar-header img {
-        width: 85px;
-        height: 85px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 3px solid #1f4396;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-    .grid-avatares-modal {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        justify-content: center;
-        max-height: 140px;
-        overflow-y: auto;
-        padding: 5px;
-        margin: 10px 0;
-    }
-    .avatar-item {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        border: 2px solid transparent;
-        cursor: pointer;
-        overflow: hidden;
-        transition: 0.2s;
-    }
-    .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar-item:hover, .avatar-item.selected {
-        border-color: #ffe45c;
-        transform: scale(1.1);
-    }
-    .btn-logout-modal {
-        display: block;
-        text-align: center;
-        margin-top: 15px;
-        color: #f44336;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 14px;
+        color: #ffffff;
+        font-size: 15px;
     }
 
-    /* --- FILMES --- */
+    .card-vermelho .input-group-modal input {
+        width: 100%;
+        padding: 12px 18px 12px 48px;
+        border: 2px solid #ffffff;
+        background: transparent;
+        border-radius: 50px;
+        outline: none;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+
+    .card-vermelho .input-group-modal input::placeholder {
+        color: rgba(255, 255, 255, 0.85);
+    }
+
+    .card-vermelho .input-group-modal input:focus {
+        background: rgba(255, 255, 255, 0.12);
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+    }
+
+    .card-vermelho .btn-acao-creme {
+        width: 100%;
+        padding: 13px;
+        background: #fff8bd;
+        color: #ab232a;
+        border: none;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s ease;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-vermelho .btn-acao-creme:hover {
+        background: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-vermelho .footer-modal {
+        margin-top: 18px;
+        font-size: 13px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+    }
+
+    .card-vermelho .footer-modal a {
+        color: #ffffff;
+        text-decoration: underline;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .card-amarelo {
+        background: #fff8bd;
+        color: #ab232a;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        text-align: center;
+    }
+
+    .card-amarelo .castelo-header i {
+        font-size: 38px;
+        color: #ab232a;
+        margin-bottom: 8px;
+    }
+
+    .card-amarelo h2.titulo-aviso {
+        font-size: 22px;
+        font-weight: 900;
+        color: #ab232a;
+        text-transform: uppercase;
+        line-height: 1.25;
+        margin-bottom: 10px;
+    }
+
+    .card-amarelo h2.titulo-cursivo {
+        font-family: 'Caveat', cursive;
+        font-size: 42px;
+        color: #1f4396;
+        line-height: 1;
+        margin-bottom: 6px;
+    }
+
+    .card-amarelo p.subtitulo-aviso {
+        font-size: 14px;
+        color: #701a1d;
+        font-weight: 600;
+        line-height: 1.4;
+        margin-bottom: 22px;
+    }
+
+    .card-amarelo .btn-acao-vermelho {
+        width: 100%;
+        padding: 13px;
+        background: #ab232a;
+        color: #ffffff;
+        border: none;
+        border-radius: 50px;
+        font-weight: 800;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 8px;
+        box-shadow: 0 4px 12px rgba(171, 35, 42, 0.3);
+    }
+
+    .card-amarelo .btn-acao-vermelho:hover {
+        background: #8e1c22;
+        transform: translateY(-2px);
+    }
+
+    .btn-fechar-absoluto {
+        position: absolute;
+        top: 18px;
+        right: 22px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: rgba(255,255,255,0.8);
+        transition: 0.2s;
+    }
+    .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
+
+    .card-amarelo .btn-fechar-absoluto { color: rgba(171,35,42,0.7); }
+    .card-amarelo .btn-fechar-absoluto:hover { color: #ab232a; }
+
+    .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
+    .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+
+    .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
+    .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
+    .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
+
+    /* --- GRID DE FILMES --- */
     .container { width: 100%; max-width: 1250px; margin: 0 auto; padding: 0 30px 50px; }
     .categoria-titulo { width: 100%; margin: 30px 0 20px; padding-bottom: 10px; border-bottom: 3px solid #1f4396; color: #1f4396; font-size: 26px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
 
@@ -359,6 +493,7 @@ if (isset($_SESSION['usuario'])) {
     .box-overlay h3 { font-size: 20px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); margin-bottom: 5px; }
     .box-overlay span { font-size: 12px; font-weight: 600; background: rgba(255, 255, 255, 0.25); padding: 4px 10px; border-radius: 20px; width: fit-content; backdrop-filter: blur(5px); }
 
+    /* MODAL DE RECEITAS DO FILME */
     .modal-filme-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); z-index: 999; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
     .modal-filme-overlay.ativo { display: flex; opacity: 1; }
     .modal-filme-content { background: #f3f1ff; width: 100%; max-width: 900px; max-height: 90vh; border-radius: 25px; overflow: hidden; position: relative; display: flex; flex-direction: column; transform: scale(0.9); transition: transform 0.3s; }
@@ -381,104 +516,113 @@ if (isset($_SESSION['usuario'])) {
     .tag { width: fit-content; margin: 15px auto 10px; padding: 5px 12px; border-radius: 20px; color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; }
     .doce { background: #ff69b4; } .salgado { background: #4CAF50; } .bebida { background: #00bcd4; }
     .card p { padding: 0 15px 20px; text-align: center; font-weight: 600; font-size: 14px; color: #333; }
-
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); z-index: 999; }
-    .card-flutuante { display: none; position: fixed; top: 85px; right: 25px; width: 360px; background: white; border-radius: 28px; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3); padding: 30px; z-index: 1000; color: #333; }
-    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-    .card-flutuante .btn-fechar { background: none; border: none; font-size: 26px; cursor: pointer; color: #999; }
-    .input-group-modal { position: relative; margin-bottom: 15px; }
-    .input-group-modal i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #1f4396; }
-    .input-group-modal input { width: 100%; padding: 12px 15px 12px 45px; border: 1px solid #ddd; border-radius: 12px; outline: none; }
-    .btn-acao { width: 100%; padding: 14px; background: #1f4396; color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-    .footer-modal { margin-top: 20px; font-size: 13px; text-align: center; color: #666; }
-    .footer-modal a { color: #1f4396; text-decoration: none; font-weight: 600; cursor: pointer; }
     </style>
 </head>
 
 <body>
 
+    <!-- NAVBAR PADRONIZADA -->
     <div class="navbar">
         <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="index.php#containerReceitas">Receitas</a>
-            <a href="#">Favoritos</a>
+            <a href="favoritos.php">Favoritos</a>
             <a href="filmes.php" class="ativo">Filmes</a>
 
             <?php if (isset($_SESSION['usuario'])): ?>
                 <a href="javascript:void(0)" onclick="alternarModais('perfil')">
-                    <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
+                    <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
                     <?= htmlspecialchars(explode(' ', $_SESSION['usuario']['nome'])[0]) ?>
                 </a>
             <?php else: ?>
                 <a href="javascript:void(0)" onclick="alternarModais('login')"><i class="fa-solid fa-user"></i> Perfil</a>
             <?php endif; ?>
-
         </div>
     </div>
 
-    <!-- BANNER DE ENTRADA (MANTÉM PROPORÇÃO TOTAL) -->
+    <!-- BANNER DE ENTRADA -->
     <div class="banner-inicio">
         <img src="img/slider/filme.webp" alt="Banner Filmes">
     </div>
 
+    <!-- OVERLAY DOS MODAIS -->
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
 
-    <div id="modalCadastro" class="card-flutuante">
-        <div class="card-header">
-            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
-            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+    <!-- 1. MODAL CADASTRO (DESIGN DISNEY) -->
+    <div id="modalCadastro" class="card-flutuante card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
+        
+        <div class="castelo-header">
+            <i class="fa-solid fa-chess-castle"></i>
         </div>
-        <h2 style="color:#1f4396">Crie a sua conta</h2>
-        <p style="font-size:14px; color:#666; margin-bottom:20px">Junte-se à nossa comunidade!</p>
+        <h2 class="titulo-cursivo">Crie a sua conta</h2>
+        <p class="subtitulo-modal">Junte-se a nossa família!</p>
+        
         <form action="cadastrar.php" method="POST">
-            <div class="input-group-modal"><i class="fa fa-user"></i><input type="text" name="nome" placeholder="Nome completo" required></div>
-            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
-            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
-            <button type="submit" class="btn-acao">Registar</button>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" name="nome" placeholder="Nome Completo" required>
+            </div>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" name="email" placeholder="E-mail" required>
+            </div>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" name="senha" placeholder="Senha" required>
+            </div>
+            <button type="submit" class="btn-acao-creme">Criar</button>
         </form>
-        <div class="footer-modal">Já tem conta? <a onclick="alternarModais('login')">Faça login</a></div>
+        <div class="footer-modal">Já tem uma conta? <a onclick="alternarModais('login')">Faça login</a></div>
     </div>
 
-    <div id="modalLogin" class="card-flutuante">
-        <div class="card-header">
-            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
-            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+    <!-- 2. MODAL LOGIN (DESIGN DISNEY) -->
+    <div id="modalLogin" class="card-flutuante card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
+        
+        <div class="castelo-header">
+            <i class="fa-solid fa-chess-castle"></i>
         </div>
-        <h2 style="color:#1f4396">Bem-vindo!</h2>
-        <p style="font-size:14px; color:#666; margin-bottom:20px">Acesse sua conta mágica.</p>
+        <h2 class="titulo-cursivo">Bem - vindo</h2>
+        <p class="subtitulo-modal">Acesse sua conta mágica:</p>
+        
         <form action="index.php" method="POST">
-            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
-            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
-            <button type="submit" class="btn-acao">Entrar</button>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" name="email" placeholder="E-mail" required>
+            </div>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" name="senha" placeholder="Senha" required>
+            </div>
+            <button type="submit" class="btn-acao-creme">Entrar</button>
         </form>
-        <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
+        <div class="footer-modal">Está chegando agora? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
-    <!-- MODAL PERFIL -->
+    <!-- 3. MODAL PERFIL (DESIGN DISNEY) -->
     <?php if (isset($_SESSION['usuario'])): ?>
-    <div id="modalPerfil" class="card-flutuante">
-        <div class="card-header">
-            <img src="<?= buscarImagem('logo.png') ?>" style="width: 90px;">
-            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
-        </div>
+    <div id="modalPerfil" class="card-flutuante card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
 
         <div class="perfil-avatar-header">
-            <img src="<?= buscarImagem($_SESSION['usuario']['foto']) ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
-            <h3 style="color:#1f4396; margin-top:8px; font-size:18px;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
-            <p style="font-size:12px; color:#777;"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
+            <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
+            <h3 style="color:#ffffff; margin-top:6px; font-size:18px; font-weight:700;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
+            <p style="font-size:12px; color:rgba(255,255,255,0.8);"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
         </div>
+
+        <h2 class="titulo-cursivo" style="font-size:32px; margin-top:8px;">Escolha seu avatar</h2>
 
         <form action="index.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="acao" value="atualizar_perfil">
             <input type="hidden" name="avatar_predefinido" id="modalInputAvatar" value="">
 
-            <div class="input-group-modal" style="margin-bottom: 10px;">
-                <i class="fa fa-user"></i>
-                <input type="text" name="nome" value="<?= htmlspecialchars($_SESSION['usuario']['nome']) ?>" required placeholder="Nome">
+            <div class="input-group-modal" style="margin-bottom: 8px;">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" name="nome" value="<?= htmlspecialchars($_SESSION['usuario']['nome']) ?>" required placeholder="Seu Nome">
             </div>
 
-            <label style="font-size:12px; font-weight:600; color:#1f4396;">Avatar Disney</label>
             <div class="grid-avatares-modal">
                 <?php foreach ($avataresPadrao as $avatar): ?>
                     <div class="avatar-item" onclick="selecionarAvatarModal('<?= $avatar['caminho_imagem'] ?>', this)">
@@ -487,14 +631,50 @@ if (isset($_SESSION['usuario'])) {
                 <?php endforeach; ?>
             </div>
 
-            <label style="font-size:12px; font-weight:600; color:#1f4396; display:block; margin-top:10px;">Ou foto própria:</label>
-            <input type="file" name="foto_upload" accept="image/*" style="font-size:12px; margin-top:5px; width:100%;" onchange="limparAvatarModal()">
+            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center; cursor:pointer;" onclick="document.getElementById('fotoUploadInput').click()">
+                <i class="fa-solid fa-image"></i> Escolher da Galeria
+            </label>
+            <input type="file" id="fotoUploadInput" name="foto_upload" accept="image/*" style="display:none;" onchange="limparAvatarModal()">
 
-            <button type="submit" class="btn-acao" style="margin-top:18px;">Salvar Alterações</button>
+            <button type="submit" class="btn-acao-creme" style="margin-top:14px;">Salvar alteração</button>
         </form>
 
-        <a href="logout.php" class="btn-logout-modal"><i class="fa-solid fa-right-from-bracket"></i> Sair da Conta</a>
+        <a href="logout.php" style="display:block; text-align:center; margin-top:12px; color:#ffffff; text-decoration:none; font-weight:600; font-size:13px;">
+            <i class="fa-solid fa-right-from-bracket"></i> Sair da conta
+        </a>
     </div>
+    <?php endif; ?>
+
+    <!-- 4. MODAL STATUS / AVISO -->
+    <?php if ($status != ""): ?>
+    <div id="modalStatus" class="card-flutuante card-amarelo" style="display: block; z-index: 1001;">
+        <button class="btn-fechar-absoluto" onclick="fecharStatus()">&times;</button>
+
+        <div class="castelo-header">
+            <i class="fa-solid fa-chess-castle"></i>
+        </div>
+
+        <?php if ($status == 'sucesso'): ?>
+            <h2 class="titulo-cursivo">Bem - vindo</h2>
+            <p class="subtitulo-aviso">
+                <?= htmlspecialchars($erro_msg ?: "Sua conta está registrada, agora é só aproveitar!") ?>
+            </p>
+            <button class="btn-acao-vermelho" onclick="fecharStatus();">Aproveitar agora</button>
+
+        <?php elseif ($status == 'erro'): ?>
+            <h2 class="titulo-aviso">OOPS!</h2>
+            <p class="subtitulo-aviso">
+                <?= htmlspecialchars($erro_msg ?: "Senha ou E-mail incorreto") ?>
+            </p>
+            <button class="btn-acao-vermelho" onclick="fecharStatus();">Tentar de novo</button>
+        <?php endif; ?>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('modalOverlay').style.display = 'block';
+    });
+    </script>
     <?php endif; ?>
 
     <div class="header-filmes">
@@ -552,6 +732,7 @@ if (isset($_SESSION['usuario'])) {
         <?php endforeach; ?>
     </div>
 
+    <!-- JAVASCRIPT DOS MODAIS -->
     <script>
     function abrirModalFilme(idModal) {
         document.getElementById(idModal).classList.add('ativo');
@@ -566,15 +747,37 @@ if (isset($_SESSION['usuario'])) {
 
     function fecharTodosModais() {
         document.getElementById('modalOverlay').style.display = 'none';
-        document.getElementById('modalCadastro').style.display = 'none';
-        document.getElementById('modalLogin').style.display = 'none';
+        if(document.getElementById('modalCadastro')) document.getElementById('modalCadastro').style.display = 'none';
+        if(document.getElementById('modalLogin')) document.getElementById('modalLogin').style.display = 'none';
+        if(document.getElementById('modalPerfil')) document.getElementById('modalPerfil').style.display = 'none';
+        if(document.getElementById('modalStatus')) document.getElementById('modalStatus').style.display = 'none';
+    }
+
+    function fecharStatus() {
+        fecharTodosModais();
+        window.history.replaceState({}, document.title, "filmes.php");
     }
 
     function alternarModais(tipo) {
         fecharTodosModais();
         document.getElementById('modalOverlay').style.display = 'block';
-        if (tipo === 'cadastro') document.getElementById('modalCadastro').style.display = 'block';
-        if (tipo === 'login') document.getElementById('modalLogin').style.display = 'block';
+        if (tipo === 'cadastro' && document.getElementById('modalCadastro')) document.getElementById('modalCadastro').style.display = 'block';
+        if (tipo === 'login' && document.getElementById('modalLogin')) document.getElementById('modalLogin').style.display = 'block';
+        if (tipo === 'perfil' && document.getElementById('modalPerfil')) document.getElementById('modalPerfil').style.display = 'block';
+    }
+
+    function selecionarAvatarModal(nomeAvatar, elemento) {
+        document.getElementById('modalInputAvatar').value = nomeAvatar;
+        let avatares = document.querySelectorAll('.avatar-item');
+        avatares.forEach(el => el.classList.remove('selected'));
+        elemento.classList.add('selected');
+        document.getElementById('modalPreviewFoto').src = elemento.querySelector('img').src;
+    }
+
+    function limparAvatarModal() {
+        document.getElementById('modalInputAvatar').value = '';
+        let avatares = document.querySelectorAll('.avatar-item');
+        avatares.forEach(el => el.classList.remove('selected'));
     }
 
     window.onclick = function(event) {

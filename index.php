@@ -2,11 +2,14 @@
 session_start();
 
 // Configurações de conexão com a base de dados
-$host = 'localhost';$dbname = 'magical_bites';
-$user = 'root';$pass = ""; 
+$host = 'localhost';
+$dbname = 'magical_bites';
+$user = 'root'; 
+$pass = ""; 
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Erro na conexão com a base de dados: " . $e->getMessage());
 }
@@ -32,74 +35,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_P
         header("Location: index.php");
         exit;
     } else {
-        header("Location: index.php?status=erro&msg=" . urlencode("E-mail ou senha incorretos!"));
+        header("Location: index.php?status=erro&msg=" . urlencode("Senha ou E-mail incorreto"));
         exit;
     }
 }
 
-
 // =========================================================================
 // 2. PROCESSAMENTO DA ATUALIZAÇÃO DO PERFIL (MODAL)
 // =========================================================================
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) &&$_POST['acao'] === 'atualizar_perfil' && isset($_SESSION['usuario'])) {$idUsuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'atualizar_perfil' && isset($_SESSION['usuario'])) {
+    $idUsuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
     $novoNome = trim($_POST['nome']);
-    $fotoPerfil =$_SESSION['usuario']['foto'] ?? 'logo_menu.png'; // Mantém a antiga se não alterar
+    $fotoPerfil = $_SESSION['usuario']['foto'] ?? 'logo_menu.png'; 
 
-    // Se escolheu um avatar pré-definido
     if (!empty($_POST['avatar_predefinido'])) {
         $fotoPerfil = trim($_POST['avatar_predefinido']);
     }
 
-    // Se fez upload de foto
-    if (isset($_FILES['foto_upload']) && $_FILES['foto_upload']['error'] === UPLOAD_ERR_OK) {$ext = strtolower(pathinfo($_FILES['foto_upload']['name'], PATHINFO_EXTENSION));$extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
+    if (isset($_FILES['foto_upload']) && $_FILES['foto_upload']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['foto_upload']['name'], PATHINFO_EXTENSION));
+        $extensoesPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
 
-        if (in_array($ext, $extensoesPermitidas)) {$novoNomeFoto = "user_" . $idUsuario . "_" . time() . "." . $ext;
+        if (in_array($ext, $extensoesPermitidas)) {
+            $novoNomeFoto = "user_" . $idUsuario . "_" . time() . "." . $ext;
             $destino = "img/perfis/" . $novoNomeFoto;
 
             if (!is_dir('img/perfis')) {
                 mkdir('img/perfis', 0777, true);
             }
 
-            if (move_uploaded_file($_FILES['foto_upload']['tmp_name'],$destino)) {
-                $fotoPerfil =$novoNomeFoto;
+            if (move_uploaded_file($_FILES['foto_upload']['tmp_name'], $destino)) {
+                $fotoPerfil = $novoNomeFoto;
             }
         }
     }
 
-    // Atualiza base de dados
     if ($idUsuario) {
-        $stmtUpdate =$pdo->prepare("UPDATE usuario SET nome_usuario = :nome, foto_perfil = :foto WHERE id_usuario = :id");
+        $stmtUpdate = $pdo->prepare("UPDATE usuario SET nome_usuario = :nome, foto_perfil = :foto WHERE id_usuario = :id");
         $stmtUpdate->execute([
             ':nome' => $novoNome,
             ':foto' => $fotoPerfil,
             ':id'   => $idUsuario
         ]);
 
-        // Atualiza a sessão
-        $_SESSION['usuario']['nome'] =$novoNome;
-        $_SESSION['usuario']['foto'] =$fotoPerfil;
+        $_SESSION['usuario']['nome'] = $novoNome;
+        $_SESSION['usuario']['foto'] = $fotoPerfil;
     }
 
     header("Location: index.php?status=sucesso&msg=" . urlencode("Perfil atualizado com sucesso!"));
     exit;
 }
 
-// =========================================================================
 // FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
-// =========================================================================
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
-    if (file_exists($nomeImagem)) return$nomeImagem;
+    if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];$extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
+    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'img/perfis', 'img/avatares'];
+    $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
 
-    foreach ($pastas as$pasta) {
-        foreach ($extensoes as$ext) {
-            $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem .$ext;
-            if (file_exists($caminhoCompleto)) return$caminhoCompleto;
+    foreach ($pastas as $pasta) {
+        foreach ($extensoes as $ext) {
+            $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminhoCompleto)) return $caminhoCompleto;
 
-            $caminhoRaiz =$pasta . "/" . $nomeImagem .$ext;
-            if (file_exists($caminhoRaiz)) return$caminhoRaiz;
+            $caminhoRaiz = $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminhoRaiz)) return $caminhoRaiz;
         }
     }
 
@@ -108,21 +109,23 @@ function buscarImagem($nomeImagem) {
 }
 
 // BUSCAS DAS RECEITAS
-$stmtDoces =$pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
-$receitasDoces =$stmtDoces->fetchAll(PDO::FETCH_ASSOC);
+$stmtDoces = $pdo->query("SELECT * FROM receitas WHERE tipo = 'DOCE'");
+$receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
 
-$stmtSalgados =$pdo->query("SELECT * FROM receitas WHERE tipo = 'SALGADO'");
-$receitasSalgados =$stmtSalgados->fetchAll(PDO::FETCH_ASSOC);
+$stmtSalgados = $pdo->query("SELECT * FROM receitas WHERE tipo = 'SALGADO'");
+$receitasSalgados = $stmtSalgados->fetchAll(PDO::FETCH_ASSOC);
 
-$stmtBebidas =$pdo->query("SELECT * FROM receitas WHERE tipo = 'BEBIDA'");
-$receitasBebidas =$stmtBebidas->fetchAll(PDO::FETCH_ASSOC);
+$stmtBebidas = $pdo->query("SELECT * FROM receitas WHERE tipo = 'BEBIDA'");
+$receitasBebidas = $stmtBebidas->fetchAll(PDO::FETCH_ASSOC);
 
-$status =$_GET['status'] ?? "";
+$status = $_GET['status'] ?? "";
 $msg = $_GET['msg'] ?? ($_GET['erro'] ?? "");
 
-// BUSCA OS AVATARES DIRETO DA BASE DE DADOS
-$stmtAvatares =$pdo->query("SELECT * FROM avatar_predefinido");
-$avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
+$avataresPadrao = [];
+try {
+    $stmtAvatares = $pdo->query("SELECT * FROM avatar_predefinido");
+    $avataresPadrao = $stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {}
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -131,7 +134,8 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Magical Bites | Receitas Disney</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -169,7 +173,6 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             height: 50px; 
             width: auto;
             display: block;
-            margin-top: 0;
         }
 
         .menu {
@@ -322,8 +325,6 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             background-position: center 65%;
             transition: background-image 0.6s ease-in-out;
             image-rendering: -webkit-optimize-contrast;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
             transform: translateZ(0);
         }
 
@@ -460,7 +461,7 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             font-size: 16px;
         }
 
-        /* --- LAYOUT RECEITAS --- */
+        /* --- RECEITAS --- */
         .container {
             width: 100%;
             max-width: 1250px;
@@ -540,7 +541,9 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             margin: 40px 0;
         }
 
-        /* --- MODAIS FLUTUANTES --- */
+        /* =========================================================================
+           NOVO ESTILO DE MODAIS BASEADO NO DESIGN EDITORIAL DISNEY
+           ========================================================================= */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -548,133 +551,243 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(4px);
+            background: rgba(18, 24, 41, 0.65);
+            backdrop-filter: blur(8px);
             z-index: 999;
         }
 
         .card-flutuante {
             display: none;
             position: fixed;
-            top: 80px;
-            right: 25px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 380px;
-            max-height: calc(100vh - 100px);
+            max-width: 90vw;
+            max-height: 90vh;
             overflow-y: auto;
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
-            padding: 28px;
+            border-radius: 36px;
+            padding: 35px 28px;
             z-index: 1000;
-            color: #333;
-            animation: fadeInSlide 0.3s ease-out;
+            animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .card-flutuante::-webkit-scrollbar { width: 6px; }
-        .card-flutuante::-webkit-scrollbar-thumb { background: #ddd; border-radius: 10px; }
+        .card-flutuante::-webkit-scrollbar { width: 5px; }
+        .card-flutuante::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
 
-        @keyframes fadeInSlide {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes popUpModal {
+            from { opacity: 0; transform: translate(-50%, -45%) scale(0.92); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        /* --- TEMA VERMELHO-CARMIM (CADASTRO, LOGIN E PERFIL) --- */
+        .card-vermelho {
+            background: #ab232a;
+            color: #ffffff;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+            border: 2px solid rgba(255, 255, 255, 0.15);
         }
 
-        .btn-fechar {
-            background: none;
-            border: none;
-            font-size: 26px;
-            cursor: pointer;
-            color: #999;
+        .card-vermelho .castelo-header {
+            text-align: center;
+            margin-bottom: 12px;
         }
 
-        .input-group-modal {
+        .card-vermelho .castelo-header i {
+            font-size: 38px;
+            color: #ffffff;
+        }
+
+        .card-vermelho h2.titulo-cursivo {
+            font-family: 'Caveat', cursive;
+            font-size: 38px;
+            color: #ffffff;
+            text-align: center;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .card-vermelho p.subtitulo-modal {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            margin-bottom: 22px;
+            font-weight: 500;
+        }
+
+        .card-vermelho .input-group-modal {
             position: relative;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
-        .input-group-modal i {
+        .card-vermelho .input-group-modal i {
             position: absolute;
-            left: 15px;
+            left: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: #1f4396;
+            color: #ffffff;
+            font-size: 15px;
         }
 
-        .input-group-modal input {
+        .card-vermelho .input-group-modal input {
             width: 100%;
-            padding: 12px 15px 12px 45px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
+            padding: 12px 18px 12px 48px;
+            border: 2px solid #ffffff;
+            background: transparent;
+            border-radius: 50px;
             outline: none;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            transition: 0.3s;
         }
 
-        .btn-acao {
+        .card-vermelho .input-group-modal input::placeholder {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .card-vermelho .input-group-modal input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .card-vermelho .btn-acao-creme {
             width: 100%;
-            padding: 14px;
-            background: #1f4396;
-            color: white;
+            padding: 13px;
+            background: #fff8bd;
+            color: #ab232a;
             border: none;
             border-radius: 50px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-vermelho .btn-acao-creme:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-vermelho .footer-modal {
+            margin-top: 18px;
+            font-size: 13px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+
+        .card-vermelho .footer-modal a {
+            color: #ffffff;
+            text-decoration: underline;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* --- TEMA AMARELO-CREME (MODAIS DE STATUS / AVISO) --- */
+        .card-amarelo {
+            background: #fff8bd;
+            color: #ab232a;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            text-align: center;
+        }
+
+        .card-amarelo .castelo-header i {
+            font-size: 38px;
+            color: #ab232a;
+            margin-bottom: 8px;
+        }
+
+        .card-amarelo h2.titulo-aviso {
+            font-size: 22px;
+            font-weight: 900;
+            color: #ab232a;
+            text-transform: uppercase;
+            line-height: 1.25;
+            margin-bottom: 10px;
+        }
+
+        .card-amarelo h2.titulo-cursivo {
+            font-family: 'Caveat', cursive;
+            font-size: 42px;
+            color: #1f4396;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .card-amarelo p.subtitulo-aviso {
+            font-size: 14px;
+            color: #701a1d;
             font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 22px;
+        }
+
+        .card-amarelo .btn-acao-vermelho {
+            width: 100%;
+            padding: 13px;
+            background: #ab232a;
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 8px;
+            box-shadow: 0 4px 12px rgba(171, 35, 42, 0.3);
+        }
+
+        .card-amarelo .btn-acao-vermelho:hover {
+            background: #8e1c22;
+            transform: translateY(-2px);
+        }
+
+        .card-amarelo .btn-outline-vermelho {
+            width: 100%;
+            padding: 11px;
+            background: transparent;
+            color: #ab232a;
+            border: 2px solid #ab232a;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
             cursor: pointer;
             transition: 0.3s;
             margin-top: 10px;
         }
 
-        .btn-acao:hover {
-            background: #162f6b;
-            transform: scale(1.02);
+        .card-amarelo .btn-outline-vermelho:hover {
+            background: rgba(171, 35, 42, 0.1);
         }
 
-        .status-icon {
-            font-size: 50px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .footer-modal {
-            margin-top: 20px;
-            font-size: 13px;
-            text-align: center;
-            color: #666;
-        }
-
-        .footer-modal a {
-            color: #1f4396;
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
+        /* --- ESTILOS ESPECÍFICOS DO PERFIL NO MODAL VERMELHO --- */
         .perfil-avatar-header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .perfil-avatar-header img {
-            width: 85px;
-            height: 85px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #1f4396;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 3px solid #ffffff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .grid-avatares-modal {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             justify-content: center;
-            max-height: 140px;
+            max-height: 160px;
             overflow-y: auto;
-            padding: 5px;
-            margin: 10px 0;
+            padding: 6px;
+            margin: 12px 0;
         }
 
         .avatar-item {
@@ -689,19 +802,25 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
 
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected {
-            border-color: #ffe45c;
-            transform: scale(1.1);
+            border-color: #fff8bd;
+            transform: scale(1.12);
         }
 
-        .btn-logout-modal {
-            display: block;
-            text-align: center;
-            margin-top: 15px;
-            color: #f44336;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
+        .btn-fechar-absoluto {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.8);
+            transition: 0.2s;
         }
+        .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
+
+        .card-amarelo .btn-fechar-absoluto { color: rgba(171,35,42,0.7); }
+        .card-amarelo .btn-fechar-absoluto:hover { color: #ab232a; }
     </style>
 </head>
 
@@ -716,7 +835,6 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             <a href="favoritos.php">Favoritos</a>
             <a href="filmes.php">Filmes</a>
 
-            <!-- ABRE O MODAL DO PERFIL SE LOGADO, SE NÃO ABRE O LOGIN -->
             <?php if (isset($_SESSION['usuario'])): ?>
                 <a href="javascript:void(0)" onclick="alternarModais('perfil')">
                     <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
@@ -728,104 +846,127 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
+    <!-- OVERLAY DOS MODAIS -->
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
 
-    <!-- 1. MODAL CADASTRO -->
-    <div id="modalCadastro" class="card-flutuante">
-        <div class="card-header">
-            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
-            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+    <!-- 1. MODAL CADASTRO (DESIGN REDESIGN DISNEY) -->
+    <div id="modalCadastro" class="card-flutuante card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
+        
+        <div class="castelo-header">
+            <i class="fa-solid fa-chess-castle"></i>
         </div>
-        <h2 style="color:#1f4396">Crie a sua conta</h2>
-        <p style="font-size:14px; color:#666; margin-bottom:20px">Junte-se à nossa comunidade!</p>
+        <h2 class="titulo-cursivo">Crie a sua conta</h2>
+        <p class="subtitulo-modal">Junte-se a nossa família!</p>
+        
         <form action="cadastrar.php" method="POST">
-            <div class="input-group-modal"><i class="fa fa-user"></i><input type="text" name="nome" placeholder="Nome completo" required></div>
-            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
-            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
-            <button type="submit" class="btn-acao">Registar</button>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" name="nome" placeholder="Nome Completo" required>
+            </div>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" name="email" placeholder="E-mail" required>
+            </div>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" name="senha" placeholder="Senha" required>
+            </div>
+            <button type="submit" class="btn-acao-creme">Criar</button>
         </form>
-        <div class="footer-modal">Já tem conta? <a onclick="alternarModais('login')">Faça login</a></div>
+        <div class="footer-modal">Já tem uma conta? <a onclick="alternarModais('login')">Faça login</a></div>
     </div>
 
-    <!-- 2. MODAL LOGIN -->
-    <div id="modalLogin" class="card-flutuante">
-        <div class="card-header">
-            <img src="<?= buscarImagem('logo.png') ?>" style="width: 100px;">
-            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
+    <!-- 2. MODAL LOGIN (DESIGN REDESIGN DISNEY) -->
+    <div id="modalLogin" class="card-flutuante card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
+        
+        <div class="castelo-header">
+            <i class="fa-solid fa-chess-castle"></i>
         </div>
-        <h2 style="color:#1f4396">Bem-vindo!</h2>
-        <p style="font-size:14px; color:#666; margin-bottom:20px">Acesse sua conta mágica.</p>
+        <h2 class="titulo-cursivo">Bem - vindo</h2>
+        <p class="subtitulo-modal">Acesse sua conta mágica:</p>
+        
         <form action="index.php" method="POST">
-            <div class="input-group-modal"><i class="fa fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
-            <div class="input-group-modal"><i class="fa fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
-            <button type="submit" class="btn-acao">Entrar</button>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" name="email" placeholder="E-mail" required>
+            </div>
+            <div class="input-group-modal">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" name="senha" placeholder="Senha" required>
+            </div>
+            <button type="submit" class="btn-acao-creme">Entrar</button>
         </form>
-        <div class="footer-modal">Novo aqui? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
+        <div class="footer-modal">Está chegando agora? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
-    <!-- 3. MODAL PERFIL -->
+    <!-- 3. MODAL PERFIL (DESIGN REDESIGN DISNEY) -->
     <?php if (isset($_SESSION['usuario'])): ?>
-    <div id="modalPerfil" class="card-flutuante">
-        <div class="card-header">
-            <img src="<?= buscarImagem('logo.png') ?>" style="width: 90px;">
-            <button class="btn-fechar" onclick="fecharTodosModais()">&times;</button>
-        </div>
+    <div id="modalPerfil" class="card-flutuante card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
 
         <div class="perfil-avatar-header">
             <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
-            <h3 style="color:#1f4396; margin-top:8px; font-size:18px;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
-            <p style="font-size:12px; color:#777;"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
+            <h3 style="color:#ffffff; margin-top:6px; font-size:18px; font-weight:700;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
+            <p style="font-size:12px; color:rgba(255,255,255,0.8);"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
         </div>
+
+        <h2 class="titulo-cursivo" style="font-size:32px; margin-top:8px;">Escolha seu avatar</h2>
 
         <form action="index.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="acao" value="atualizar_perfil">
             <input type="hidden" name="avatar_predefinido" id="modalInputAvatar" value="">
 
-            <div class="input-group-modal" style="margin-bottom: 10px;">
-                <i class="fa fa-user"></i>
-                <input type="text" name="nome" value="<?= htmlspecialchars($_SESSION['usuario']['nome']) ?>" required placeholder="Nome">
+            <div class="input-group-modal" style="margin-bottom: 8px;">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" name="nome" value="<?= htmlspecialchars($_SESSION['usuario']['nome']) ?>" required placeholder="Seu Nome">
             </div>
 
-            <label style="font-size:12px; font-weight:600; color:#1f4396;">Avatar Disney</label>
             <div class="grid-avatares-modal">
-                <?php foreach ($avataresPadrao as$avatar): ?>
+                <?php foreach ($avataresPadrao as $avatar): ?>
                     <div class="avatar-item" onclick="selecionarAvatarModal('<?= $avatar['caminho_imagem'] ?>', this)">
                         <img src="<?= buscarImagem($avatar['caminho_imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                     </div>
                 <?php endforeach; ?>
             </div>
 
-            <label style="font-size:12px; font-weight:600; color:#1f4396; display:block; margin-top:10px;">Ou foto própria:</label>
-            <input type="file" name="foto_upload" accept="image/*" style="font-size:12px; margin-top:5px; width:100%;" onchange="limparAvatarModal()">
+            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center; cursor:pointer;" onclick="document.getElementById('fotoUploadInput').click()">
+                <i class="fa-solid fa-image"></i> Escolher da Galeria
+            </label>
+            <input type="file" id="fotoUploadInput" name="foto_upload" accept="image/*" style="display:none;" onchange="limparAvatarModal()">
 
-            <button type="submit" class="btn-acao" style="margin-top:18px;">Salvar Alterações</button>
+            <button type="submit" class="btn-acao-creme" style="margin-top:14px;">Salvar alteração</button>
         </form>
 
-        <a href="logout.php" class="btn-logout-modal"><i class="fa-solid fa-right-from-bracket"></i> Sair da Conta</a>
+        <a href="logout.php" style="display:block; text-align:center; margin-top:12px; color:#ffffff; text-decoration:none; font-weight:600; font-size:13px;">
+            <i class="fa-solid fa-right-from-bracket"></i> Sair da conta
+        </a>
     </div>
     <?php endif; ?>
 
-    <!-- 4. MODAL STATUS / MENSAGENS -->
+    <!-- 4. MODAL STATUS / MENSAGENS E ERROS (DESIGN AMARELO-CREME) -->
     <?php if ($status != ""): ?>
-    <div id="modalStatus" class="card-flutuante" style="display: block; z-index: 1001;">
-        <div class="card-header">
-            <button class="btn-fechar" onclick="fecharStatus()">&times;</button>
+    <div id="modalStatus" class="card-flutuante card-amarelo" style="display: block; z-index: 1001;">
+        <button class="btn-fechar-absoluto" onclick="fecharStatus()">&times;</button>
+
+        <div class="castelo-header">
+            <i class="fa-solid fa-chess-castle"></i>
         </div>
 
         <?php if ($status == 'sucesso'): ?>
-            <div class="status-icon" style="color: #4CAF50;">✅</div>
-            <h2 style="color:#1f4396; text-align:center;">Prontinho!</h2>
-            <p style="font-size:14px; color:#666; text-align:center; margin-bottom:20px;">
-                <?= htmlspecialchars($msg) ?>
+            <h2 class="titulo-cursivo">Bem - vindo</h2>
+            <p class="subtitulo-aviso">
+                <?= htmlspecialchars($msg ?: "Sua conta está registrada, agora é só aproveitar!") ?>
             </p>
-            <button class="btn-acao" onclick="fecharStatus();">Continuar</button>
+            <button class="btn-acao-vermelho" onclick="fecharStatus();">Aproveitar agora</button>
+
         <?php elseif ($status == 'erro'): ?>
-            <div class="status-icon" style="color: #f44336;">❌</div>
-            <h2 style="color:#1f4396; text-align:center;">Oops!</h2>
-            <p style="font-size:14px; color:#666; text-align:center; margin-bottom:20px;">
-                <?= htmlspecialchars($msg) ?>
+            <h2 class="titulo-aviso">OOPS!</h2>
+            <p class="subtitulo-aviso">
+                <?= htmlspecialchars($msg ?: "Senha ou E-mail incorreto") ?>
             </p>
-            <button class="btn-acao" onclick="fecharStatus();">Tentar Novamente</button>
+            <button class="btn-acao-vermelho" onclick="fecharStatus();">Tentar de novo</button>
         <?php endif; ?>
     </div>
 
@@ -867,7 +1008,6 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
 
-        <!-- Botão de Seta -->
         <button class="btn-seta-destaque" onclick="mudarPratoDestaque()" title="Próximo prato">
             <i class="fa-solid fa-chevron-left"></i>
         </button>
@@ -886,7 +1026,7 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
 
         <h2 class="titulo">Receitas Doces</h2>
         <div class="lista">
-            <?php foreach($receitasDoces as$r): ?>
+            <?php foreach($receitasDoces as $r): ?>
             <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
                 <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                 <div class="tag doce"><?= htmlspecialchars($r['tipo']) ?></div>
@@ -897,7 +1037,7 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
 
         <h2 class="titulo">Receitas Salgadas</h2>
         <div class="lista">
-            <?php foreach($receitasSalgados as$r): ?>
+            <?php foreach($receitasSalgados as $r): ?>
             <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
                 <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                 <div class="tag salgado"><?= htmlspecialchars($r['tipo']) ?></div>
@@ -909,7 +1049,7 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
         <?php if(count($receitasBebidas) > 0): ?>
         <h2 class="titulo">Bebidas Mágicas</h2>
         <div class="lista">
-            <?php foreach($receitasBebidas as$r): ?>
+            <?php foreach($receitasBebidas as $r): ?>
             <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
                 <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                 <div class="tag bebida"><?= htmlspecialchars($r['tipo']) ?></div>
@@ -923,7 +1063,6 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script>
-    // PESQUISA EM TEMPO REAL
     function pesquisarReceitas() {
         let input = document.getElementById('inputPesquisa').value.toLowerCase();
         let cards = document.getElementsByClassName('card');
@@ -948,7 +1087,6 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
         }
     }
 
-    // MODAIS
     function fecharTodosModais() {
         document.getElementById('modalOverlay').style.display = 'none';
         if(document.getElementById('modalCadastro')) document.getElementById('modalCadastro').style.display = 'none';
@@ -984,7 +1122,6 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
         avatares.forEach(el => el.classList.remove('selected'));
     }
 
-    // SLIDER
     const hero = document.querySelector(".hero");
     const dots = document.querySelectorAll(".dot");
     const banners = [
@@ -1014,10 +1151,8 @@ $avataresPadrao =$stmtAvatares->fetchAll(PDO::FETCH_ASSOC);
         atualizarSlide();
     }
 
-    // Inicializa slider no carregamento
     atualizarSlide();
 
-    // ROLETA DE PRATOS EM DESTAQUE
     let indexAtivo = 1;
 
     function mudarPratoDestaque() {
