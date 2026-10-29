@@ -24,7 +24,7 @@ CREATE TABLE receitas (
     id_filme INT,
     descricao TEXT,
     imagem VARCHAR(255),
-    avaliacao DECIMAL(2,1),
+    avaliacao DECIMAL(2,1) DEFAULT 5.0,
     tempo_preparo VARCHAR(50),
     dificuldade VARCHAR(50),
     ingredientes TEXT, 
@@ -36,7 +36,7 @@ CREATE TABLE receitas (
 CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     nome_usuario VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     foto_perfil VARCHAR(255) DEFAULT 'avatar1.webp'
 );
@@ -48,6 +48,7 @@ CREATE TABLE avatar_predefinido (
     caminho_imagem VARCHAR(255) NOT NULL
 );
 
+-- TABELA DE FAVORITOS
 CREATE TABLE favoritar (
     id_favoritos INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -58,6 +59,19 @@ CREATE TABLE favoritar (
     UNIQUE KEY uq_usuario_receita (id_usuario, id_receita)
 );
 
+-- TABELA DE AVALIAÇÕES E COMENTÁRIOS DOS CLIENTES
+CREATE TABLE avaliacoes (
+    id_avaliacao INT AUTO_INCREMENT PRIMARY KEY,
+    id_receita INT NOT NULL,
+    id_usuario INT NOT NULL,
+    estrelas INT NOT NULL CHECK (estrelas BETWEEN 1 AND 5),
+    comentario TEXT NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_receita) REFERENCES receitas(id_receita) ON DELETE CASCADE,
+    FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+    UNIQUE KEY uq_usuario_receita_aval (id_usuario, id_receita)
+);
+
 -- 3. INSERÇÃO DAS CATEGORIAS
 INSERT INTO categoria (id_categoria, nome_categoria) VALUES
 (1, 'Princesas & Contos de Fadas'),
@@ -65,7 +79,11 @@ INSERT INTO categoria (id_categoria, nome_categoria) VALUES
 (3, 'Turma do Mickey & Amigos'),
 (4, 'Clássicos & Aventuras');
 
--- 4. INSERÇÃO DOS AVATARES
+-- 4. INSERÇÃO DE USUÁRIO DEMO
+INSERT INTO usuario (id_usuario, nome_usuario, email, senha, foto_perfil) VALUES
+(1, 'Chefe Mágico', 'admin@magicalbites.com', '123456', 'avatar1.webp');
+
+-- 5. INSERÇÃO DOS AVATARES
 INSERT INTO avatar_predefinido (nome_avatar, caminho_imagem) VALUES
 ('Avatar 1', 'avatar1.webp'), ('Avatar 2', 'avatar2.webp'), ('Avatar 3', 'avatar3.webp'), ('Avatar 4', 'avatar4.webp'),
 ('Avatar 5', 'avatar5.webp'), ('Avatar 6', 'avatar6.webp'), ('Avatar 7', 'avatar7.webp'), ('Avatar 8', 'avatar8.webp'),
@@ -85,7 +103,8 @@ INSERT INTO avatar_predefinido (nome_avatar, caminho_imagem) VALUES
 ('Avatar 61', 'avatar61.webp'),('Avatar 62', 'avatar62.webp'),('Avatar 63', 'avatar63.webp'),('Avatar 64', 'avatar64.webp'),
 ('Avatar 65', 'avatar65.webp'),('Avatar 66', 'avatar66.webp'),('Avatar 67', 'avatar67.webp'),('Avatar 68', 'avatar68.webp'),
 ('Avatar 69', 'avatar69.webp'),('Avatar 70', 'avatar70.webp');
--- 5. INSERÇÃO DOS FILMES (VINCULADOS ÀS CATEGORIAS)
+
+-- 6. INSERÇÃO DOS FILMES
 INSERT INTO filme (id_filme, nome_filme, imagem, id_categoria) VALUES 
 (1, 'Branca de Neve', 'brancadeneve.webp', 1), 
 (2, 'Frozen', 'frozen.webp', 1), 
