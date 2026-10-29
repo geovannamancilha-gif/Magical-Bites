@@ -125,12 +125,16 @@ function buscarImagem($nomeImagem) {
     return "img/" . (strpos($nomeImagem, '.') !== false ? $nomeImagem : $nomeImagem . ".png");
 }
 
-// CONSULTA DINÂMICA DAS RECEITAS SALGADAS COM NOME DO FILME
+// CONSULTA DINÂMICA DAS RECEITAS SALGADAS COM NOME DO FILME E MÉDIA DE AVALIAÇÕES
 $stmtSalgados = $pdo->query("
-    SELECT r.*, f.nome_filme 
+    SELECT r.*, f.nome_filme, 
+           COUNT(a.id_avaliacao) AS total_avaliacoes, 
+           AVG(a.estrelas) AS media_estrelas
     FROM receitas r 
     LEFT JOIN filme f ON r.id_filme = f.id_filme 
+    LEFT JOIN avaliacoes a ON r.id_receita = a.id_receita
     WHERE r.tipo = 'SALGADO' OR r.tipo = 'SALGADOS'
+    GROUP BY r.id_receita
     ORDER BY r.nome_receita ASC
 ");
 $receitasSalgados = $stmtSalgados->fetchAll(PDO::FETCH_ASSOC);
@@ -601,7 +605,11 @@ try {
                         
                         <div class="card-receita-meta">
                             <span><i class="fa-regular fa-clock"></i> <?= htmlspecialchars($r['tempo_preparo'] ?? '30min') ?></span>
-                            <span class="card-receita-rating">★ <?= htmlspecialchars($r['avaliacao'] ?? '5.0') ?></span>
+                            <?php if (($r['total_avaliacoes'] ?? 0) > 0): 
+                                $media = round((float)($r['media_estrelas'] ?? $r['avaliacao'] ?? 0), 1);
+                            ?>
+                                <span class="card-receita-rating">★ <?= number_format($media, 1) ?></span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </a>

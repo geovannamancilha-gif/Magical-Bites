@@ -54,21 +54,18 @@ try {
 
         $usuarioBD = null;
 
-        // Tenta identificar o utilizador estritamente pelo ID da sessão
         if ($idUsuarioSessao) {
             $stmtUserCheck = $pdo->prepare("SELECT * FROM usuario WHERE id_usuario = :id");
             $stmtUserCheck->execute([':id' => $idUsuarioSessao]);
             $usuarioBD = $stmtUserCheck->fetch(PDO::FETCH_ASSOC);
         }
 
-        // Se não encontrou pelo ID, procura pelo e-mail registrado na sessão
         if (!$usuarioBD && !empty($emailSessao)) {
             $stmtUserCheck = $pdo->prepare("SELECT * FROM usuario WHERE email = :email");
             $stmtUserCheck->execute([':email' => $emailSessao]);
             $usuarioBD = $stmtUserCheck->fetch(PDO::FETCH_ASSOC);
         }
 
-        // Se o utilizador não existir no BD, limpa a sessão e exige novo login
         if (!$usuarioBD) {
             unset($_SESSION['usuario']);
             header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Sua sessão é inválida. Por favor, faça login novamente."));
@@ -77,7 +74,6 @@ try {
 
         $idUsuarioValido = $usuarioBD['id_usuario'];
 
-        // Atualiza a sessão com os dados corretos do banco de dados
         $_SESSION['usuario']['id'] = $idUsuarioValido;
         $_SESSION['usuario']['nome'] = $usuarioBD['nome_usuario'];
         $_SESSION['usuario']['email'] = $usuarioBD['email'];
@@ -97,7 +93,6 @@ try {
         }
 
         try {
-            // Insere ou atualiza a avaliação garantindo o ID do utilizador ligado
             $stmtAvaliar = $pdo->prepare("
                 INSERT INTO avaliacoes (id_receita, id_usuario, estrelas, comentario) 
                 VALUES (:id_receita, :id_usuario, :estrelas, :comentario)
@@ -112,7 +107,6 @@ try {
                 ':comentario2'=> $comentario
             ]);
 
-            // Recalcula e atualiza a média geral da receita na tabela 'receitas'
             $stmtMedia = $pdo->prepare("SELECT AVG(estrelas) as media FROM avaliacoes WHERE id_receita = :id_receita");
             $stmtMedia->execute([':id_receita' => $id_receita]);
             $mediaRow = $stmtMedia->fetch(PDO::FETCH_ASSOC);
@@ -145,7 +139,37 @@ try {
         die("<h1 style='color:#fff; text-align:center; margin-top:50px;'>Receita não encontrada na base de dados para o ID: $id_receita!</h1>");
     }
 
-    // BUSCA AVALIAÇÕES DE CLIENTES VINCULADAS AOS SEUS RESPECTIVOS UTILIZADORES
+    // BUSCA RECEITAS RECOMENDADAS CONTANDO SUAS AVALIAÇÕES REAIS
+    $stmtRecomendadas = $pdo->prepare("
+        SELECT r.*, COUNT(a.id_avaliacao) as total_aval 
+        FROM receitas r
+        LEFT JOIN avaliacoes a ON r.id_receita = a.id_receita
+        WHERE r.id_receita != :id_atual AND r.tipo = :tipo
+        GROUP BY r.id_receita
+        ORDER BY RAND() 
+        LIMIT 4
+    ");
+    $stmtRecomendadas->execute([
+        ':id_atual' => $id_receita,
+        ':tipo'     => $receita['tipo'] ?? 'Salgado'
+    ]);
+    $receitasRecomendadas = $stmtRecomendadas->fetchAll(PDO::FETCH_ASSOC);
+
+    if (count($receitasRecomendadas) < 2) {
+        $stmtRecomendadas = $pdo->prepare("
+            SELECT r.*, COUNT(a.id_avaliacao) as total_aval 
+            FROM receitas r
+            LEFT JOIN avaliacoes a ON r.id_receita = a.id_receita
+            WHERE r.id_receita != :id_atual 
+            GROUP BY r.id_receita
+            ORDER BY RAND() 
+            LIMIT 4
+        ");
+        $stmtRecomendadas->execute([':id_atual' => $id_receita]);
+        $receitasRecomendadas = $stmtRecomendadas->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // BUSCA AVALIAÇÕES DE CLIENTES DA RECEITA ATUAL
     $stmtAvaliacoesList = $pdo->prepare("
         SELECT a.*, u.nome_usuario, u.foto_perfil 
         FROM avaliacoes a 
@@ -157,13 +181,13 @@ try {
     $avaliacoesClientes = $stmtAvaliacoesList->fetchAll(PDO::FETCH_ASSOC);
     $totalAvaliacoes = count($avaliacoesClientes);
 
-    // Processamento das listas de ingredientes e preparo
+    // Processamento de ingredientes e preparo
     $lista_ingredientes = array_filter(array_map('trim', explode(";", $receita['ingredientes'])));
     $passos_preparo = array_filter(array_map('trim', preg_split('/(?=\d+\.\s)/', $receita['modo_preparo'])));
 
     $tipo_formatado = ucfirst(strtolower($receita['tipo'] ?? 'Salgado'));
 
-    // VERIFICAÇÃO SE A RECEITA ESTÁ FAVORITADA PELO UTILIZADOR LOGADO
+    // VERIFICAÇÃO SE A RECEITA ESTÁ FAVORITADA
     $isFavorito = false;
     if (isset($_SESSION['usuario'])) {
         $idUsuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
@@ -195,7 +219,7 @@ if (isset($_SESSION['usuario'])) {
     }
 }
 
-// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
+// FUNÇÃO DE CARREGAMENTO DE IMAGENS
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
@@ -309,26 +333,122 @@ function buscarImagem($nomeImagem) {
             border: 2px solid #fff6a9ff;
         }
 
-        /* --- CONTAINER PRINCIPAL --- */
+        /* --- CONTAINER PRINCIPAL CENTRALIZADO --- */
         .container {
-            max-width: 1150px;
-            margin: 45px auto 70px;
-            padding: 0 30px;
+            max-width: 1240px;
+            margin: 40px auto 70px;
+            padding: 0 25px;
+        }
+
+        /* LAYOUT CENTRALIZADO COM SIDEBAR */
+        .layout-com-sidebar {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 40px;
+            align-items: start;
+            justify-content: center;
+        }
+
+        .conteudo-principal {
+            min-width: 0;
+            width: 100%;
+        }
+
+        /* BARRA LATERAL - RECOMENDAÇÕES */
+        .sidebar-recomendados {
+            background: rgba(10, 20, 42, 0.7);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            position: sticky;
+            top: 90px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .sidebar-titulo {
+            font-size: 17px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #fff6a9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-titulo i {
+            color: #fff6a9;
+        }
+
+        .lista-recomendadas {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-recomendada {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card-recomendada:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(4px);
+            border-color: #fff6a9;
+        }
+
+        .card-recomendada img {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .info-recomendada h4 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.3;
+            margin-bottom: 4px;
+        }
+
+        .info-recomendada .meta-rec {
+            font-size: 11.5px;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-recomendada .meta-rec i {
+            color: #fbbf24;
         }
 
         /* HERO RECEITA */
         .hero-receita {
             display: grid;
-            grid-template-columns: 480px 1fr;
-            gap: 45px;
+            grid-template-columns: 380px 1fr;
+            gap: 35px;
             align-items: center;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
         }
 
         .hero-imagem {
             width: 100%;
-            height: 360px;
-            border-radius: 28px;
+            height: 330px;
+            border-radius: 24px;
             overflow: hidden;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
         }
@@ -346,10 +466,10 @@ function buscarImagem($nomeImagem) {
         }
 
         .hero-info .titulo {
-            font-size: 36px;
+            font-size: 34px;
             font-weight: 800;
             color: #ffffff;
-            line-height: 1.15;
+            line-height: 1.2;
             text-shadow: 0 3px 10px rgba(0,0,0,0.6);
         }
 
@@ -375,11 +495,10 @@ function buscarImagem($nomeImagem) {
         .tag-categoria {
             background: #fff6a9;
             color: #0b1329;
-            padding: 3px 16px;
+            padding: 3px 14px;
             border-radius: 20px;
             font-weight: 700;
-            font-size: 13px;
-            margin-left: 5px;
+            font-size: 12.5px;
         }
 
         .descricao {
@@ -404,7 +523,7 @@ function buscarImagem($nomeImagem) {
             color: #ffffff;
             text-decoration: none;
             font-weight: 700;
-            font-size: 16px;
+            font-size: 15px;
             transition: 0.3s ease;
         }
 
@@ -416,7 +535,7 @@ function buscarImagem($nomeImagem) {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 15px;
             color: #ffffff;
             transition: 0.3s ease;
         }
@@ -427,25 +546,30 @@ function buscarImagem($nomeImagem) {
             transform: scale(1.08);
         }
 
+        /* FAVORITADO NO TOM AMARELO DO SITE */
+        .btn-acao-pill.favoritado {
+            color: #fff6a9;
+        }
+
         .btn-acao-pill.favoritado .icone-circulo {
-            background: #ff528a;
-            border-color: #ff528a;
-            color: #ffffff;
+            background: #fff6a9;
+            border-color: #fff6a9;
+            color: #0b1329;
         }
 
         /* GRID PREPARO E INGREDIENTES */
         .conteudo-grid {
             display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 50px;
-            margin-bottom: 70px;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 40px;
+            margin-bottom: 50px;
         }
 
         .secao-titulo {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 800;
             color: #ffffff;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
             text-shadow: 0 3px 8px rgba(0,0,0,0.6);
         }
 
@@ -453,12 +577,12 @@ function buscarImagem($nomeImagem) {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
         }
 
         .lista-preparo li {
             color: #f1f5f9;
-            font-size: 14.5px;
+            font-size: 14px;
             line-height: 1.6;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
@@ -479,7 +603,7 @@ function buscarImagem($nomeImagem) {
             position: relative;
             padding-left: 20px;
             color: #f1f5f9;
-            font-size: 14.5px;
+            font-size: 14px;
             line-height: 1.5;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
@@ -496,8 +620,8 @@ function buscarImagem($nomeImagem) {
         /* --- SEÇÃO DE AVALIAÇÃO --- */
         .secao-avaliacao {
             text-align: center;
-            margin-top: 50px;
-            padding: 35px 25px;
+            margin-top: 40px;
+            padding: 30px 20px;
             background: rgba(10, 20, 42, 0.65);
             border-radius: 24px;
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -506,7 +630,7 @@ function buscarImagem($nomeImagem) {
         }
 
         .secao-avaliacao h3 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: #ffffff;
             text-transform: uppercase;
@@ -519,9 +643,9 @@ function buscarImagem($nomeImagem) {
             display: flex;
             justify-content: center;
             gap: 10px;
-            font-size: 34px;
+            font-size: 32px;
             color: rgba(255, 255, 255, 0.3);
-            margin: 15px 0 10px;
+            margin: 12px 0 8px;
             cursor: pointer;
         }
 
@@ -537,23 +661,23 @@ function buscarImagem($nomeImagem) {
 
         .subtitulo-avaliacao {
             color: #cbd5e1;
-            font-size: 13.5px;
-            margin-bottom: 15px;
+            font-size: 13px;
+            margin-bottom: 12px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .campo-comentario textarea {
             width: 100%;
-            max-width: 650px;
-            padding: 14px 18px;
-            border-radius: 18px;
+            max-width: 600px;
+            padding: 12px 16px;
+            border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.2);
             background: rgba(15, 23, 42, 0.8);
             color: #ffffff;
-            font-size: 14px;
+            font-size: 13.5px;
             outline: none;
             resize: vertical;
-            margin-top: 10px;
+            margin-top: 8px;
             transition: 0.3s;
         }
 
@@ -566,13 +690,13 @@ function buscarImagem($nomeImagem) {
             background: #fff8bd;
             color: #ab232a;
             border: none;
-            padding: 12px 32px;
+            padding: 10px 28px;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 14.5px;
             border-radius: 50px;
             cursor: pointer;
             transition: 0.3s;
-            margin-top: 15px;
+            margin-top: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
@@ -582,39 +706,39 @@ function buscarImagem($nomeImagem) {
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
         }
 
-        /* --- LISTA DE AVALIAÇÕES DOS OUTROS CLIENTES --- */
+        /* --- LISTA DE AVALIAÇÕES DOS CLIENTES --- */
         .secao-lista-avaliacoes {
-            margin-top: 60px;
+            margin-top: 45px;
         }
 
         .grid-avaliacoes {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 22px;
-            margin-top: 22px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 18px;
+            margin-top: 18px;
         }
 
         .card-avaliacao-cliente {
             background: rgba(15, 23, 42, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            padding: 22px;
+            border-radius: 18px;
+            padding: 18px;
             backdrop-filter: blur(6px);
             box-shadow: 0 6px 18px rgba(0,0,0,0.25);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .header-avaliacao-cliente {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .avatar-avaliacao-cliente {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #fff6a9;
@@ -622,24 +746,24 @@ function buscarImagem($nomeImagem) {
 
         .info-usuario-aval .nome {
             font-weight: 700;
-            font-size: 15px;
+            font-size: 14px;
             color: #ffffff;
         }
 
         .info-usuario-aval .data {
-            font-size: 11px;
+            font-size: 10.5px;
             color: #94a3b8;
         }
 
         .estrelas-cliente {
             color: #fbbf24;
-            font-size: 14px;
+            font-size: 13px;
             display: flex;
             gap: 3px;
         }
 
         .comentario-cliente {
-            font-size: 13.5px;
+            font-size: 13px;
             color: #e2e8f0;
             line-height: 1.5;
         }
@@ -728,10 +852,12 @@ function buscarImagem($nomeImagem) {
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
 
-        @media (max-width: 900px) {
+        @media (max-width: 992px) {
+            .layout-com-sidebar { grid-template-columns: 1fr; }
+            .sidebar-recomendados { position: static; margin-top: 40px; }
             .hero-receita { grid-template-columns: 1fr; gap: 25px; }
             .hero-imagem { height: 280px; }
-            .conteudo-grid { grid-template-columns: 1fr; gap: 40px; }
+            .conteudo-grid { grid-template-columns: 1fr; gap: 30px; }
             .grid-avaliacoes { grid-template-columns: 1fr; }
         }
     </style>
@@ -851,144 +977,188 @@ function buscarImagem($nomeImagem) {
     </script>
     <?php endif; ?>
 
-    <!-- CONTEÚDO PRINCIPAL DA RECEITA -->
+    <!-- CONTEÚDO PRINCIPAL DA RECEITA COM SIDEBAR -->
     <div class="container">
-
-        <!-- SEÇÃO HERO -->
-        <div class="hero-receita">
-            <div class="hero-imagem">
-                <img src="<?= buscarImagem($receita['imagem']) ?>" alt="<?= htmlspecialchars($receita['nome_receita']) ?>" onerror="this.src='img/logo/logo_menu.png'">
-            </div>
-
-            <div class="hero-info">
-                <h1 class="titulo"><?= htmlspecialchars($receita['nome_receita']) ?></h1>
-
-                <div class="meta-info">
-                    <div class="meta-item">
-                        <i class="fa-solid fa-clock"></i>
-                        <span><?= htmlspecialchars($receita['tempo_preparo']) ?></span>
-                    </div>
-                    <div class="meta-item">
-                        <i class="fa-solid fa-star"></i>
-                        <span><?= htmlspecialchars($receita['avaliacao'] ?? '5.0') ?> (<?= $totalAvaliacoes ?> <?= $totalAvaliacoes == 1 ? 'avaliação' : 'avaliações' ?>)</span>
-                    </div>
-                    <span class="tag-categoria"><?= htmlspecialchars($tipo_formatado) ?></span>
-                </div>
-
-                <p class="descricao"><?= htmlspecialchars($receita['descricao']) ?></p>
-
-                <div class="acoes">
-                    <a href="favoritar.php?id=<?= $receita['id_receita'] ?>" class="btn-acao-pill <?= $isFavorito ? 'favoritado' : '' ?>">
-                        <div class="icone-circulo"><i class="fa-solid fa-heart"></i></div>
-                        <span><?= $isFavorito ? 'Favoritado' : 'Favoritar' ?></span>
-                    </a>
-
-                    <a href="#modo-preparo" class="btn-acao-pill">
-                        <div class="icone-circulo"><i class="fa-solid fa-utensils"></i></div>
-                        <span>Fazer agora</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTEÚDO EM DUAS COLUNAS -->
-        <div class="conteudo-grid" id="modo-preparo">
+        <div class="layout-com-sidebar">
             
-            <!-- COLUNA MODO DE PREPARO -->
-            <div>
-                <h2 class="secao-titulo">Modo de preparo:</h2>
-                <ul class="lista-preparo">
-                    <?php 
-                    $num = 1;
-                    foreach($passos_preparo as $passo): 
-                        $textoLimpo = preg_replace('/^\d+\.\s*/', '', $passo);
-                    ?>
-                        <li><strong><?= $num ?>.</strong> <?= htmlspecialchars($textoLimpo) ?></li>
-                    <?php 
-                        $num++;
-                    endforeach; 
-                    ?>
-                </ul>
-            </div>
+            <!-- COLUNA PRINCIPAL DA RECEITA -->
+            <div class="conteudo-principal">
 
-            <!-- COLUNA INGREDIENTES -->
-            <div>
-                <h2 class="secao-titulo">Ingredientes:</h2>
-                <ul class="lista-ingredientes">
-                    <?php foreach($lista_ingredientes as $ingrediente): ?>
-                        <li><?= htmlspecialchars($ingrediente) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
-
-        </div>
-
-        <!-- SEÇÃO DE AVALIAÇÃO DA RECEITA -->
-        <div class="secao-avaliacao">
-            <h3>COMO FICOU ESSA RECEITA?</h3>
-
-            <?php if (isset($_SESSION['usuario'])): ?>
-                <form action="receita.php?id=<?= $id_receita ?>" method="POST" id="formAvaliacao">
-                    <input type="hidden" name="acao" value="avaliar">
-                    <input type="hidden" name="estrelas" id="inputEstrelas" value="0">
-
-                    <div class="estrelas-avaliacao" id="estrelasBox">
-                        <i class="fa-solid fa-star" data-value="1"></i>
-                        <i class="fa-solid fa-star" data-value="2"></i>
-                        <i class="fa-solid fa-star" data-value="3"></i>
-                        <i class="fa-solid fa-star" data-value="4"></i>
-                        <i class="fa-solid fa-star" data-value="5"></i>
-                    </div>
-                    <p class="subtitulo-avaliacao" id="textoEstrelas">Clique nas estrelas para selecionar uma nota</p>
-
-                    <div class="campo-comentario">
-                        <textarea name="comentario" placeholder="Escreva aqui o que achou dessa receita para ajudar outros cozinheiros..." rows="3" required></textarea>
+                <!-- SEÇÃO HERO -->
+                <div class="hero-receita">
+                    <div class="hero-imagem">
+                        <img src="<?= buscarImagem($receita['imagem']) ?>" alt="<?= htmlspecialchars($receita['nome_receita']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                     </div>
 
-                    <button type="submit" class="btn-enviar-avaliacao">Enviar Avaliação</button>
-                </form>
-            <?php else: ?>
-                <div class="estrelas-avaliacao" style="cursor: default;">
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                    <i class="fa-solid fa-star"></i>
-                </div>
-                <p class="subtitulo-avaliacao">Faça login para avaliar e deixar seu comentário sobre esta receita!</p>
-                <button type="button" class="btn-enviar-avaliacao" onclick="alternarModais('login')">Fazer Login para Avaliar</button>
-            <?php endif; ?>
-        </div>
+                    <div class="hero-info">
+                        <h1 class="titulo"><?= htmlspecialchars($receita['nome_receita']) ?></h1>
 
-        <!-- SEÇÃO DE AVALIAÇÕES DOS OUTROS CLIENTES -->
-        <div class="secao-lista-avaliacoes">
-            <h2 class="secao-titulo">Avaliações dos Clientes (<?= $totalAvaliacoes ?>)</h2>
+                        <div class="meta-info">
+                            <div class="meta-item">
+                                <i class="fa-solid fa-clock"></i>
+                                <span><?= htmlspecialchars($receita['tempo_preparo']) ?></span>
+                            </div>
 
-            <?php if ($totalAvaliacoes > 0): ?>
-                <div class="grid-avaliacoes">
-                    <?php foreach ($avaliacoesClientes as $aval): ?>
-                        <div class="card-avaliacao-cliente">
-                            <div class="header-avaliacao-cliente">
-                                <img src="<?= buscarImagem($aval['foto_perfil'] ?? 'avatar1.webp') ?>" class="avatar-avaliacao-cliente" onerror="this.src='img/logo/logo_menu.png'">
-                                <div class="info-usuario-aval">
-                                    <div class="nome"><?= htmlspecialchars($aval['nome_usuario']) ?></div>
-                                    <div class="data"><?= date('d/m/Y \à\s H:i', strtotime($aval['data_criacao'])) ?></div>
+                            <!-- EXIBIÇÃO CONDICIONAL DA AVALIAÇÃO DA RECEITA PRINCIPAL -->
+                            <?php if ($totalAvaliacoes > 0 && !empty($receita['avaliacao'])): ?>
+                                <div class="meta-item">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span><?= number_format((float)$receita['avaliacao'], 1, ',', '.') ?> (<?= $totalAvaliacoes ?> <?= $totalAvaliacoes == 1 ? 'avaliação' : 'avaliações' ?>)</span>
                                 </div>
-                            </div>
-                            <div class="estrelas-cliente">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <i class="fa-<?= $i <= $aval['estrelas'] ? 'solid' : 'regular' ?> fa-star"></i>
-                                <?php endfor; ?>
-                            </div>
-                            <p class="comentario-cliente"><?= nl2br(htmlspecialchars($aval['comentario'])) ?></p>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <p style="color: #cbd5e1; font-size: 14.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Esta receita ainda não possui avaliações. Seja o primeiro a avaliar!</p>
-            <?php endif; ?>
-        </div>
+                            <?php else: ?>
+                                <div class="meta-item">
+                                    <i class="fa-regular fa-star"></i>
+                                    <span>Sem avaliações</span>
+                                </div>
+                            <?php endif; ?>
 
+                            <span class="tag-categoria"><?= htmlspecialchars($tipo_formatado) ?></span>
+                        </div>
+
+                        <p class="descricao"><?= htmlspecialchars($receita['descricao']) ?></p>
+
+                        <div class="acoes">
+                            <a href="favoritar.php?id=<?= $receita['id_receita'] ?>" class="btn-acao-pill <?= $isFavorito ? 'favoritado' : '' ?>">
+                                <div class="icone-circulo"><i class="fa-solid fa-heart"></i></div>
+                                <span><?= $isFavorito ? 'Favoritado' : 'Favoritar' ?></span>
+                            </a>
+
+                            <a href="#modo-preparo" class="btn-acao-pill">
+                                <div class="icone-circulo"><i class="fa-solid fa-utensils"></i></div>
+                                <span>Fazer agora</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTEÚDO EM DUAS COLUNAS (MODO PREPARO E INGREDIENTES) -->
+                <div class="conteudo-grid" id="modo-preparo">
+                    
+                    <!-- MODO DE PREPARO -->
+                    <div>
+                        <h2 class="secao-titulo">Modo de preparo:</h2>
+                        <ul class="lista-preparo">
+                            <?php 
+                            $num = 1;
+                            foreach($passos_preparo as $passo): 
+                                $textoLimpo = preg_replace('/^\d+\.\s*/', '', $passo);
+                            ?>
+                                <li><strong><?= $num ?>.</strong> <?= htmlspecialchars($textoLimpo) ?></li>
+                            <?php 
+                                $num++;
+                            endforeach; 
+                            ?>
+                        </ul>
+                    </div>
+
+                    <!-- INGREDIENTES -->
+                    <div>
+                        <h2 class="secao-titulo">Ingredientes:</h2>
+                        <ul class="lista-ingredientes">
+                            <?php foreach($lista_ingredientes as $ingrediente): ?>
+                                <li><?= htmlspecialchars($ingrediente) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- SEÇÃO DE AVALIAÇÃO DA RECEITA -->
+                <div class="secao-avaliacao">
+                    <h3>COMO FICOU ESSA RECEITA?</h3>
+
+                    <?php if (isset($_SESSION['usuario'])): ?>
+                        <form action="receita.php?id=<?= $id_receita ?>" method="POST" id="formAvaliacao">
+                            <input type="hidden" name="acao" value="avaliar">
+                            <input type="hidden" name="estrelas" id="inputEstrelas" value="0">
+
+                            <div class="estrelas-avaliacao" id="estrelasBox">
+                                <i class="fa-solid fa-star" data-value="1"></i>
+                                <i class="fa-solid fa-star" data-value="2"></i>
+                                <i class="fa-solid fa-star" data-value="3"></i>
+                                <i class="fa-solid fa-star" data-value="4"></i>
+                                <i class="fa-solid fa-star" data-value="5"></i>
+                            </div>
+                            <p class="subtitulo-avaliacao" id="textoEstrelas">Clique nas estrelas para selecionar uma nota</p>
+
+                            <div class="campo-comentario">
+                                <textarea name="comentario" placeholder="Escreva aqui o que achou dessa receita para ajudar outros cozinheiros..." rows="3" required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-enviar-avaliacao">Enviar Avaliação</button>
+                        </form>
+                    <?php else: ?>
+                        <div class="estrelas-avaliacao" style="cursor: default;">
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="subtitulo-avaliacao">Faça login para avaliar e deixar seu comentário sobre esta receita!</p>
+                        <button type="button" class="btn-enviar-avaliacao" onclick="alternarModais('login')">Fazer Login para Avaliar</button>
+                    <?php endif; ?>
+                </div>
+
+                <!-- SEÇÃO DE AVALIAÇÕES DOS CLIENTES -->
+                <div class="secao-lista-avaliacoes">
+                    <h2 class="secao-titulo">Avaliações dos Clientes (<?= $totalAvaliacoes ?>)</h2>
+
+                    <?php if ($totalAvaliacoes > 0): ?>
+                        <div class="grid-avaliacoes">
+                            <?php foreach ($avaliacoesClientes as $aval): ?>
+                                <div class="card-avaliacao-cliente">
+                                    <div class="header-avaliacao-cliente">
+                                        <img src="<?= buscarImagem($aval['foto_perfil'] ?? 'avatar1.webp') ?>" class="avatar-avaliacao-cliente" onerror="this.src='img/logo/logo_menu.png'">
+                                        <div class="info-usuario-aval">
+                                            <div class="nome"><?= htmlspecialchars($aval['nome_usuario']) ?></div>
+                                            <div class="data"><?= date('d/m/Y \à\s H:i', strtotime($aval['data_criacao'])) ?></div>
+                                        </div>
+                                    </div>
+                                    <div class="estrelas-cliente">
+                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                            <i class="fa-<?= $i <= $aval['estrelas'] ? 'solid' : 'regular' ?> fa-star"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                    <p class="comentario-cliente"><?= nl2br(htmlspecialchars($aval['comentario'])) ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php else: ?>
+                        <p style="color: #cbd5e1; font-size: 14.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Esta receita ainda não possui avaliações. Seja o primeiro a avaliar!</p>
+                    <?php endif; ?>
+                </div>
+
+            </div>
+
+            <!-- BARRA LATERAL COM RECEITAS RECOMENDADAS -->
+            <aside class="sidebar-recomendados">
+                <h3 class="sidebar-titulo"><i class="fa-solid fa-utensils"></i> Recomendadas</h3>
+                <div class="lista-recomendadas">
+                    <?php if (!empty($receitasRecomendadas)): ?>
+                        <?php foreach ($receitasRecomendadas as $rec): ?>
+                            <a href="receita.php?id=<?= $rec['id_receita'] ?>" class="card-recomendada">
+                                <img src="<?= buscarImagem($rec['imagem']) ?>" alt="<?= htmlspecialchars($rec['nome_receita']) ?>" onerror="this.src='img/logo/logo_menu.png'">
+                                <div class="info-recomendada">
+                                    <h4><?= htmlspecialchars($rec['nome_receita']) ?></h4>
+                                    <div class="meta-rec">
+                                        <span><i class="fa-solid fa-clock"></i> <?= htmlspecialchars($rec['tempo_preparo']) ?></span>
+                                        
+                                        <!-- EXIBE NOTA APENAS SE A RECEITA RECOMENDADA TIVER AVALIAÇÃO REAL -->
+                                        <?php if (!empty($rec['total_aval']) && $rec['total_aval'] > 0 && !empty($rec['avaliacao'])): ?>
+                                            <span><i class="fa-solid fa-star"></i> <?= number_format((float)$rec['avaliacao'], 1, ',', '.') ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p style="font-size: 13px; color: #cbd5e1;">Nenhuma recomendação no momento.</p>
+                    <?php endif; ?>
+                </div>
+            </aside>
+
+        </div>
     </div>
 
     <!-- JAVASCRIPT DOS MODAIS E AVALIAÇÃO -->
@@ -1001,18 +1171,15 @@ function buscarImagem($nomeImagem) {
 
         if (estrelas.length > 0) {
             estrelas.forEach((estrela) => {
-                // Passar o mouse por cima
                 estrela.addEventListener('mouseover', function() {
                     const val = parseInt(this.getAttribute('data-value'));
                     destacarEstrelas(val);
                 });
 
-                // Tirar o mouse
                 estrela.addEventListener('mouseout', function() {
                     destacarEstrelas(ratingSelecionado);
                 });
 
-                // Clicar para fixar a nota
                 estrela.addEventListener('click', function() {
                     ratingSelecionado = parseInt(this.getAttribute('data-value'));
                     inputEstrelas.value = ratingSelecionado;

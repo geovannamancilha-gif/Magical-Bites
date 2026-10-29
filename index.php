@@ -109,15 +109,30 @@ function buscarImagem($nomeImagem) {
 }
 
 // =========================================================================
-// 3. CONSULTAS DINÂMICAS DAS RECEITAS (DO BANCO DE DADOS + FILMES)
+// 3. CONSULTAS DINÂMICAS DAS RECEITAS (DO BANCO DE DADOS + FILMES + AVALIAÇÕES)
 // =========================================================================
-$stmtSalgados = $pdo->query("SELECT r.*, f.nome_filme FROM receitas r LEFT JOIN filme f ON r.id_filme = f.id_filme WHERE r.tipo = 'SALGADO' LIMIT 6");
+$sqlReceitas = "
+    SELECT r.*, f.nome_filme, 
+           COUNT(a.id_avaliacao) AS total_avaliacoes, 
+           AVG(a.estrelas) AS media_estrelas
+    FROM receitas r 
+    LEFT JOIN filme f ON r.id_filme = f.id_filme 
+    LEFT JOIN avaliacoes a ON r.id_receita = a.id_receita 
+    WHERE r.tipo = :tipo 
+    GROUP BY r.id_receita 
+    LIMIT 6
+";
+
+$stmtSalgados = $pdo->prepare($sqlReceitas);
+$stmtSalgados->execute([':tipo' => 'SALGADO']);
 $receitasSalgados = $stmtSalgados->fetchAll(PDO::FETCH_ASSOC);
 
-$stmtDoces = $pdo->query("SELECT r.*, f.nome_filme FROM receitas r LEFT JOIN filme f ON r.id_filme = f.id_filme WHERE r.tipo = 'DOCE' LIMIT 6");
+$stmtDoces = $pdo->prepare($sqlReceitas);
+$stmtDoces->execute([':tipo' => 'DOCE']);
 $receitasDoces = $stmtDoces->fetchAll(PDO::FETCH_ASSOC);
 
-$stmtBebidas = $pdo->query("SELECT r.*, f.nome_filme FROM receitas r LEFT JOIN filme f ON r.id_filme = f.id_filme WHERE r.tipo = 'BEBIDA' LIMIT 6");
+$stmtBebidas = $pdo->prepare($sqlReceitas);
+$stmtBebidas->execute([':tipo' => 'BEBIDA']);
 $receitasBebidas = $stmtBebidas->fetchAll(PDO::FETCH_ASSOC);
 
 $status = $_GET['status'] ?? "";
@@ -717,7 +732,7 @@ try {
         .item-receita-rating {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
             color: #ffc107;
             font-size: 14px;
             letter-spacing: 1px;
@@ -775,7 +790,7 @@ try {
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
         }
 
-        /* --- 5. & 7. & 9. SECÇÕES FULL-WIDTH (ESTILO EXTREMO NO CANTO ESQUERDO) --- */
+        /* --- 5. & 7. & 9. SECÇÕES FULL-WIDTH --- */
         .secao-full-vermelha, .secao-full-creme {
             width: 100%;
             position: relative;
@@ -797,7 +812,6 @@ try {
             box-shadow: inset 0 10px 20px -10px rgba(0,0,0,0.15), inset 0 -10px 20px -10px rgba(0,0,0,0.15);
         }
 
-        /* Layout expandido colado no canto esquerdo */
         .container-full-vermelho, .container-full-creme {
             max-width: 100%;
             margin: 0;
@@ -815,7 +829,6 @@ try {
             max-width: 600px;
         }
 
-        /* Título grande e marcante */
         .titulo-banner-red {
             font-size: 46px;
             font-weight: 900;
@@ -894,7 +907,6 @@ try {
             margin-bottom: 26px;
         }
 
-        /* Imagem esfumada na direita */
         .banner-red-img, .banner-creme-img {
             position: absolute;
             top: 0;
@@ -1589,9 +1601,23 @@ try {
                     <?php endif; ?>
                     <div class="item-receita-titulo"><?= htmlspecialchars($r['nome_receita']) ?></div>
                     <div class="item-receita-desc"><?= htmlspecialchars($r['descricao'] ?? 'Saborosa receita salgada mágica inspirada no cinema.') ?></div>
-                    <div class="item-receita-rating">
-                        ★★★★★
-                    </div>
+                    
+                    <?php if (($r['total_avaliacoes'] ?? 0) > 0): 
+                        $media = round((float)($r['media_estrelas'] ?? $r['avaliacao'] ?? 0), 1);
+                    ?>
+                        <div class="item-receita-rating">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($media >= $i): ?>
+                                    <i class="fa-solid fa-star"></i>
+                                <?php elseif ($media >= $i - 0.5): ?>
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                <?php else: ?>
+                                    <i class="fa-regular fa-star"></i>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                            <span style="font-size: 12px; color: #ffffff; font-weight: 700; margin-left: 4px;"><?= number_format($media, 1) ?></span>
+                        </div>
+                    <?php endif; ?>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -1638,9 +1664,23 @@ try {
                     <?php endif; ?>
                     <div class="item-receita-titulo"><?= htmlspecialchars($r['nome_receita']) ?></div>
                     <div class="item-receita-desc"><?= htmlspecialchars($r['descricao'] ?? 'Deliciosa receita doce mágica inspirada no cinema.') ?></div>
-                    <div class="item-receita-rating">
-                        ★★★★★
-                    </div>
+                    
+                    <?php if (($r['total_avaliacoes'] ?? 0) > 0): 
+                        $media = round((float)($r['media_estrelas'] ?? $r['avaliacao'] ?? 0), 1);
+                    ?>
+                        <div class="item-receita-rating">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($media >= $i): ?>
+                                    <i class="fa-solid fa-star"></i>
+                                <?php elseif ($media >= $i - 0.5): ?>
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                <?php else: ?>
+                                    <i class="fa-regular fa-star"></i>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                            <span style="font-size: 12px; color: #ffffff; font-weight: 700; margin-left: 4px;"><?= number_format($media, 1) ?></span>
+                        </div>
+                    <?php endif; ?>
                 </a>
                 <?php endforeach; ?>
             </div>
@@ -1686,9 +1726,23 @@ try {
                     <?php endif; ?>
                     <div class="item-receita-titulo"><?= htmlspecialchars($r['nome_receita']) ?></div>
                     <div class="item-receita-desc"><?= htmlspecialchars($r['descricao'] ?? 'Refrescante bebida mágica inspirada no cinema.') ?></div>
-                    <div class="item-receita-rating">
-                        ★★★★★
-                    </div>
+                    
+                    <?php if (($r['total_avaliacoes'] ?? 0) > 0): 
+                        $media = round((float)($r['media_estrelas'] ?? $r['avaliacao'] ?? 0), 1);
+                    ?>
+                        <div class="item-receita-rating">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <?php if ($media >= $i): ?>
+                                    <i class="fa-solid fa-star"></i>
+                                <?php elseif ($media >= $i - 0.5): ?>
+                                    <i class="fa-solid fa-star-half-stroke"></i>
+                                <?php else: ?>
+                                    <i class="fa-regular fa-star"></i>
+                                <?php endif; ?>
+                            <?php endfor; ?>
+                            <span style="font-size: 12px; color: #ffffff; font-weight: 700; margin-left: 4px;"><?= number_format($media, 1) ?></span>
+                        </div>
+                    <?php endif; ?>
                 </a>
                 <?php endforeach; ?>
             </div>
