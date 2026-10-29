@@ -89,34 +89,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
 // FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
-    if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'fundo', 'img/perfis', 'img/avatares', 'img/fundo', 'img/logo'];
-    $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
+    $variacoes = [$nomeImagem];
+    if (strpos($nomeImagem, 'beb') !== false) {
+        $variacoes[] = 'bebidas-receitas.webp';
+        $variacoes[] = 'bebitas-receitas.webp';
+        $variacoes[] = 'bebidas-receitas.png';
+        $variacoes[] = 'bebitas-receitas.png';
+        $variacoes[] = 'bebidas_receitas.png';
+        $variacoes[] = 'bebidas_receitas.webp';
+    }
 
-    foreach ($pastas as $pasta) {
-        foreach ($extensoes as $ext) {
-            $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem . $ext;
-            if (file_exists($caminhoCompleto)) return $caminhoCompleto;
+    $pastas = ['', 'logo', 'elementos', 'fundo', 'pratos', 'filme', 'slider', 'perfis', 'avatares'];
+    $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg'];
 
-            $caminhoRaiz = $pasta . "/" . $nomeImagem . $ext;
-            if (file_exists($caminhoRaiz)) return $caminhoRaiz;
+    foreach ($variacoes as $var) {
+        if (file_exists($var)) return $var;
+        if (file_exists("img/" . $var)) return "img/" . $var;
+
+        $nomeBase = pathinfo($var, PATHINFO_FILENAME);
+
+        foreach ($pastas as $pasta) {
+            $prefixo = empty($pasta) ? "img/" : "img/" . trim($pasta, '/') . "/";
+            foreach ($extensoes as $ext) {
+                $caminho1 = $prefixo . $var . $ext;
+                if (file_exists($caminho1)) return $caminho1;
+
+                $caminho2 = $prefixo . $nomeBase . $ext;
+                if (file_exists($caminho2)) return $caminho2;
+            }
         }
     }
 
-    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
-    return "img/logo/logo_menu.png";
+    return "img/" . (strpos($nomeImagem, '.') !== false ? $nomeImagem : $nomeImagem . ".png");
 }
 
-// CONSULTA DINÂMICA DAS RECEITAS SALGADAS COM NOME DO FILME
-$stmtSalgados = $pdo->query("
+// CONSULTA DINÂMICA DAS RECEITAS DE BEBIDAS COM NOME DO FILME
+$stmtBebidas = $pdo->query("
     SELECT r.*, f.nome_filme 
     FROM receitas r 
     LEFT JOIN filme f ON r.id_filme = f.id_filme 
     WHERE r.tipo = 'BEBIDA'
     ORDER BY r.nome_receita ASC
 ");
-$receitasBebidas = $stmtSalgados->fetchAll(PDO::FETCH_ASSOC);
+$receitasBebidas = $stmtBebidas->fetchAll(PDO::FETCH_ASSOC);
 
 $status = $_GET['status'] ?? "";
 $msg = $_GET['msg'] ?? ($_GET['erro'] ?? "");
@@ -148,7 +164,7 @@ try {
         html { scroll-behavior: smooth; }
 
         body {
-            background-color: #0b1329;
+            background-color: #0a1733;
             color: #ffffff;
             overflow-x: hidden;
         }
@@ -203,49 +219,52 @@ try {
             border: 2px solid #fff6a9ff;
         }
 
-        /* --- PAGE HEADER --- */
+        /* --- PAGE HEADER BANNER --- */
         .page-header-banner {
-            background: linear-gradient(135deg, #1e3a6a 0%, #0d1e3d 100%);
-            padding: 50px 20px 40px;
+            background-color: #fff4b8;
+            padding: 25px 20px 30px;
             text-align: center;
             position: relative;
-            border-bottom: 3px solid #a62428;
+            border-bottom: 4px solid #a62428;
         }
 
-        .page-header-banner h1 {
-            font-size: 40px;
-            font-weight: 900;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+        .banner-titulo-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
-        .page-header-banner p {
-            font-size: 16px;
-            color: #fff8bd;
-            font-weight: 600;
-            max-width: 600px;
-            margin: 0 auto 25px;
+        .img-titulo-banner {
+            width: 100%;
+            max-width: 330px;
+            height: auto;
+            display: block;
+            object-fit: contain;
         }
 
         .search-page-box {
             position: relative;
             width: 100%;
-            max-width: 550px;
+            max-width: 480px;
             margin: 0 auto;
         }
 
         .search-page-box input {
             width: 100%;
-            padding: 13px 25px 13px 48px;
+            padding: 10px 20px 10px 48px;
             border-radius: 50px;
-            border: none;
-            background: #fffdf5;
+            border: 2px solid #a62428;
+            background: #fff4b8;
             font-size: 15px;
-            color: #1e293b;
+            color: #a62428;
             outline: none;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            box-shadow: none;
+        }
+
+        .search-page-box input::placeholder {
+            color: #a62428;
+            opacity: 0.8;
         }
 
         .search-page-box i {
@@ -253,17 +272,18 @@ try {
             left: 18px;
             top: 50%;
             transform: translateY(-50%);
-            color: #24487a;
+            color: #a62428;
             font-size: 17px;
         }
 
-        /* --- SECTION SALGADOS --- */
+        /* --- SEÇÃO BEBIDAS (FUNDO VISÍVEL COM FILTRO AZUL ESCURO TRANSPARENTE) --- */
         .secao-bebidas-page {
             position: relative;
-            background: radial-gradient(circle at 50% 30%, #1a3c70 0%, #0d1e3d 60%, #081226 100%);
-            background-image: linear-gradient(to bottom, rgba(13, 30, 61, 0.85), rgba(8, 18, 38, 0.95)), url('<?= buscarImagem("fundo_vila_magica.png") ?>');
+            background-image: linear-gradient(rgba(10, 25, 55, 0.45), rgba(6, 16, 38, 0.55)), url('<?= buscarImagem("fundo2_index") ?>');
             background-size: cover;
-            background-position: center bottom;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             padding: 50px 0 70px;
             min-height: 70vh;
         }
@@ -281,21 +301,23 @@ try {
         }
 
         .card-receita-item {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(10, 20, 42, 0.65);
             border-radius: 22px;
             overflow: hidden;
             text-decoration: none;
             color: #ffffff;
             transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(6px);
         }
 
         .card-receita-item:hover {
             transform: translateY(-7px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-            border-color: rgba(255, 246, 169, 0.4);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            border-color: rgba(255, 246, 169, 0.5);
+            background: rgba(14, 28, 58, 0.75);
         }
 
         .card-receita-img {
@@ -347,7 +369,7 @@ try {
 
         .card-receita-desc {
             font-size: 12.5px;
-            color: #cbd5e1;
+            color: #e2e8f0;
             line-height: 1.5;
             margin-bottom: 15px;
             display: -webkit-box;
@@ -365,7 +387,7 @@ try {
             color: #fff8bd;
             font-weight: 600;
             padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .card-receita-rating {
@@ -435,17 +457,8 @@ try {
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
         .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
 
-        .card-amarelo { background: #fff8bd; color: #a62428; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); text-align: center; }
-        .card-amarelo .castelo-header i { font-size: 38px; color: #a62428; margin-bottom: 8px; }
-        .card-amarelo h2.titulo-aviso { font-size: 22px; font-weight: 900; color: #a62428; text-transform: uppercase; line-height: 1.25; margin-bottom: 10px; }
-        .card-amarelo h2.titulo-cursivo { font-family: 'Caveat', cursive; font-size: 42px; color: #1f4396; line-height: 1; margin-bottom: 6px; }
-        .card-amarelo p.subtitulo-aviso { font-size: 14px; color: #701a1d; font-weight: 600; line-height: 1.4; margin-bottom: 22px; }
-        .card-amarelo .btn-acao-vermelho { width: 100%; padding: 13px; background: #a62428; color: #ffffff; border: none; border-radius: 50px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 8px; box-shadow: 0 4px 12px rgba(166, 36, 40, 0.3); }
-
         .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
-        .card-amarelo .btn-fechar-absoluto { color: rgba(166,36,40,0.7); }
-        .card-amarelo .btn-fechar-absoluto:hover { color: #a62428; }
 
         .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
         .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -456,9 +469,11 @@ try {
 
         @media (max-width: 900px) {
             .grid-receitas { grid-template-columns: repeat(2, 1fr); }
+            .img-titulo-banner { max-width: 260px; }
         }
         @media (max-width: 600px) {
             .grid-receitas { grid-template-columns: 1fr; }
+            .img-titulo-banner { max-width: 210px; }
         }
     </style>
 </head>
@@ -470,7 +485,7 @@ try {
         <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php">Início</a>
-            <a href="bebidas.php" class="ativo">Salgados</a>
+            <a href="salgados.php">Salgados</a>
             <a href="doces.php">Doces</a>
             <a href="bebidas.php" class="ativo">Bebidas</a>
             <a href="favoritos.php">Favoritos</a>
@@ -557,12 +572,13 @@ try {
 
     <!-- HEADER DA PÁGINA -->
     <header class="page-header-banner">
-        <h1>Bebidas Mágicas</h1>
-        <p>Goles de Pura Magia — Smoothies, sucos e elixires dos seus filmes favoritos.</p>
+        <div class="banner-titulo-box">
+            <img src="<?= buscarImagem('bebitas-receitas.webp') ?>" alt="Receitas Bebidas" class="img-titulo-banner">
+        </div>
         
         <div class="search-page-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="inputPesquisa" placeholder="Buscar receita salgada..." onkeyup="pesquisarReceitas()">
+            <input type="text" id="inputPesquisa" placeholder="Buscar receita..." onkeyup="pesquisarReceitas()">
         </div>
     </header>
 
@@ -580,7 +596,7 @@ try {
                     </div>
                     <div class="card-receita-body">
                         <h3 class="card-receita-titulo"><?= htmlspecialchars($r['nome_receita']) ?></h3>
-                        <p class="card-receita-desc"><?= htmlspecialchars($r['descricao'] ?? 'Saborosa receita salgada mágica inspirada no cinema.') ?></p>
+                        <p class="card-receita-desc"><?= htmlspecialchars($r['descricao'] ?? 'Saborosa receita de bebida mágica inspirada no cinema.') ?></p>
                         
                         <div class="card-receita-meta">
                             <span><i class="fa-regular fa-clock"></i> <?= htmlspecialchars($r['tempo_preparo'] ?? '30min') ?></span>

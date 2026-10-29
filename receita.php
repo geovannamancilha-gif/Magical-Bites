@@ -13,6 +13,129 @@ try {
 
     $id_receita = isset($_GET['id']) ? (int)$_GET['id'] : 1;
 
+    // =========================================================================
+    // 1. PROCESSAMENTO DE LOGIN NA PRÓPRIA PÁGINA
+    // =========================================================================
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_POST['senha']) && !isset($_POST['acao'])) {
+        $email = trim($_POST['email']);
+        $senha = trim($_POST['senha']);
+
+        $stmtUser = $pdo->prepare("SELECT * FROM usuario WHERE email = :email");
+        $stmtUser->execute([':email' => $email]);
+        $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+        if ($usuario && ($senha === $usuario['senha'] || password_verify($senha, $usuario['senha']))) {
+            $_SESSION['usuario'] = [
+                'id'    => $usuario['id_usuario'],
+                'nome'  => $usuario['nome_usuario'],
+                'email' => $usuario['email'],
+                'foto'  => !empty($usuario['foto_perfil']) ? $usuario['foto_perfil'] : 'avatar1.webp'
+            ];
+            header("Location: receita.php?id=$id_receita&status=sucesso&msg=" . urlencode("Login efetuado com sucesso!"));
+            exit;
+        } else {
+            header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Senha ou E-mail incorreto."));
+            exit;
+        }
+    }
+
+    // =========================================================================
+    // 2. PROCESSAMENTO DE ENVIO DE AVALIAÇÃO / COMENTÁRIO
+    // =========================================================================
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'avaliar') {
+        if (!isset($_SESSION['usuario'])) {
+            header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Você precisa estar logado para enviar uma avaliação!"));
+            exit;
+        }
+
+        $sessaoUser = $_SESSION['usuario'];
+        $idUsuarioSessao = $sessaoUser['id'] ?? $sessaoUser['id_usuario'] ?? null;
+        $emailSessao = $sessaoUser['email'] ?? '';
+
+        $usuarioBD = null;
+
+        // Tenta identificar o utilizador estritamente pelo ID da sessão
+        if ($idUsuarioSessao) {
+            $stmtUserCheck = $pdo->prepare("SELECT * FROM usuario WHERE id_usuario = :id");
+            $stmtUserCheck->execute([':id' => $idUsuarioSessao]);
+            $usuarioBD = $stmtUserCheck->fetch(PDO::FETCH_ASSOC);
+        }
+
+        // Se não encontrou pelo ID, procura pelo e-mail registrado na sessão
+        if (!$usuarioBD && !empty($emailSessao)) {
+            $stmtUserCheck = $pdo->prepare("SELECT * FROM usuario WHERE email = :email");
+            $stmtUserCheck->execute([':email' => $emailSessao]);
+            $usuarioBD = $stmtUserCheck->fetch(PDO::FETCH_ASSOC);
+        }
+
+        // Se o utilizador não existir no BD, limpa a sessão e exige novo login
+        if (!$usuarioBD) {
+            unset($_SESSION['usuario']);
+            header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Sua sessão é inválida. Por favor, faça login novamente."));
+            exit;
+        }
+
+        $idUsuarioValido = $usuarioBD['id_usuario'];
+
+        // Atualiza a sessão com os dados corretos do banco de dados
+        $_SESSION['usuario']['id'] = $idUsuarioValido;
+        $_SESSION['usuario']['nome'] = $usuarioBD['nome_usuario'];
+        $_SESSION['usuario']['email'] = $usuarioBD['email'];
+        $_SESSION['usuario']['foto'] = $usuarioBD['foto_perfil'];
+
+        $estrelas = isset($_POST['estrelas']) ? (int)$_POST['estrelas'] : 0;
+        $comentario = trim($_POST['comentario'] ?? '');
+
+        if ($estrelas < 1 || $estrelas > 5) {
+            header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Por favor, selecione uma nota de 1 a 5 estrelas."));
+            exit;
+        }
+
+        if (empty($comentario)) {
+            header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Por favor, escreva um comentário sobre a receita."));
+            exit;
+        }
+
+        try {
+            // Insere ou atualiza a avaliação garantindo o ID do utilizador ligado
+            $stmtAvaliar = $pdo->prepare("
+                INSERT INTO avaliacoes (id_receita, id_usuario, estrelas, comentario) 
+                VALUES (:id_receita, :id_usuario, :estrelas, :comentario)
+                ON DUPLICATE KEY UPDATE estrelas = :estrelas2, comentario = :comentario2, data_criacao = CURRENT_TIMESTAMP
+            ");
+            $stmtAvaliar->execute([
+                ':id_receita' => $id_receita,
+                ':id_usuario' => $idUsuarioValido,
+                ':estrelas'   => $estrelas,
+                ':comentario' => $comentario,
+                ':estrelas2'  => $estrelas,
+                ':comentario2'=> $comentario
+            ]);
+
+            // Recalcula e atualiza a média geral da receita na tabela 'receitas'
+            $stmtMedia = $pdo->prepare("SELECT AVG(estrelas) as media FROM avaliacoes WHERE id_receita = :id_receita");
+            $stmtMedia->execute([':id_receita' => $id_receita]);
+            $mediaRow = $stmtMedia->fetch(PDO::FETCH_ASSOC);
+            
+            if ($mediaRow && $mediaRow['media']) {
+                $novaMedia = round($mediaRow['media'], 1);
+                $stmtUpdateRec = $pdo->prepare("UPDATE receitas SET avaliacao = :media WHERE id_receita = :id_receita");
+                $stmtUpdateRec->execute([
+                    ':media' => $novaMedia,
+                    ':id_receita' => $id_receita
+                ]);
+            }
+
+            header("Location: receita.php?id=$id_receita&status=sucesso&msg=" . urlencode("Sua avaliação foi registrada com sucesso!"));
+            exit;
+
+        } catch (PDOException $e) {
+            header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Erro ao registrar avaliação na base de dados."));
+            exit;
+        }
+    }
+
+    // BUSCA A RECEITA ATUAL
     $stmt = $pdo->prepare("SELECT * FROM receitas WHERE id_receita = :id");
     $stmt->bindParam(':id', $id_receita, PDO::PARAM_INT);
     $stmt->execute();
@@ -22,14 +145,25 @@ try {
         die("<h1 style='color:#fff; text-align:center; margin-top:50px;'>Receita não encontrada na base de dados para o ID: $id_receita!</h1>");
     }
 
-    // Processamento de listas
+    // BUSCA AVALIAÇÕES DE CLIENTES VINCULADAS AOS SEUS RESPECTIVOS UTILIZADORES
+    $stmtAvaliacoesList = $pdo->prepare("
+        SELECT a.*, u.nome_usuario, u.foto_perfil 
+        FROM avaliacoes a 
+        JOIN usuario u ON a.id_usuario = u.id_usuario 
+        WHERE a.id_receita = :id_receita 
+        ORDER BY a.data_criacao DESC
+    ");
+    $stmtAvaliacoesList->execute([':id_receita' => $id_receita]);
+    $avaliacoesClientes = $stmtAvaliacoesList->fetchAll(PDO::FETCH_ASSOC);
+    $totalAvaliacoes = count($avaliacoesClientes);
+
+    // Processamento das listas de ingredientes e preparo
     $lista_ingredientes = array_filter(array_map('trim', explode(";", $receita['ingredientes'])));
     $passos_preparo = array_filter(array_map('trim', preg_split('/(?=\d+\.\s)/', $receita['modo_preparo'])));
 
-    // Definição de cores por categoria
     $tipo_formatado = ucfirst(strtolower($receita['tipo'] ?? 'Salgado'));
 
-    // VERIFICAÇÃO SE A RECEITA ESTÁ FAVORITADA PELO USUÁRIO LOGADO
+    // VERIFICAÇÃO SE A RECEITA ESTÁ FAVORITADA PELO UTILIZADOR LOGADO
     $isFavorito = false;
     if (isset($_SESSION['usuario'])) {
         $idUsuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
@@ -103,7 +237,6 @@ function buscarImagem($nomeImagem) {
 
         html { scroll-behavior: smooth; }
 
-        /* --- FUNDO DINÂMICO --- */
         body { 
             background-color: #0b1329;
             background-image: url('<?= buscarImagem("fundo_receitas") ?>');
@@ -166,9 +299,7 @@ function buscarImagem($nomeImagem) {
             color: #fff6a9ff;
         }
 
-        .menu a i {
-            font-size: 18px;
-        }
+        .menu a i { font-size: 18px; }
 
         .nav-user-avatar {
             width: 32px;
@@ -239,7 +370,7 @@ function buscarImagem($nomeImagem) {
         }
 
         .meta-item i.fa-clock { color: #ffffff; }
-        .meta-item i.fa-star { color: #ffffff; }
+        .meta-item i.fa-star { color: #fbbf24; }
 
         .tag-categoria {
             background: #fff6a9;
@@ -362,11 +493,16 @@ function buscarImagem($nomeImagem) {
             top: -2px;
         }
 
+        /* --- SEÇÃO DE AVALIAÇÃO --- */
         .secao-avaliacao {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 50px;
+            padding: 35px 25px;
+            background: rgba(10, 20, 42, 0.65);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .secao-avaliacao h3 {
@@ -382,34 +518,137 @@ function buscarImagem($nomeImagem) {
         .estrelas-avaliacao {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            font-size: 26px;
-            color: #ffffff;
-            margin-bottom: 10px;
+            gap: 10px;
+            font-size: 34px;
+            color: rgba(255, 255, 255, 0.3);
+            margin: 15px 0 10px;
             cursor: pointer;
         }
 
-        .estrelas-avaliacao i:hover,
-        .estrelas-avaliacao i:hover ~ i {
+        .estrelas-avaliacao i {
+            transition: all 0.2s ease;
+        }
+
+        .estrelas-avaliacao i.ativa {
             color: #fbbf24;
+            transform: scale(1.15);
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
         }
 
         .subtitulo-avaliacao {
             color: #cbd5e1;
             font-size: 13.5px;
+            margin-bottom: 15px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        /* =========================================================================
-           MODAIS COM TEMA DISNEY (CARMIM & CREME)
-           ========================================================================= */
+        .campo-comentario textarea {
+            width: 100%;
+            max-width: 650px;
+            padding: 14px 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .campo-comentario textarea:focus {
+            border-color: #fff6a9;
+            box-shadow: 0 0 12px rgba(255, 246, 169, 0.3);
+        }
+
+        .btn-enviar-avaliacao {
+            background: #fff8bd;
+            color: #ab232a;
+            border: none;
+            padding: 12px 32px;
+            font-weight: 800;
+            font-size: 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-enviar-avaliacao:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        /* --- LISTA DE AVALIAÇÕES DOS OUTROS CLIENTES --- */
+        .secao-lista-avaliacoes {
+            margin-top: 60px;
+        }
+
+        .grid-avaliacoes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 22px;
+            margin-top: 22px;
+        }
+
+        .card-avaliacao-cliente {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 22px;
+            backdrop-filter: blur(6px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-avaliacao-cliente {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar-avaliacao-cliente {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fff6a9;
+        }
+
+        .info-usuario-aval .nome {
+            font-weight: 700;
+            font-size: 15px;
+            color: #ffffff;
+        }
+
+        .info-usuario-aval .data {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .estrelas-cliente {
+            color: #fbbf24;
+            font-size: 14px;
+            display: flex;
+            gap: 3px;
+        }
+
+        .comentario-cliente {
+            font-size: 13.5px;
+            color: #e2e8f0;
+            line-height: 1.5;
+        }
+
+        /* MODAIS DISNEY */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(18, 24, 41, 0.65);
             backdrop-filter: blur(8px);
             z-index: 999;
@@ -418,21 +657,15 @@ function buscarImagem($nomeImagem) {
         .card-flutuante {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 380px;
-            max-width: 90vw;
-            max-height: 90vh;
+            width: 380px; max-width: 90vw; max-height: 90vh;
             overflow-y: auto;
             border-radius: 36px;
             padding: 35px 28px;
             z-index: 1000;
             animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .card-flutuante::-webkit-scrollbar { width: 5px; }
-        .card-flutuante::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
 
         @keyframes popUpModal {
             from { opacity: 0; transform: translate(-50%, -45%) scale(0.92); }
@@ -446,178 +679,46 @@ function buscarImagem($nomeImagem) {
             border: 2px solid rgba(255, 255, 255, 0.15);
         }
 
-        .card-vermelho .castelo-header {
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .card-vermelho .castelo-header i {
-            font-size: 38px;
-            color: #ffffff;
-        }
+        .card-vermelho .castelo-header { text-align: center; margin-bottom: 12px; }
+        .card-vermelho .castelo-header i { font-size: 38px; color: #ffffff; }
 
         .card-vermelho h2.titulo-cursivo {
             font-family: 'Caveat', cursive;
-            font-size: 38px;
-            color: #ffffff;
-            text-align: center;
-            line-height: 1;
-            margin-bottom: 2px;
+            font-size: 38px; color: #ffffff; text-align: center; line-height: 1; margin-bottom: 2px;
         }
 
         .card-vermelho p.subtitulo-modal {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-            text-align: center;
-            margin-bottom: 22px;
-            font-weight: 500;
+            font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; margin-bottom: 22px; font-weight: 500;
         }
 
-        .card-vermelho .input-group-modal {
-            position: relative;
-            margin-bottom: 14px;
-        }
-
-        .card-vermelho .input-group-modal i {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #ffffff;
-            font-size: 15px;
-        }
-
+        .card-vermelho .input-group-modal { position: relative; margin-bottom: 14px; }
+        .card-vermelho .input-group-modal i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #ffffff; font-size: 15px; }
         .card-vermelho .input-group-modal input {
-            width: 100%;
-            padding: 12px 18px 12px 48px;
-            border: 2px solid #ffffff;
-            background: transparent;
-            border-radius: 50px;
-            outline: none;
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 500;
-            transition: 0.3s;
+            width: 100%; padding: 12px 18px 12px 48px; border: 2px solid #ffffff; background: transparent; border-radius: 50px; outline: none; color: #ffffff; font-size: 14px; font-weight: 500; transition: 0.3s;
         }
-
-        .card-vermelho .input-group-modal input::placeholder {
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .card-vermelho .input-group-modal input:focus {
-            background: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-        }
+        .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
 
         .card-vermelho .btn-acao-creme {
-            width: 100%;
-            padding: 13px;
-            background: #fff8bd;
-            color: #ab232a;
-            border: none;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 16px;
-            cursor: pointer;
-            transition: 0.3s ease;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%; padding: 13px; background: #fff8bd; color: #ab232a; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .card-vermelho .btn-acao-creme:hover {
-            background: #ffffff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-vermelho .footer-modal {
-            margin-top: 18px;
-            font-size: 13px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-        }
-
-        .card-vermelho .footer-modal a {
-            color: #ffffff;
-            text-decoration: underline;
-            font-weight: 700;
-            cursor: pointer;
-        }
+        .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
+        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
 
         .card-amarelo {
-            background: #fff8bd;
-            color: #ab232a;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-            text-align: center;
+            background: #fff8bd; color: #ab232a; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); text-align: center;
         }
-
-        .card-amarelo .castelo-header i {
-            font-size: 38px;
-            color: #ab232a;
-            margin-bottom: 8px;
-        }
-
-        .card-amarelo h2.titulo-aviso {
-            font-size: 22px;
-            font-weight: 900;
-            color: #ab232a;
-            text-transform: uppercase;
-            line-height: 1.25;
-            margin-bottom: 10px;
-        }
-
-        .card-amarelo h2.titulo-cursivo {
-            font-family: 'Caveat', cursive;
-            font-size: 42px;
-            color: #1f4396;
-            line-height: 1;
-            margin-bottom: 6px;
-        }
-
-        .card-amarelo p.subtitulo-aviso {
-            font-size: 14px;
-            color: #701a1d;
-            font-weight: 600;
-            line-height: 1.4;
-            margin-bottom: 22px;
-        }
-
+        .card-amarelo .castelo-header i { font-size: 38px; color: #ab232a; margin-bottom: 8px; }
+        .card-amarelo h2.titulo-aviso { font-size: 22px; font-weight: 900; color: #ab232a; text-transform: uppercase; line-height: 1.25; margin-bottom: 10px; }
+        .card-amarelo h2.titulo-cursivo { font-family: 'Caveat', cursive; font-size: 42px; color: #1f4396; line-height: 1; margin-bottom: 6px; }
+        .card-amarelo p.subtitulo-aviso { font-size: 14px; color: #701a1d; font-weight: 600; line-height: 1.4; margin-bottom: 22px; }
         .card-amarelo .btn-acao-vermelho {
-            width: 100%;
-            padding: 13px;
-            background: #ab232a;
-            color: #ffffff;
-            border: none;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 8px;
-            box-shadow: 0 4px 12px rgba(171, 35, 42, 0.3);
+            width: 100%; padding: 13px; background: #ab232a; color: #ffffff; border: none; border-radius: 50px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 8px; box-shadow: 0 4px 12px rgba(171, 35, 42, 0.3);
         }
 
-        .card-amarelo .btn-acao-vermelho:hover {
-            background: #8e1c22;
-            transform: translateY(-2px);
-        }
-
-        .btn-fechar-absoluto {
-            position: absolute;
-            top: 18px;
-            right: 22px;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: rgba(255,255,255,0.8);
-            transition: 0.2s;
-        }
+        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
-
         .card-amarelo .btn-fechar-absoluto { color: rgba(171,35,42,0.7); }
-        .card-amarelo .btn-fechar-absoluto:hover { color: #ab232a; }
 
         .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
         .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -631,6 +732,7 @@ function buscarImagem($nomeImagem) {
             .hero-receita { grid-template-columns: 1fr; gap: 25px; }
             .hero-imagem { height: 280px; }
             .conteudo-grid { grid-template-columns: 1fr; gap: 40px; }
+            .grid-avaliacoes { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -662,80 +764,52 @@ function buscarImagem($nomeImagem) {
     <!-- OVERLAY DOS MODAIS -->
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
 
-    <!-- 1. MODAL CADASTRO (DESIGN DISNEY) -->
+    <!-- MODAL CADASTRO -->
     <div id="modalCadastro" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
-        
-        <div class="castelo-header">
-            <i class="fa-solid fa-chess-castle"></i>
-        </div>
+        <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
         <h2 class="titulo-cursivo">Crie a sua conta</h2>
         <p class="subtitulo-modal">Junte-se a nossa família!</p>
-        
         <form action="cadastrar.php" method="POST">
-            <div class="input-group-modal">
-                <i class="fa-solid fa-user"></i>
-                <input type="text" name="nome" placeholder="Nome Completo" required>
-            </div>
-            <div class="input-group-modal">
-                <i class="fa-solid fa-envelope"></i>
-                <input type="email" name="email" placeholder="E-mail" required>
-            </div>
-            <div class="input-group-modal">
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" name="senha" placeholder="Senha" required>
-            </div>
+            <div class="input-group-modal"><i class="fa-solid fa-user"></i><input type="text" name="nome" placeholder="Nome Completo" required></div>
+            <div class="input-group-modal"><i class="fa-solid fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+            <div class="input-group-modal"><i class="fa-solid fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
             <button type="submit" class="btn-acao-creme">Criar</button>
         </form>
         <div class="footer-modal">Já tem uma conta? <a onclick="alternarModais('login')">Faça login</a></div>
     </div>
 
-    <!-- 2. MODAL LOGIN (DESIGN DISNEY) -->
+    <!-- MODAL LOGIN -->
     <div id="modalLogin" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
-        
-        <div class="castelo-header">
-            <i class="fa-solid fa-chess-castle"></i>
-        </div>
+        <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
         <h2 class="titulo-cursivo">Bem - vindo</h2>
         <p class="subtitulo-modal">Acesse sua conta mágica:</p>
-        
-        <form action="index.php" method="POST">
-            <div class="input-group-modal">
-                <i class="fa-solid fa-envelope"></i>
-                <input type="email" name="email" placeholder="E-mail" required>
-            </div>
-            <div class="input-group-modal">
-                <i class="fa-solid fa-lock"></i>
-                <input type="password" name="senha" placeholder="Senha" required>
-            </div>
+        <form action="receita.php?id=<?= $id_receita ?>" method="POST">
+            <div class="input-group-modal"><i class="fa-solid fa-envelope"></i><input type="email" name="email" placeholder="E-mail" required></div>
+            <div class="input-group-modal"><i class="fa-solid fa-lock"></i><input type="password" name="senha" placeholder="Senha" required></div>
             <button type="submit" class="btn-acao-creme">Entrar</button>
         </form>
         <div class="footer-modal">Está chegando agora? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
-    <!-- 3. MODAL PERFIL (DESIGN DISNEY) -->
+    <!-- MODAL PERFIL -->
     <?php if (isset($_SESSION['usuario'])): ?>
     <div id="modalPerfil" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
-
         <div class="perfil-avatar-header">
             <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" id="modalPreviewFoto" onerror="this.src='img/logo/logo_menu.png'">
             <h3 style="color:#ffffff; margin-top:6px; font-size:18px; font-weight:700;"><?= htmlspecialchars($_SESSION['usuario']['nome']) ?></h3>
             <p style="font-size:12px; color:rgba(255,255,255,0.8);"><?= htmlspecialchars($_SESSION['usuario']['email']) ?></p>
         </div>
-
         <h2 class="titulo-cursivo" style="font-size:32px; margin-top:8px;">Escolha seu avatar</h2>
-
         <form action="index.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="acao" value="atualizar_perfil">
             <input type="hidden" name="avatar_predefinido" id="modalInputAvatar" value="">
-
             <div class="input-group-modal" style="margin-bottom: 8px;">
                 <i class="fa-solid fa-user"></i>
                 <input type="text" name="nome" value="<?= htmlspecialchars($_SESSION['usuario']['nome']) ?>" required placeholder="Seu Nome">
             </div>
-
             <div class="grid-avatares-modal">
                 <?php foreach ($avataresPadrao as $avatar): ?>
                     <div class="avatar-item" onclick="selecionarAvatarModal('<?= $avatar['caminho_imagem'] ?>', this)">
@@ -743,46 +817,33 @@ function buscarImagem($nomeImagem) {
                     </div>
                 <?php endforeach; ?>
             </div>
-
             <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center; cursor:pointer;" onclick="document.getElementById('fotoUploadInput').click()">
                 <i class="fa-solid fa-image"></i> Escolher da Galeria
             </label>
             <input type="file" id="fotoUploadInput" name="foto_upload" accept="image/*" style="display:none;" onchange="limparAvatarModal()">
-
             <button type="submit" class="btn-acao-creme" style="margin-top:14px;">Salvar alteração</button>
         </form>
-
         <a href="logout.php" style="display:block; text-align:center; margin-top:12px; color:#ffffff; text-decoration:none; font-weight:600; font-size:13px;">
             <i class="fa-solid fa-right-from-bracket"></i> Sair da conta
         </a>
     </div>
     <?php endif; ?>
 
-    <!-- 4. MODAL STATUS / AVISO -->
+    <!-- MODAL STATUS / AVISO -->
     <?php if ($status != ""): ?>
     <div id="modalStatus" class="card-flutuante card-amarelo" style="display: block; z-index: 1001;">
         <button class="btn-fechar-absoluto" onclick="fecharStatus()">&times;</button>
-
-        <div class="castelo-header">
-            <i class="fa-solid fa-chess-castle"></i>
-        </div>
-
+        <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
         <?php if ($status == 'sucesso'): ?>
-            <h2 class="titulo-cursivo">Bem - vindo</h2>
-            <p class="subtitulo-aviso">
-                <?= htmlspecialchars($msg ?: "Ação realizada com sucesso!") ?>
-            </p>
+            <h2 class="titulo-cursivo">Muito Obrigado!</h2>
+            <p class="subtitulo-aviso"><?= htmlspecialchars($msg ?: "Ação realizada com sucesso!") ?></p>
             <button class="btn-acao-vermelho" onclick="fecharStatus();">Continuar</button>
-
         <?php elseif ($status == 'erro'): ?>
             <h2 class="titulo-aviso">OOPS!</h2>
-            <p class="subtitulo-aviso">
-                <?= htmlspecialchars($msg ?: "Ocorreu um erro ao processar seu pedido") ?>
-            </p>
+            <p class="subtitulo-aviso"><?= htmlspecialchars($msg ?: "Ocorreu um erro ao processar seu pedido") ?></p>
             <button class="btn-acao-vermelho" onclick="fecharStatus();">Tentar de novo</button>
         <?php endif; ?>
     </div>
-
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('modalOverlay').style.display = 'block';
@@ -809,7 +870,7 @@ function buscarImagem($nomeImagem) {
                     </div>
                     <div class="meta-item">
                         <i class="fa-solid fa-star"></i>
-                        <span><?= htmlspecialchars($receita['avaliacao'] ?? '4.9') ?> (128 avaliações)</span>
+                        <span><?= htmlspecialchars($receita['avaliacao'] ?? '5.0') ?> (<?= $totalAvaliacoes ?> <?= $totalAvaliacoes == 1 ? 'avaliação' : 'avaliações' ?>)</span>
                     </div>
                     <span class="tag-categoria"><?= htmlspecialchars($tipo_formatado) ?></span>
                 </div>
@@ -865,20 +926,125 @@ function buscarImagem($nomeImagem) {
         <!-- SEÇÃO DE AVALIAÇÃO DA RECEITA -->
         <div class="secao-avaliacao">
             <h3>COMO FICOU ESSA RECEITA?</h3>
-            <div class="estrelas-avaliacao">
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-                <i class="fa-solid fa-star"></i>
-            </div>
-            <p class="subtitulo-avaliacao">Clique aqui para avaliar a receita</p>
+
+            <?php if (isset($_SESSION['usuario'])): ?>
+                <form action="receita.php?id=<?= $id_receita ?>" method="POST" id="formAvaliacao">
+                    <input type="hidden" name="acao" value="avaliar">
+                    <input type="hidden" name="estrelas" id="inputEstrelas" value="0">
+
+                    <div class="estrelas-avaliacao" id="estrelasBox">
+                        <i class="fa-solid fa-star" data-value="1"></i>
+                        <i class="fa-solid fa-star" data-value="2"></i>
+                        <i class="fa-solid fa-star" data-value="3"></i>
+                        <i class="fa-solid fa-star" data-value="4"></i>
+                        <i class="fa-solid fa-star" data-value="5"></i>
+                    </div>
+                    <p class="subtitulo-avaliacao" id="textoEstrelas">Clique nas estrelas para selecionar uma nota</p>
+
+                    <div class="campo-comentario">
+                        <textarea name="comentario" placeholder="Escreva aqui o que achou dessa receita para ajudar outros cozinheiros..." rows="3" required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-enviar-avaliacao">Enviar Avaliação</button>
+                </form>
+            <?php else: ?>
+                <div class="estrelas-avaliacao" style="cursor: default;">
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <p class="subtitulo-avaliacao">Faça login para avaliar e deixar seu comentário sobre esta receita!</p>
+                <button type="button" class="btn-enviar-avaliacao" onclick="alternarModais('login')">Fazer Login para Avaliar</button>
+            <?php endif; ?>
+        </div>
+
+        <!-- SEÇÃO DE AVALIAÇÕES DOS OUTROS CLIENTES -->
+        <div class="secao-lista-avaliacoes">
+            <h2 class="secao-titulo">Avaliações dos Clientes (<?= $totalAvaliacoes ?>)</h2>
+
+            <?php if ($totalAvaliacoes > 0): ?>
+                <div class="grid-avaliacoes">
+                    <?php foreach ($avaliacoesClientes as $aval): ?>
+                        <div class="card-avaliacao-cliente">
+                            <div class="header-avaliacao-cliente">
+                                <img src="<?= buscarImagem($aval['foto_perfil'] ?? 'avatar1.webp') ?>" class="avatar-avaliacao-cliente" onerror="this.src='img/logo/logo_menu.png'">
+                                <div class="info-usuario-aval">
+                                    <div class="nome"><?= htmlspecialchars($aval['nome_usuario']) ?></div>
+                                    <div class="data"><?= date('d/m/Y \à\s H:i', strtotime($aval['data_criacao'])) ?></div>
+                                </div>
+                            </div>
+                            <div class="estrelas-cliente">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                    <i class="fa-<?= $i <= $aval['estrelas'] ? 'solid' : 'regular' ?> fa-star"></i>
+                                <?php endfor; ?>
+                            </div>
+                            <p class="comentario-cliente"><?= nl2br(htmlspecialchars($aval['comentario'])) ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p style="color: #cbd5e1; font-size: 14.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Esta receita ainda não possui avaliações. Seja o primeiro a avaliar!</p>
+            <?php endif; ?>
         </div>
 
     </div>
 
-    <!-- JAVASCRIPT DOS MODAIS -->
+    <!-- JAVASCRIPT DOS MODAIS E AVALIAÇÃO -->
     <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const estrelas = document.querySelectorAll('#estrelasBox i');
+        const inputEstrelas = document.getElementById('inputEstrelas');
+        const textoEstrelas = document.getElementById('textoEstrelas');
+        let ratingSelecionado = 0;
+
+        if (estrelas.length > 0) {
+            estrelas.forEach((estrela) => {
+                // Passar o mouse por cima
+                estrela.addEventListener('mouseover', function() {
+                    const val = parseInt(this.getAttribute('data-value'));
+                    destacarEstrelas(val);
+                });
+
+                // Tirar o mouse
+                estrela.addEventListener('mouseout', function() {
+                    destacarEstrelas(ratingSelecionado);
+                });
+
+                // Clicar para fixar a nota
+                estrela.addEventListener('click', function() {
+                    ratingSelecionado = parseInt(this.getAttribute('data-value'));
+                    inputEstrelas.value = ratingSelecionado;
+                    destacarEstrelas(ratingSelecionado);
+                    textoEstrelas.innerText = `Você selecionou ${ratingSelecionado} de 5 estrelas`;
+                    textoEstrelas.style.color = "#fff6a9";
+                });
+            });
+
+            function destacarEstrelas(qtd) {
+                estrelas.forEach((s) => {
+                    const v = parseInt(s.getAttribute('data-value'));
+                    if (v <= qtd) {
+                        s.classList.add('ativa');
+                    } else {
+                        s.classList.remove('ativa');
+                    }
+                });
+            }
+        }
+
+        const formAvaliacao = document.getElementById('formAvaliacao');
+        if (formAvaliacao) {
+            formAvaliacao.addEventListener('submit', function(e) {
+                if (parseInt(inputEstrelas.value) === 0) {
+                    e.preventDefault();
+                    alert('Por favor, clique em uma das estrelas para definir sua nota antes de enviar!');
+                }
+            });
+        }
+    });
+
     function fecharTodosModais() {
         document.getElementById('modalOverlay').style.display = 'none';
         if(document.getElementById('modalCadastro')) document.getElementById('modalCadastro').style.display = 'none';
