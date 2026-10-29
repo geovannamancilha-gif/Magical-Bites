@@ -200,9 +200,9 @@ try {
         }
 
         .nav-user-avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 70%;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             object-fit: cover;
             border: 2px solid #fff6a9ff;
         }
@@ -386,7 +386,6 @@ try {
             border-radius: 32px;
         }
 
-        /* Luva do Mickey Aumentada */
         .mickey-glove-img {
             position: absolute;
             bottom: -400px;
@@ -398,7 +397,6 @@ try {
             pointer-events: none;
         }
 
-        /* --- FORMATO DAS ESCRITAS DO CENTRO --- */
         .magia-text-side {
             position: relative;
             max-width: 520px;
@@ -462,7 +460,6 @@ try {
             margin-bottom: 14px;
         }
 
-        /* Mickey Feiticeiro Aumentado e Encostado no Texto */
         .mickey-feiticeiro-img {
             position: absolute;
             right: -1200px;
@@ -590,7 +587,7 @@ try {
             margin: auto 0;
         }
 
-        /* --- 4. SECÇÃO: RECEITAS SALGADAS (Fundo: fundo2_index.png) --- */
+        /* --- 4. SECÇÃO: RECEITAS SALGADAS --- */
         .secao-salgados {
             position: relative;
             background-image: url('img/slider/fundo2_index.png');
@@ -601,7 +598,7 @@ try {
             overflow: hidden;
         }
 
-        /* --- 6. SECÇÃO: RECEITAS DOCES (Fundo: fundo1_index.jfif) --- */
+        /* --- 6. SECÇÃO: RECEITAS DOCES --- */
         .secao-doces {
             position: relative;
             background-image: url('img/slider/fundo1_index.jfif');
@@ -612,7 +609,7 @@ try {
             overflow: hidden;
         }
 
-        /* --- 8. SECÇÃO: RECEITAS BEBIDAS (Fundo: fundo3_index.png) --- */
+        /* --- 8. SECÇÃO: RECEITAS BEBIDAS --- */
         .secao-bebidas {
             position: relative;
             background-image: url('img/slider/fundo3_index.png');
@@ -623,7 +620,6 @@ try {
             overflow: hidden;
         }
 
-        /* EFEITO BRILHINHO/ESTRELAS SOBRE AS 3 SEÇÕES */
         .secao-salgados::before, .secao-doces::before, .secao-bebidas::before {
             content: '';
             position: absolute;
@@ -660,12 +656,9 @@ try {
             text-decoration: none;
             color: #ffffff;
             transition: transform 0.3s ease;
-            
-            /* CARDS TRANSPARENTES */
             background: transparent !important;
             border: none;
             box-shadow: none;
-            
             padding: 12px;
         }
 
@@ -751,6 +744,7 @@ try {
             transition: all 0.3s ease;
             box-shadow: 0 6px 20px rgba(166, 36, 40, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
         }
 
         .btn-ver-mais-vermelho:hover {
@@ -772,6 +766,7 @@ try {
             transition: all 0.3s ease;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
         }
 
         .btn-ver-mais-creme:hover {
@@ -780,148 +775,265 @@ try {
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
         }
 
-        /* --- 5. SECÇÃO FULL-WIDTH VERMELHA --- */
-        .secao-full-vermelha {
+        /* --- 5. & 7. & 9. SECÇÕES FULL-WIDTH (ESTILO EXTREMO NO CANTO ESQUERDO) --- */
+        .secao-full-vermelha, .secao-full-creme {
             width: 100%;
-            background-color: #a62428;
-            padding: 55px 0;
             position: relative;
-            box-shadow: inset 0 10px 20px -10px rgba(0,0,0,0.3), inset 0 -10px 20px -10px rgba(0,0,0,0.3);
-        }
-
-        .container-full-vermelho {
-            max-width: 1150px;
-            margin: 0 auto;
-            padding: 0 25px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 45px;
+            padding: 65px 0;
+            overflow: hidden;
+            min-height: 480px;
+            display: flex;
             align-items: center;
         }
 
+        .secao-full-vermelha {
+            background: linear-gradient(135deg, #a62428 0%, #881c20 100%);
+            box-shadow: inset 0 10px 20px -10px rgba(0,0,0,0.3), inset 0 -10px 20px -10px rgba(0,0,0,0.3);
+        }
+
+        .secao-full-creme {
+            background: linear-gradient(135deg, #fff8bd 0%, #f7f0aa 100%);
+            color: #a62428;
+            box-shadow: inset 0 10px 20px -10px rgba(0,0,0,0.15), inset 0 -10px 20px -10px rgba(0,0,0,0.15);
+        }
+
+        /* Layout expandido colado no canto esquerdo */
+        .container-full-vermelho, .container-full-creme {
+            max-width: 100%;
+            margin: 0;
+            padding: 0 0 0 5%;
+            width: 100%;
+            display: grid;
+            grid-template-columns: minmax(500px, 620px) 1fr;
+            gap: 20px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .conteudo-banner-texto {
+            max-width: 600px;
+        }
+
+        /* Título grande e marcante */
         .titulo-banner-red {
-            font-size: 32px;
-            font-weight: 800;
+            font-size: 46px;
+            font-weight: 900;
             color: #ffffff;
             line-height: 1.1;
-            margin-bottom: 22px;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            letter-spacing: -0.8px;
         }
 
         .script-banquete {
             font-family: 'Caveat', cursive;
-            font-size: 72px;
-            font-weight: 600;
+            font-size: 98px;
+            font-weight: 700;
             display: inline-block;
-            margin-right: 4px;
-            line-height: 0.8;
+            margin-right: 6px;
+            line-height: 0.7;
             vertical-align: middle;
+            color: #fff8bd;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
 
         .combo-sub {
-            font-size: 15.5px;
+            display: block;
+            font-size: 15px;
             font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 22px;
-            line-height: 1.45;
+            color: #fff8bd;
+            margin-bottom: 16px;
+            line-height: 1.4;
+            letter-spacing: 0.3px;
         }
 
         .combo-desc {
-            font-size: 14.5px;
+            font-size: 16px;
             font-weight: 400;
             color: rgba(255, 255, 255, 0.95);
             line-height: 1.6;
-        }
-
-        .banner-red-img {
-            width: 100%;
-            height: 380px;
-            border-radius: 36px;
-            overflow: hidden;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
-        }
-
-        .banner-red-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* --- 6. SECÇÃO FULL-WIDTH CREME --- */
-        .secao-full-creme {
-            width: 100%;
-            background-color: #fff8bd;
-            color: #a62428;
-            padding: 55px 0;
-            position: relative;
-            box-shadow: inset 0 10px 20px -10px rgba(0,0,0,0.15), inset 0 -10px 20px -10px rgba(0,0,0,0.15);
-        }
-
-        .container-full-creme {
-            max-width: 1150px;
-            margin: 0 auto;
-            padding: 0 25px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 45px;
-            align-items: center;
+            margin-bottom: 26px;
         }
 
         .titulo-banner-creme {
-            font-size: 32px;
-            font-weight: 800;
+            font-size: 46px;
+            font-weight: 900;
             color: #a62428;
             line-height: 1.1;
-            margin-bottom: 22px;
+            margin-bottom: 16px;
+            letter-spacing: -0.8px;
         }
 
         .script-festival {
             font-family: 'Caveat', cursive;
-            font-size: 72px;
-            font-weight: 600;
+            font-size: 98px;
+            font-weight: 700;
             display: inline-block;
-            margin-right: 4px;
-            line-height: 0.8;
+            margin-right: 6px;
+            line-height: 0.7;
             vertical-align: middle;
             color: #a62428;
         }
 
         .combo-sub-creme {
-            font-size: 15.5px;
+            display: block;
+            font-size: 15px;
             font-weight: 700;
             color: #a62428;
-            margin-bottom: 22px;
-            line-height: 1.45;
+            margin-bottom: 16px;
+            line-height: 1.4;
+            letter-spacing: 0.3px;
         }
 
         .combo-desc-creme {
-            font-size: 14.5px;
+            font-size: 16px;
             font-weight: 400;
-            color: #5c1417;
+            color: #4a1012;
             line-height: 1.6;
+            margin-bottom: 26px;
         }
 
-        .banner-creme-img {
-            width: 100%;
-            height: 380px;
-            border-radius: 36px;
+        /* Imagem esfumada na direita */
+        .banner-red-img, .banner-creme-img {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 55%;
+            height: 100%;
+            border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+            z-index: 1;
         }
 
-        .banner-creme-img img {
+        .banner-red-img img, .banner-creme-img img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%);
+            mask-image: linear-gradient(to right, transparent 0%, black 35%);
         }
 
-        /* MODAIS DISNEY */
+        /* --- RODAPÉ (FOOTER) --- */
+        .site-footer {
+            background: #294f88;
+            color: #ffffff;
+            padding: 60px 0 25px;
+            border-top: 3px solid #ff9800;
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-container {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 40px;
+        }
+
+        .footer-col h3 {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff8bd;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            position: relative;
+        }
+
+        .footer-col h3::after {
+            content: '';
+            display: block;
+            width: 35px;
+            height: 3px;
+            background: #a62428;
+            margin-top: 8px;
+            border-radius: 2px;
+        }
+
+        .footer-about img {
+            height: 55px;
+            width: auto;
+            margin-bottom: 15px;
+        }
+
+        .footer-about p {
+            font-size: 13.5px;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease, padding-left 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-links a:hover {
+            color: #fff8bd;
+            padding-left: 5px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: #a62428;
+            color: #fff8bd;
+            transform: translateY(-4px);
+        }
+
+        .footer-bottom {
+            max-width: 1150px;
+            margin: 40px auto 0;
+            padding: 20px 25px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            font-size: 13px;
+            color: #cbd5e1;
+        }
+
+        .footer-bottom i {
+            color: #ff9800;
+        }
+
+        /* --- MODAIS FLUTUANTES --- */
         .modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(18, 24, 41, 0.65);
+            background: rgba(18, 24, 41, 0.75);
             backdrop-filter: blur(8px);
             z-index: 999;
         }
@@ -939,6 +1051,21 @@ try {
             animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
+        .card-combo-modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 740px;
+            max-width: 92vw;
+            max-height: 88vh;
+            overflow-y: auto;
+            border-radius: 36px;
+            padding: 35px 30px;
+            z-index: 1000;
+            animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
         @keyframes popUpModal {
             from { opacity: 0; transform: translate(-50%, -45%) scale(0.92); }
             to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -949,6 +1076,113 @@ try {
             color: #ffffff;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
             border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .card-amarelo {
+            background: #fff8bd;
+            color: #a62428;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            border: 2px solid rgba(166, 36, 40, 0.2);
+        }
+
+        .combo-modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .combo-modal-header h2 {
+            font-family: 'Caveat', cursive;
+            font-size: 46px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .combo-modal-header p {
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0.92;
+        }
+
+        .grid-combo-items {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 15px;
+        }
+
+        .item-combo-card {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            padding: 14px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .card-amarelo .item-combo-card {
+            background: rgba(166, 36, 40, 0.08);
+            border: 1px solid rgba(166, 36, 40, 0.15);
+        }
+
+        .item-combo-card img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        .item-combo-card h4 {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            line-height: 1.25;
+        }
+
+        .item-combo-card p {
+            font-size: 12px;
+            line-height: 1.4;
+            opacity: 0.9;
+            margin-bottom: 12px;
+        }
+
+        .btn-ver-receita-combo {
+            display: inline-block;
+            margin-top: auto;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .card-vermelho .btn-ver-receita-combo {
+            background: #fff8bd;
+            color: #a62428;
+        }
+
+        .card-vermelho .btn-ver-receita-combo:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+        }
+
+        .card-amarelo .btn-ver-receita-combo {
+            background: #a62428;
+            color: #ffffff;
+        }
+
+        .card-amarelo .btn-ver-receita-combo:hover {
+            background: #881c20;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(166,36,40,0.4);
         }
 
         .card-vermelho .castelo-header { text-align: center; margin-bottom: 12px; }
@@ -977,22 +1211,15 @@ try {
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
         .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
 
-        .card-amarelo { background: #fff8bd; color: #a62428; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); text-align: center; }
-        .card-amarelo .castelo-header i { font-size: 38px; color: #a62428; margin-bottom: 8px; }
-        .card-amarelo h2.titulo-aviso { font-size: 22px; font-weight: 900; color: #a62428; text-transform: uppercase; line-height: 1.25; margin-bottom: 10px; }
-        .card-amarelo h2.titulo-cursivo { font-family: 'Caveat', cursive; font-size: 42px; color: #1f4396; line-height: 1; margin-bottom: 6px; }
-        .card-amarelo p.subtitulo-aviso { font-size: 14px; color: #701a1d; font-weight: 600; line-height: 1.4; margin-bottom: 22px; }
-        .card-amarelo .btn-acao-vermelho { width: 100%; padding: 13px; background: #a62428; color: #ffffff; border: none; border-radius: 50px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 8px; box-shadow: 0 4px 12px rgba(166, 36, 40, 0.3); }
-
         .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
         .card-amarelo .btn-fechar-absoluto { color: rgba(166,36,40,0.7); }
         .card-amarelo .btn-fechar-absoluto:hover { color: #a62428; }
 
         .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
-        .perfil-avatar-header img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 4px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; max-height: 220px; overflow-y: auto; padding: 6px; margin: 12px 0; }
-        .avatar-item { width: 68px; height: 68px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
+        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
 
@@ -1008,8 +1235,27 @@ try {
             .magia-text-side { max-width: 100%; padding-right: 0; }
             .mickey-feiticeiro-img { position: relative; right: 0; bottom: 0; margin-top: 15px; }
             .grid-3-categorias { grid-template-columns: 1fr; }
-            .container-full-vermelho, .container-full-creme { grid-template-columns: 1fr; text-align: center; }
+            .container-full-vermelho, .container-full-creme { grid-template-columns: 1fr; text-align: center; padding: 0 20px; }
+            .conteudo-banner-texto { max-width: 100%; }
             .grid-home-receitas { grid-template-columns: 1fr; }
+            .footer-container { grid-template-columns: 1fr 1fr; }
+
+            .banner-red-img, .banner-creme-img {
+                position: relative;
+                width: 100%;
+                height: 280px;
+                margin-top: 25px;
+            }
+
+            .banner-red-img img, .banner-creme-img img {
+                -webkit-mask-image: none;
+                mask-image: none;
+                border-radius: 24px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .grid-combo-items { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 768px) {
@@ -1023,6 +1269,10 @@ try {
                 height: 38px;
                 font-size: 15px;
             }
+        }
+
+        @media (max-width: 600px) {
+            .footer-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -1138,6 +1388,96 @@ try {
     });
     </script>
     <?php endif; ?>
+
+    <!-- 5. MODAL COMBO: BANQUETE REAL NA FLORESTA ENCANTADA -->
+    <div id="modalComboBanquete" class="card-combo-modal card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
+        <div class="combo-modal-header">
+            <h2>Banquete Real na Floresta Encantada</h2>
+            <p>Desperte em um verdadeiro conto de fadas! Saboreie aromas envolventes e acompanhamentos crocantes perfeitos para começar o dia com espírito de aventura.</p>
+        </div>
+        <div class="grid-combo-items">
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('pocao_da_bruxa.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Poção da Bruxa">
+                <h4>Poção da Bruxa</h4>
+                <p>Bebida quente, aromática e aconchegante com especiarias.</p>
+                <a href="receita.php?id=57" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('petisco_pongo.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Petiscos do Pongo">
+                <h4>Petiscos do Pongo</h4>
+                <p>Rolinhos de carne moída recheados com queijo e bacon.</p>
+                <a href="receita.php?id=33" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('torta_maca_branca_neve.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Torta de Maçã">
+                <h4>Torta de Maçã</h4>
+                <p>A clássica torta de maçã da Branca de Neve sem feitiço.</p>
+                <a href="receita.php?id=1" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+        <button class="btn-acao-creme" onclick="fecharTodosModais()" style="margin-top:22px;">Fechar Combo</button>
+    </div>
+
+    <!-- 6. MODAL COMBO: FESTIVAL DAS LANTERNAS DOURADAS -->
+    <div id="modalComboLanternas" class="card-combo-modal card-amarelo">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
+        <div class="combo-modal-header">
+            <h2>Festival das Lanternas Douradas</h2>
+            <p>Ilumine sua tarde com uma combinação brilhante de chás aromáticos, biscoitos quentinhos e o toque inconfundível de uma celebração mágica ao pôr do sol.</p>
+        </div>
+        <div class="grid-combo-items">
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('tody_de_lava.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Toddy de Lava do Wu">
+                <h4>Toddy de Lava do Wu</h4>
+                <p>Uma bebida quente, aconchegante e aromática.</p>
+                <a href="receita.php?id=61" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('cookies_enrolados.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Cookies de Enrolados">
+                <h4>Cookies de Enrolados</h4>
+                <p>Cookies macios e coloridos com confeitos lilás e amarelos.</p>
+                <a href="receita.php?id=4" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('bolo_de_cafe.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Bolo de Café com Espiral de Canela">
+                <h4>Bolo de Café com Espiral de Canela</h4>
+                <p>Bolo fofinho com espiral aconchegante de canela.</p>
+                <a href="receita.php?id=6" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+        <button class="btn-ver-mais-vermelho" onclick="fecharTodosModais()" style="margin-top:22px; width: 100%;">Fechar Combo</button>
+    </div>
+
+    <!-- 7. MODAL COMBO: SESSÃO MÁGICA DE CINEMA -->
+    <div id="modalComboSessao" class="card-combo-modal card-vermelho">
+        <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
+        <div class="combo-modal-header">
+            <h2>Sessão Mágica de Cinema</h2>
+            <p>O combo definitivo para dar play na sua maratona! Petiscos crocantes irresistíveis, pipoca doce quentinha e bebida borbulhante bem gelada para acompanhar seus filmes favoritos.</p>
+        </div>
+        <div class="grid-combo-items">
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('pipoca_da_bela.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Pipoca Rosa da Aurora">
+                <h4>Pipoca Rosa da Aurora</h4>
+                <p>Pipoca doce rosa e crocante com calda de marshmallow.</p>
+                <a href="receita.php?id=10" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('refrigeranteazul_wei.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Refrigerante Azul Gelado do Wei">
+                <h4>Refrigerante Azul Gelado do Wei</h4>
+                <p>Uma bebida leve, efervescente e super refrescante.</p>
+                <a href="receita.php?id=62" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="item-combo-card">
+                <img src="<?= buscarImagem('chips_mulan.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Chips Crocantes da Mulan">
+                <h4>Chips Crocantes da Mulan</h4>
+                <p>Chips crocantes e temperadas de batata-doce assadas.</p>
+                <a href="receita.php?id=37" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+        </div>
+        <button class="btn-acao-creme" onclick="fecharTodosModais()" style="margin-top:22px;">Fechar Combo</button>
+    </div>
 
     <!-- 1. BANNER PRINCIPAL (HERO SLIDER) -->
     <section class="secao-hero">
@@ -1266,20 +1606,21 @@ try {
     <!-- 5. BANNER FULL-WIDTH VERMELHO: BANQUETE REAL NA FLORESTA ENCANTADA -->
     <section class="secao-full-vermelha">
         <div class="container-full-vermelho">
-            <div>
+            <div class="conteudo-banner-texto">
                 <h2 class="titulo-banner-red">
                     <span class="script-banquete">Banquete</span> Real na<br>Floresta Encantada
                 </h2>
-                <p class="combo-sub">
-                    Combo: Café Colombiano dos Madrigal + Biscoitos Estrela da Terra do Nunca + Torta de maçã
-                </p>
+                <span class="combo-sub">
+                    <i class="fa-solid fa-utensils"></i> Combo: Poção da Bruxa + Petiscos do Pongo + Torta de maçã
+                </span>
                 <p class="combo-desc">
                     Desperte em um verdadeiro conto de fadas! Saboreie aromas envolventes e acompanhamentos crocantes perfeitos para começar o dia com espírito de aventura.
                 </p>
+                <a href="javascript:void(0)" onclick="abrirModalCombo('banquete')" class="btn-ver-mais-creme">VER COMBO COMPLETO</a>
             </div>
-            <div class="banner-red-img">
-                <img src="<?= buscarImagem('banquete_floresta.webp') ?>" onerror="this.src='<?= buscarImagem('cafe_biscoitos_torta.webp') ?>'" alt="Banquete Real na Floresta Encantada">
-            </div>
+        </div>
+        <div class="banner-red-img">
+            <img src="<?= buscarImagem('banquete_real.png') ?>" onerror="this.src='<?= buscarImagem('pocao_da_bruxa.webp') ?>'" alt="Banquete Real na Floresta Encantada">
         </div>
     </section>
 
@@ -1313,20 +1654,21 @@ try {
     <!-- 7. BANNER FULL-WIDTH CREME: FESTIVAL DAS LANTERNAS DOURADAS -->
     <section class="secao-full-creme">
         <div class="container-full-creme">
-            <div>
+            <div class="conteudo-banner-texto">
                 <h2 class="titulo-banner-creme">
                     <span class="script-festival">Festival</span> das Lanternas<br>Douradas
                 </h2>
-                <p class="combo-sub-creme">
-                    Combo: Torrada de Geleia da Rapunzel + Cookies de Enrolados + Biscoitos Doce de Leite com Canela
-                </p>
+                <span class="combo-sub-creme">
+                    <i class="fa-solid fa-mug-hot"></i> Combo: Toddy de lava do wu + Cookies de enrolados + Bolo de café
+                </span>
                 <p class="combo-desc-creme">
-                    Ilumine a sua mesa com a combinação perfeita de crosta amanteigada, recheios de frutas e toque de canela para uma refeição digna de um por do sol.
+                    Ilumine sua tarde com uma combinação brilhante de chás aromáticos, biscoitos quentinhos e o toque inconfundível de uma celebração mágica ao pôr do sol.
                 </p>
+                <a href="javascript:void(0)" onclick="abrirModalCombo('lanternas')" class="btn-ver-mais-vermelho">VER COMBO COMPLETO</a>
             </div>
-            <div class="banner-creme-img">
-                <img src="<?= buscarImagem('lanternas_combo.webp') ?>" onerror="this.src='img/pratos/cookies_banner.png'" alt="Festival das Lanternas Douradas">
-            </div>
+        </div>
+        <div class="banner-creme-img">
+            <img src="<?= buscarImagem('festival_lanternas.png') ?>" onerror="this.src='<?= buscarImagem('tody_de_lava.webp') ?>'" alt="Festival das Lanternas Douradas">
         </div>
     </section>
 
@@ -1360,22 +1702,68 @@ try {
     <!-- 9. BANNER FULL-WIDTH VERMELHO: SESSÃO MÁGICA DE CINEMA -->
     <section class="secao-full-vermelha">
         <div class="container-full-vermelho">
-            <div>
+            <div class="conteudo-banner-texto">
                 <h2 class="titulo-banner-red">
                     <span class="script-banquete">Sessão</span> Mágica de<br>Cinema
                 </h2>
-                <p class="combo-sub">
-                    Combo: Pipoca Rosa da Aurora + Refrigerante Azul Gelado do Wei + Chips Crocantes da Mulan
-                </p>
+                <span class="combo-sub">
+                    <i class="fa-solid fa-film"></i> Combo: Pipoca Rosa + Refrigerante Azul + Chips Crocantes
+                </span>
                 <p class="combo-desc">
                     O combo definitivo para dar play na sua maratona! Petiscos crocantes irresistíveis, pipoca doce quentinha e bebida borbulhante bem gelada para acompanhar seus filmes favoritos.
                 </p>
-            </div>
-            <div class="banner-red-img">
-                <img src="<?= buscarImagem('sessao_magica_combo.webp') ?>" onerror="this.src='<?= buscarImagem('cinema_combo.webp') ?>'" alt="Sessão Mágica de Cinema">
+                <a href="javascript:void(0)" onclick="abrirModalCombo('sessao')" class="btn-ver-mais-creme">VER COMBO COMPLETO</a>
             </div>
         </div>
+        <div class="banner-red-img">
+            <img src="<?= buscarImagem('sessao_cinema.png') ?>" onerror="this.src='<?= buscarImagem('pipoca_da_bela.webp') ?>'" alt="Sessão Mágica de Cinema">
+        </div>
     </section>
+
+    <!-- 10. RODAPÉ MÁGICO DO SITE -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-col footer-about">
+                <img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites" onerror="this.src='img/logo/logo_menu.png'">
+                <p>Traga a magia dos filmes Disney diretamente para a sua cozinha! No Magical Bites encontra as receitas mais encantadoras do cinema.</p>
+                <div class="footer-social">
+                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" title="Pinterest"><i class="fa-brands fa-pinterest"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3>Navegação</h3>
+                <ul class="footer-links">
+                    <li><a href="index.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Início</a></li>
+                    <li><a href="#containerReceitas"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Receitas</a></li>
+                    <li><a href="favoritos.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Favoritos</a></li>
+                    <li><a href="filmes.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Filmes</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Categorias</h3>
+                <ul class="footer-links">
+                    <li><a href="salgados.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Salgados</a></li>
+                    <li><a href="doces.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Doces</a></li>
+                    <li><a href="bebidas.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Bebidas</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Magia & Sabor</h3>
+                <p style="font-size: 13.5px; color: #e2e8f0; line-height: 1.6;">"Qualquer um pode cozinhar, mas apenas os destemidos podem ser grandes."</p>
+                <p style="font-size: 12px; color: #fff8bd; margin-top: 10px; font-weight: 700;">— Ratatouille</p>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; <?= date('Y') ?> Magical Bites. Todos os direitos reservados. Feito com <i class="fa-solid fa-heart"></i> e magia.</p>
+        </div>
+    </footer>
 
     <!-- JAVASCRIPT DOS SLIDERS E MODAIS -->
     <script>
@@ -1444,6 +1832,9 @@ try {
         if(document.getElementById('modalLogin')) document.getElementById('modalLogin').style.display = 'none';
         if(document.getElementById('modalPerfil')) document.getElementById('modalPerfil').style.display = 'none';
         if(document.getElementById('modalStatus')) document.getElementById('modalStatus').style.display = 'none';
+        if(document.getElementById('modalComboBanquete')) document.getElementById('modalComboBanquete').style.display = 'none';
+        if(document.getElementById('modalComboLanternas')) document.getElementById('modalComboLanternas').style.display = 'none';
+        if(document.getElementById('modalComboSessao')) document.getElementById('modalComboSessao').style.display = 'none';
     }
 
     function fecharStatus() {
@@ -1457,6 +1848,14 @@ try {
         if (tipo === 'cadastro') document.getElementById('modalCadastro').style.display = 'block';
         if (tipo === 'login') document.getElementById('modalLogin').style.display = 'block';
         if (tipo === 'perfil') document.getElementById('modalPerfil').style.display = 'block';
+    }
+
+    function abrirModalCombo(tipo) {
+        fecharTodosModais();
+        document.getElementById('modalOverlay').style.display = 'block';
+        if (tipo === 'banquete') document.getElementById('modalComboBanquete').style.display = 'block';
+        if (tipo === 'lanternas') document.getElementById('modalComboLanternas').style.display = 'block';
+        if (tipo === 'sessao') document.getElementById('modalComboSessao').style.display = 'block';
     }
 
     function selecionarAvatarModal(nomeAvatar, elemento) {
