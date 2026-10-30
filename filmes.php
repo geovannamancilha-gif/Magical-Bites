@@ -94,7 +94,7 @@ function buscarImagem($nomeImagem) {
     if (file_exists($nomeImagem)) return $nomeImagem;
 
     $pastas = ['cardsfilme', 'pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'fundo', 'img/cardsfilme', 'img/perfis', 'img/avatares', 'img/fundo', 'img/logo', 'img/slider'];
-    $extensoes = ['', '.png', '.webp', '.jpg', '.jpeg', '.jfif'];
+    $extensoes = ['', '.jpg', '.png', '.webp', '.jpeg', '.jfif'];
 
     foreach ($pastas as $pasta) {
         foreach ($extensoes as $ext) {
@@ -306,7 +306,7 @@ try {
             display: block;
         }
 
-        /* --- 2. SEÇÃO DE BUSCA E CATEGORIAS (FUNDO ÚNICO E LISA) --- */
+        /* --- 2. SEÇÃO DE BUSCA E CATEGORIAS --- */
         .secao-busca-categorias {
             background-color: #f7f6f2;
             background-image: url('<?= buscarImagem("mickey1.png") ?>');
@@ -374,6 +374,8 @@ try {
             justify-content: flex-start;
             padding-top: 25px;
             cursor: pointer;
+            isolation: isolate;
+            transform: translateZ(0);
         }
 
         .card-categoria-item:hover {
@@ -388,10 +390,13 @@ try {
             height: 100%;
             object-fit: cover;
             z-index: 1;
+            transform: scale(1.02);
             transition: transform 0.5s ease;
         }
 
-        .card-categoria-item:hover .card-categoria-bg { transform: scale(1.06); }
+        .card-categoria-item:hover .card-categoria-bg { 
+            transform: scale(1.08); 
+        }
 
         .card-cat-titulo {
             position: relative;
@@ -409,13 +414,15 @@ try {
 
         /* --- 3. SEÇÃO INFERIOR DA GRELHA DE FILMES --- */
         .secao-grid-filmes {
-            background-image: url('<?= buscarImagem("fundofilme1.jpg") ?>');
+            background-color: #0b1329;
+            background-image: url('<?= buscarImagem("fundofilme3") ?>');
             background-repeat: no-repeat;
             background-position: center top;
             background-size: cover;
             background-attachment: fixed;
             padding: 50px 0 80px;
             position: relative;
+            width: 100%;
         }
 
         .container-filmes-grid {
@@ -431,7 +438,7 @@ try {
             width: 100%;
             margin: 30px 0 20px;
             padding-bottom: 8px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.35);
+            border-bottom: 2px solid #fff3bc;
             color: #ffffff;
             font-size: 26px;
             font-weight: 800;
@@ -440,6 +447,44 @@ try {
             gap: 12px;
             letter-spacing: 0.3px;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+        }
+
+        /* BOTÃO FLUTUANTE ESTÁVEL - OCULTO INICIALMENTE */
+        .btn-flutuante-voltar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 52px;
+            height: 52px;
+            background-color: #a62428;
+            color: #fff3bc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 22px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+            transition: opacity 0.35s ease, visibility 0.35s ease, transform 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+            border: 2.5px solid #fff3bc;
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .btn-flutuante-voltar.visivel {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .btn-flutuante-voltar:hover {
+            transform: scale(1.12);
+            background-color: #831a1e;
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
         }
 
         /* GRELHA COM 4 COLUNAS */
@@ -527,39 +572,136 @@ try {
             gap: 5px;
         }
 
-        /* --- MODAIS DISNEY --- */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(18, 24, 41, 0.5); backdrop-filter: blur(3px); z-index: 999; }
-        .card-flutuante { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 380px; max-width: 90vw; max-height: 90vh; overflow-y: auto; border-radius: 36px; padding: 35px 28px; z-index: 1000; animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popUpModal { from { opacity: 0; transform: translate(-50%, -45%) scale(0.92); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
-        .card-vermelho { background: #a62428; color: #ffffff; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); border: 2px solid rgba(255, 255, 255, 0.15); }
+        /* --- MODAIS FLUTUANTES DA CONTA (EXATOS DO INDEX.PHP) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 24, 41, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 999;
+        }
+
+        .card-flutuante {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 380px; max-width: 90vw; max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 36px;
+            padding: 35px 28px;
+            z-index: 1000;
+            animation: popUpModal 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popUpModal {
+            from { opacity: 0; transform: translate(-50%, -45%) scale(0.92); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .card-vermelho {
+            background: #a62428;
+            color: #ffffff;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+
         .card-vermelho .castelo-header { text-align: center; margin-bottom: 12px; }
         .card-vermelho .castelo-header i { font-size: 38px; color: #ffffff; }
-        .card-vermelho h2.titulo-cursivo { font-family: 'Caveat', cursive; font-size: 38px; color: #ffffff; text-align: center; line-height: 1; margin-bottom: 2px; }
-        .card-vermelho p.subtitulo-modal { font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; margin-bottom: 22px; font-weight: 500; }
+
+        .card-vermelho h2.titulo-cursivo {
+            font-family: 'Caveat', cursive;
+            font-size: 38px; color: #ffffff; text-align: center; line-height: 1; margin-bottom: 2px;
+        }
+
+        .card-vermelho p.subtitulo-modal {
+            font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; margin-bottom: 22px; font-weight: 500;
+        }
+
         .card-vermelho .input-group-modal { position: relative; margin-bottom: 14px; }
         .card-vermelho .input-group-modal i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #ffffff; font-size: 15px; }
-        .card-vermelho .input-group-modal input { width: 100%; padding: 12px 18px 12px 48px; border: 2px solid #ffffff; background: transparent; border-radius: 50px; outline: none; color: #ffffff; font-size: 14px; font-weight: 500; transition: 0.3s; }
+        .card-vermelho .input-group-modal input {
+            width: 100%; padding: 12px 18px 12px 48px; border: 2px solid #ffffff; background: transparent; border-radius: 50px; outline: none; color: #ffffff; font-size: 14px; font-weight: 500; transition: 0.3s;
+        }
         .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
-        .card-vermelho .btn-acao-creme { width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+
+        .card-vermelho .btn-acao-creme {
+            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
         .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
 
-        /* MODAL DE RECEITAS DO FILME */
-        .modal-filme-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 999; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
+        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
+        .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
+
+        .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
+        .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
+        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
+
+        /* --- MODAL DE RECEITAS DO FILME COM A COR DO TEMA NO INTERIOR --- */
+        .modal-filme-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(5px); z-index: 999; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
         .modal-filme-overlay.ativo { display: flex; opacity: 1; }
-        .modal-filme-content { background: #f3f1ff; width: 100%; max-width: 850px; max-height: 90vh; border-radius: 25px; overflow: hidden; position: relative; display: flex; flex-direction: column; color: #333; }
+        
+        .modal-filme-content { 
+            background-color: var(--cor-tema); 
+            width: 100%; 
+            max-width: 850px; 
+            max-height: 90vh; 
+            border-radius: 28px; 
+            overflow: hidden; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            color: #ffffff; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+        }
+
         .modal-header { height: 180px; position: relative; display: flex; align-items: flex-end; padding: 30px; background-color: var(--cor-tema); overflow: hidden; }
-        .modal-header img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .modal-header-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--cor-tema) 0%, rgba(0, 0, 0, 0.2) 100%); }
-        .modal-header h2 { position: relative; color: white; font-size: 32px; z-index: 3; }
-        .modal-filme-content .btn-fechar { position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10; }
-        .modal-body { padding: 30px; overflow-y: auto; flex: 1; }
+        .modal-header img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
+        .modal-header-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--cor-tema) 10%, rgba(0, 0, 0, 0.15) 100%); }
+        .modal-header h2 { position: relative; color: #ffffff; font-size: 32px; font-weight: 800; z-index: 3; text-shadow: 0 2px 10px rgba(0,0,0,0.7); }
+        .modal-filme-content .btn-fechar { position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10; transition: 0.3s; }
+        .modal-filme-content .btn-fechar:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
+
+        .modal-body { 
+            padding: 30px; 
+            overflow-y: auto; 
+            flex: 1; 
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25));
+        }
+
         .lista-receitas { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-        .card { background: white; color: black; border-radius: 20px; overflow: hidden; text-decoration: none; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+
+        .card { 
+            background: rgba(255, 255, 255, 0.18); 
+            color: #ffffff; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            text-decoration: none; 
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease; 
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); 
+            display: flex; 
+            flex-direction: column; 
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            backdrop-filter: blur(6px);
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            background: rgba(255, 255, 255, 0.28);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+        }
+
         .card img { width: 100%; height: 140px; object-fit: cover; }
-        .tag { width: fit-content; margin: 15px auto 10px; padding: 5px 12px; border-radius: 20px; color: white; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        .doce { background: #ff69b4; } .salgado { background: #4CAF50; } .bebida { background: #00bcd4; }
-        .card p { padding: 0 15px 20px; text-align: center; font-weight: 600; font-size: 14px; color: #333; }
+        .tag { width: fit-content; margin: 15px auto 10px; padding: 5px 14px; border-radius: 20px; color: white; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .doce { background: #ff69b4; } .salgado { background: #2e7d32; } .bebida { background: #00bcd4; }
+        .card p { padding: 0 15px 20px; text-align: center; font-weight: 700; font-size: 14px; color: #ffffff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); }
 
         @media (max-width: 1024px) {
             .grid-filmes { grid-template-columns: repeat(3, 1fr); }
@@ -568,7 +710,18 @@ try {
         @media (max-width: 768px) {
             .grid-filmes, .grid-3-categorias { grid-template-columns: repeat(2, 1fr); }
             .banner-inicio { height: 450px; }
-            .secao-grid-filmes { background-attachment: scroll; }
+            .secao-grid-filmes { 
+                background-attachment: scroll; 
+                background-size: cover;
+                background-position: center center;
+            }
+            .btn-flutuante-voltar {
+                width: 46px;
+                height: 46px;
+                font-size: 18px;
+                bottom: 20px;
+                right: 20px;
+            }
         }
         @media (max-width: 520px) {
             .grid-filmes, .grid-3-categorias { grid-template-columns: repeat(1, 1fr); }
@@ -606,7 +759,7 @@ try {
         <img src="<?= buscarImagem('filme.webp') ?>" alt="Banner Filmes" onerror="this.src='img/slider/bg-destaque.webp'">
     </div>
 
-    <!-- 2. SEÇÃO DE BUSCA E CATEGORIAS DA DISNEY -->
+    <!-- 2. SEÇÃO DE BUSCA E CATEGORIAS DA DISNEY (PARTE 2) -->
     <section class="secao-busca-categorias" id="secaoCategorias">
         <div class="container-secao">
             
@@ -640,7 +793,7 @@ try {
     <!-- OVERLAY DOS MODAIS -->
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
 
-    <!-- MODAL CADASTRO -->
+    <!-- 1. MODAL CADASTRO (IGUAL AO INDEX.PHP) -->
     <div id="modalCadastro" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
         <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
@@ -655,7 +808,7 @@ try {
         <div class="footer-modal">Já tem uma conta? <a onclick="alternarModais('login')">Faça login</a></div>
     </div>
 
-    <!-- MODAL LOGIN -->
+    <!-- 2. MODAL LOGIN (IGUAL AO INDEX.PHP) -->
     <div id="modalLogin" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
         <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
@@ -669,7 +822,7 @@ try {
         <div class="footer-modal">Está chegando agora? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
-    <!-- MODAL PERFIL -->
+    <!-- 3. MODAL PERFIL (IGUAL AO INDEX.PHP) -->
     <?php if (isset($_SESSION['usuario'])): ?>
     <div id="modalPerfil" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
@@ -728,10 +881,10 @@ try {
                         </div>
                     </div>
 
-                    <!-- MODAL DE RECEITAS DO FILME -->
+                    <!-- MODAL DE RECEITAS DO FILME COM A COR DO TEMA NO INTERIOR -->
                     <div id="modal-filme-<?= $id ?>" class="modal-filme-overlay">
-                        <div class="modal-filme-content">
-                            <div class="modal-header" style="--cor-tema: <?= $corTema ?>;">
+                        <div class="modal-filme-content" style="--cor-tema: <?= $corTema ?>;">
+                            <div class="modal-header">
                                 <img src="<?= buscarImagem($filme['imagem']) ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>" onerror="this.style.opacity='0';">
                                 <div class="modal-header-overlay"></div>
                                 <button onclick="fecharModalFilme('modal-filme-<?= $id ?>', event)" class="btn-fechar">&times;</button>
@@ -751,7 +904,7 @@ try {
                                         </a>
                                         <?php endforeach; ?>
                                     <?php else: ?>
-                                        <p style="text-align:center; width:100%; color:#666;">Ainda não há receitas cadastradas para este filme.</p>
+                                        <p style="text-align:center; width:100%; color:#ffffff; font-weight: 500;">Ainda não há receitas cadastradas para este filme.</p>
                                     <?php endif; ?>
                                 </div>
                             </div>
@@ -767,8 +920,40 @@ try {
         </div>
     </section>
 
-    <!-- JAVASCRIPT DOS FILTROS E MODAIS -->
+    <!-- BOTÃO FLUTUANTE QUE SÓ APARECE NA 3ª PARTE -->
+    <a href="javascript:void(0)" onclick="voltarParaParte2(event)" class="btn-flutuante-voltar" id="btnVoltarParte2" title="Voltar para a Busca e Categorias">
+        <i class="fa-solid fa-arrow-up"></i>
+    </a>
+
+    <!-- JAVASCRIPT DOS FILTROS, MODAIS E SCROLL -->
     <script>
+    // MOSTRAR A SETA SÓ NA 3ª PARTE (GRELHA DE FILMES)
+    window.addEventListener('scroll', function() {
+        let btn = document.getElementById('btnVoltarParte2');
+        let secaoFilmes = document.getElementById('secaoFilmes');
+        if (secaoFilmes && btn) {
+            let topoSecaoFilmes = secaoFilmes.offsetTop;
+            if (window.scrollY >= topoSecaoFilmes - 250) {
+                btn.classList.add('visivel');
+            } else {
+                btn.classList.remove('visivel');
+            }
+        }
+    });
+
+    // ROLAGEM EXATA PARA ENQUADRAR COMO NA IMAGEM ENVIADA
+    function voltarParaParte2(event) {
+        if (event) event.preventDefault();
+        let secaoCategorias = document.getElementById('secaoCategorias');
+        if (secaoCategorias) {
+            let posicaoEnquadrada = secaoCategorias.offsetTop - 80;
+            window.scrollTo({
+                top: posicaoEnquadrada,
+                behavior: 'smooth'
+            });
+        }
+    }
+
     function abrirModalFilme(idModal) {
         document.getElementById(idModal).classList.add('ativo');
         document.body.style.overflow = 'hidden';
@@ -793,6 +978,20 @@ try {
         if (tipo === 'cadastro' && document.getElementById('modalCadastro')) document.getElementById('modalCadastro').style.display = 'block';
         if (tipo === 'login' && document.getElementById('modalLogin')) document.getElementById('modalLogin').style.display = 'block';
         if (tipo === 'perfil' && document.getElementById('modalPerfil')) document.getElementById('modalPerfil').style.display = 'block';
+    }
+
+    function selecionarAvatarModal(nomeAvatar, elemento) {
+        document.getElementById('modalInputAvatar').value = nomeAvatar;
+        let avatares = document.querySelectorAll('.avatar-item');
+        avatares.forEach(el => el.classList.remove('selected'));
+        elemento.classList.add('selected');
+        document.getElementById('modalPreviewFoto').src = elemento.querySelector('img').src;
+    }
+
+    function limparAvatarModal() {
+        document.getElementById('modalInputAvatar').value = '';
+        let avatares = document.querySelectorAll('.avatar-item');
+        avatares.forEach(el => el.classList.remove('selected'));
     }
 
     // PESQUISA EM TEMPO REAL
