@@ -1867,11 +1867,7 @@ try {
                     </ul>
                 </div>
 
-                <div class="footer-col">
-                    <h3>Magia & Sabor</h3>
-                    <p style="font-size: 13.5px; color: #ffffff; line-height: 1.6; text-shadow: 0 2px 5px rgba(0,0,0,0.9);">"Qualquer um pode cozinhar, mas apenas os destemidos podem ser grandes."</p>
-                    <p style="font-size: 12px; color: #fff8bd; margin-top: 10px; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.9);">— Ratatouille</p>
-                </div>
+               
             </div>
 
             <div class="footer-bottom">
