@@ -42,6 +42,24 @@ function buscarImagem($nomeImagem) {
     return "img/logo/logo_menu.png";
 }
 
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR SEM RETORNAR A LOGO DO SITE
+function buscarImagemCursor($tipo) {
+    $nomesPossiveis = ($tipo === 'aberto') 
+        ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
+        : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
+
+    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+
+    foreach ($pastas as $pasta) {
+        foreach ($nomesPossiveis as $nome) {
+            $caminho = $pasta . $nome;
+            if (file_exists($caminho)) return $caminho;
+        }
+    }
+
+    return "img/" . $nomesPossiveis[0];
+}
+
 // Suporte flexível para a chave de ID na sessão
 $id_usuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
 
@@ -85,6 +103,26 @@ try {
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        /* --- OCULTA O CURSOR PADRÃO DO SISTEMA --- */
+        html, body, *, a, button, input, select, textarea, label {
+            cursor: none !important;
+        }
+
+        /* --- ESTILO DO CURSOR PERSONALIZADO DO MICKEY --- */
+        #mickeyCursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 38px;
+            height: auto;
+            pointer-events: none;
+            z-index: 999999;
+            display: none;
+            transform: translate(-30%, -10%);
+            transition: transform 0.05s ease-out;
+        }
+
         html { scroll-behavior: smooth; }
 
         body { 
@@ -126,7 +164,6 @@ try {
             font-size: 16px;
             font-weight: 700;
             transition: 0.3s;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -302,7 +339,6 @@ try {
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            cursor: pointer;
             box-shadow: 0 4px 14px rgba(0,0,0,0.18); 
             transition: all 0.25s ease; 
             z-index: 5;
@@ -450,20 +486,20 @@ try {
         .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
 
         .card-vermelho .btn-acao-creme {
-            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
-        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
+        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; }
 
-        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
+        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
 
         .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
         .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
-        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; overflow: hidden; transition: 0.2s; }
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
 
@@ -504,6 +540,9 @@ try {
     </style>
 </head>
 <body>
+
+    <!-- ELEMENTO DO CURSOR DO MICKEY -->
+    <img id="mickeyCursor" src="<?= buscarImagemCursor('aberto') ?>" alt="Cursor Mickey">
 
     <!-- NAVBAR PADRONIZADA -->
     <div class="navbar">
@@ -586,7 +625,7 @@ try {
                     </div>
                 <?php endforeach; ?>
             </div>
-            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center; cursor:pointer;" onclick="document.getElementById('fotoUploadInput').click()">
+            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center;" onclick="document.getElementById('fotoUploadInput').click()">
                 <i class="fa-solid fa-image"></i> Escolher da Galeria
             </label>
             <input type="file" id="fotoUploadInput" name="foto_upload" accept="image/*" style="display:none;" onchange="limparAvatarModal()">
@@ -669,8 +708,49 @@ try {
         </div>
     </div>
 
-    <!-- JAVASCRIPT DOS MODAIS -->
+    <!-- JAVASCRIPT DOS MODAIS E CURSOR DO MICKEY -->
     <script>
+    // --- LÓGICA DO CURSOR PERSONALIZADO DO MICKEY ---
+    const mickeyCursor = document.getElementById('mickeyCursor');
+    const imgAberto = "<?= buscarImagemCursor('aberto') ?>";
+    const imgFechado = "<?= buscarImagemCursor('fechado') ?>";
+
+    if (mickeyCursor) {
+        document.addEventListener('mousemove', (e) => {
+            mickeyCursor.style.display = 'block';
+            mickeyCursor.style.left = e.clientX + 'px';
+            mickeyCursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            mickeyCursor.style.display = 'none';
+        });
+
+        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .card-favorito-item, .btn-fav-icon-overlay, .btn-explorar';
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgFechado;
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+
+        document.addEventListener('mousedown', () => {
+            mickeyCursor.src = imgFechado;
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+    }
+
     function fecharTodosModais() {
         document.getElementById('modalOverlay').style.display = 'none';
         if(document.getElementById('modalCadastro')) document.getElementById('modalCadastro').style.display = 'none';
