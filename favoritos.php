@@ -47,15 +47,19 @@ function buscarImagem($nomeImagem) {
 // Suporte flexível para a chave de ID na sessão
 $id_usuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
 
-// Busca as receitas favoritadas do utilizador na tabela 'favoritar' junto com os dados do filme
+// Busca as receitas favoritadas do utilizador junto com o filme e média real de avaliações
 $receitasFavoritas = [];
 if ($id_usuario) {
     $stmt = $pdo->prepare("
-        SELECT r.*, fl.nome_filme 
+        SELECT r.*, fl.nome_filme,
+               COUNT(a.id_avaliacao) AS total_avaliacoes,
+               AVG(a.estrelas) AS media_estrelas
         FROM receitas r
         INNER JOIN favoritar f ON r.id_receita = f.id_receita
         LEFT JOIN filme fl ON r.id_filme = fl.id_filme
+        LEFT JOIN avaliacoes a ON r.id_receita = a.id_receita
         WHERE f.id_usuario = :id_usuario
+        GROUP BY r.id_receita, f.id_favoritos
         ORDER BY f.id_favoritos DESC
     ");
     $stmt->execute([':id_usuario' => $id_usuario]);
@@ -333,11 +337,21 @@ try {
             opacity: 0.9;
         }
 
+        /* --- ESTRELA E MÉDIA NUMÉRICA (ESTILO DA IMAGEM) --- */
         .card-fav-stars {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #ffca28;
+            font-size: 16px;
+            margin-top: 4px;
+        }
+
+        .card-fav-stars .nota-numero {
             color: #1f4396;
-            font-size: 17px;
-            letter-spacing: 3px;
-            margin-top: 2px;
+            font-weight: 800;
+            font-size: 15px;
+            margin-left: 6px;
         }
 
         /* ESTADO VAZIO (SEM FAVORITOS) */
@@ -618,9 +632,17 @@ try {
                             
                             <p class="card-fav-desc"><?= htmlspecialchars($r['descricao'] ?? 'Saborosa receita mágica inspirada no cinema.') ?></p>
                             
-                            <div class="card-fav-stars">
-                                ★★★★★
-                            </div>
+                            <?php if (($r['total_avaliacoes'] ?? 0) > 0): 
+                                $media = (float)($r['media_estrelas'] ?? $r['avaliacao'] ?? 0);
+                                $mediaArredondada = (int)round($media);
+                            ?>
+                                <div class="card-fav-stars">
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <i class="fa-<?= $i <= $mediaArredondada ? 'solid' : 'regular' ?> fa-star"></i>
+                                    <?php endfor; ?>
+                                    <span class="nota-numero"><?= number_format($media, 1, '.', '') ?></span>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                     </div>
