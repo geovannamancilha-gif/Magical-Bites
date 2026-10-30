@@ -87,11 +87,6 @@ try {
             exit;
         }
 
-        if (empty($comentario)) {
-            header("Location: receita.php?id=$id_receita&status=erro&msg=" . urlencode("Por favor, escreva um comentário sobre a receita."));
-            exit;
-        }
-
         try {
             $stmtAvaliar = $pdo->prepare("
                 INSERT INTO avaliacoes (id_receita, id_usuario, estrelas, comentario) 
@@ -1082,7 +1077,7 @@ function buscarImagem($nomeImagem) {
                             <p class="subtitulo-avaliacao" id="textoEstrelas">Clique nas estrelas para selecionar uma nota</p>
 
                             <div class="campo-comentario">
-                                <textarea name="comentario" placeholder="Escreva aqui o que achou dessa receita para ajudar outros cozinheiros..." rows="3" required></textarea>
+                                <textarea name="comentario" placeholder="Escreva aqui o que achou dessa receita..." rows="3"></textarea>
                             </div>
 
                             <button type="submit" class="btn-enviar-avaliacao">Enviar Avaliação</button>
@@ -1120,7 +1115,9 @@ function buscarImagem($nomeImagem) {
                                             <i class="fa-<?= $i <= $aval['estrelas'] ? 'solid' : 'regular' ?> fa-star"></i>
                                         <?php endfor; ?>
                                     </div>
-                                    <p class="comentario-cliente"><?= nl2br(htmlspecialchars($aval['comentario'])) ?></p>
+                                    <?php if (!empty(trim($aval['comentario']))): ?>
+                                        <p class="comentario-cliente"><?= nl2br(htmlspecialchars($aval['comentario'])) ?></p>
+                                    <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
                         </div>
