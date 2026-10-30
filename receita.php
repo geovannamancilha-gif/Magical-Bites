@@ -40,7 +40,7 @@ try {
     }
 
     // =========================================================================
-    // 2. PROCESSAMENTO DE ENVIO DE AVALIAÇÃO / COMENTÁRIO
+    // 2. PROCESSAMENTO DE ENVIO DE AVALIAÇÃO / COMENTÁRIO E FOTO
     // =========================================================================
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'avaliar') {
         if (!isset($_SESSION['usuario'])) {
@@ -87,19 +87,43 @@ try {
             exit;
         }
 
+        // Processamento de upload de foto opcional do prato
+        $fotoAvaliacao = null;
+        if (isset($_FILES['foto_avaliacao']) && $_FILES['foto_avaliacao']['error'] === UPLOAD_ERR_OK) {
+            $ext = strtolower(pathinfo($_FILES['foto_avaliacao']['name'], PATHINFO_EXTENSION));
+            $extPermitidas = ['jpg', 'jpeg', 'png', 'webp'];
+            
+            if (in_array($ext, $extPermitidas)) {
+                $diretorio = 'img/avaliacoes/';
+                if (!is_dir($diretorio)) {
+                    mkdir($diretorio, 0755, true);
+                }
+                $nomeFoto = time() . '_' . uniqid() . '.' . $ext;
+                if (move_uploaded_file($_FILES['foto_avaliacao']['tmp_name'], $diretorio . $nomeFoto)) {
+                    $fotoAvaliacao = $nomeFoto;
+                }
+            }
+        }
+
         try {
             $stmtAvaliar = $pdo->prepare("
-                INSERT INTO avaliacoes (id_receita, id_usuario, estrelas, comentario) 
-                VALUES (:id_receita, :id_usuario, :estrelas, :comentario)
-                ON DUPLICATE KEY UPDATE estrelas = :estrelas2, comentario = :comentario2, data_criacao = CURRENT_TIMESTAMP
+                INSERT INTO avaliacoes (id_receita, id_usuario, estrelas, comentario, foto_avaliacao) 
+                VALUES (:id_receita, :id_usuario, :estrelas, :comentario, :foto)
+                ON DUPLICATE KEY UPDATE 
+                    estrelas = :estrelas2, 
+                    comentario = :comentario2, 
+                    foto_avaliacao = COALESCE(:foto2, foto_avaliacao), 
+                    data_criacao = CURRENT_TIMESTAMP
             ");
             $stmtAvaliar->execute([
                 ':id_receita' => $id_receita,
                 ':id_usuario' => $idUsuarioValido,
                 ':estrelas'   => $estrelas,
                 ':comentario' => $comentario,
+                ':foto'       => $fotoAvaliacao,
                 ':estrelas2'  => $estrelas,
-                ':comentario2'=> $comentario
+                ':comentario2'=> $comentario,
+                ':foto2'      => $fotoAvaliacao
             ]);
 
             $stmtMedia = $pdo->prepare("SELECT AVG(estrelas) as media FROM avaliacoes WHERE id_receita = :id_receita");
@@ -219,7 +243,7 @@ function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'img/perfis', 'img/avatares', 'fundo'];
+    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'avaliacoes', 'img/perfis', 'img/avatares', 'img/avaliacoes', 'fundo'];
     $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
 
     foreach ($pastas as $pasta) {
@@ -681,6 +705,34 @@ function buscarImagem($nomeImagem) {
             box-shadow: 0 0 12px rgba(255, 246, 169, 0.3);
         }
 
+        /* UPLOAD DE FOTO OPCIONAL */
+        .campo-foto-avaliacao {
+            margin-top: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .campo-foto-avaliacao label {
+            font-size: 13px;
+            color: #cbd5e1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            transition: 0.3s;
+        }
+
+        .campo-foto-avaliacao label:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: #fff6a9;
+            color: #fff6a9;
+        }
+
         .btn-enviar-avaliacao {
             background: #fff8bd;
             color: #ab232a;
@@ -761,6 +813,15 @@ function buscarImagem($nomeImagem) {
             font-size: 13px;
             color: #e2e8f0;
             line-height: 1.5;
+        }
+
+        .img-avaliacao-cliente {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-top: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
         /* MODAIS DISNEY */
@@ -1063,7 +1124,7 @@ function buscarImagem($nomeImagem) {
                     <h3>COMO FICOU ESSA RECEITA?</h3>
 
                     <?php if (isset($_SESSION['usuario'])): ?>
-                        <form action="receita.php?id=<?= $id_receita ?>" method="POST" id="formAvaliacao">
+                        <form action="receita.php?id=<?= $id_receita ?>" method="POST" id="formAvaliacao" enctype="multipart/form-data">
                             <input type="hidden" name="acao" value="avaliar">
                             <input type="hidden" name="estrelas" id="inputEstrelas" value="0">
 
@@ -1078,6 +1139,13 @@ function buscarImagem($nomeImagem) {
 
                             <div class="campo-comentario">
                                 <textarea name="comentario" placeholder="Escreva aqui o que achou dessa receita..." rows="3"></textarea>
+                            </div>
+
+                            <div class="campo-foto-avaliacao">
+                                <label for="inputFotoAvaliacao">
+                                    <i class="fa-solid fa-camera"></i> <span id="nomeFotoSelecionada">Adicionar foto do seu prato</span>
+                                </label>
+                                <input type="file" name="foto_avaliacao" id="inputFotoAvaliacao" accept="image/*" style="display: none;" onchange="mostrarNomeFoto(this)">
                             </div>
 
                             <button type="submit" class="btn-enviar-avaliacao">Enviar Avaliação</button>
@@ -1117,6 +1185,10 @@ function buscarImagem($nomeImagem) {
                                     </div>
                                     <?php if (!empty(trim($aval['comentario']))): ?>
                                         <p class="comentario-cliente"><?= nl2br(htmlspecialchars($aval['comentario'])) ?></p>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($aval['foto_avaliacao'])): ?>
+                                        <img src="<?= buscarImagem($aval['foto_avaliacao']) ?>" class="img-avaliacao-cliente" alt="Foto da avaliação" onerror="this.style.display='none'">
                                     <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
@@ -1208,6 +1280,17 @@ function buscarImagem($nomeImagem) {
             });
         }
     });
+
+    function mostrarNomeFoto(input) {
+        const span = document.getElementById('nomeFotoSelecionada');
+        if (input.files && input.files[0]) {
+            span.innerText = "Foto: " + input.files[0].name;
+            span.style.color = "#fff6a9";
+        } else {
+            span.innerText = "Adicionar foto do seu prato (opcional)";
+            span.style.color = "#cbd5e1";
+        }
+    }
 
     function fecharTodosModais() {
         document.getElementById('modalOverlay').style.display = 'none';
