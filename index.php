@@ -927,23 +927,31 @@ try {
             mask-image: linear-gradient(to right, transparent 0%, black 35%);
         }
 
-        /* --- RODAPÉ (FOOTER) --- */
+        /* --- RODAPÉ MÁGICO DO SITE (IMAGEM Á DIREITA & TEXTO À ESQUERDA) --- */
         .site-footer {
-            background: #294f88;
-            color: #ffffff;
-            padding: 60px 0 25px;
-            border-top: 3px solid #ff9800;
             position: relative;
+            background-image: linear-gradient(180deg, rgba(11, 19, 41, 0.40) 0%, rgba(11, 19, 41, 0.85) 100%), url('<?= buscarImagem("dama_vagabundo.png") ?>');
+            background-size: cover;
+            background-position: right 80%;
+            background-repeat: no-repeat;
+            color: #ffffff;
+            padding: 60px 20px 30px;
+            border-top: 4px solid #fff8bd;
             z-index: 10;
         }
 
+        .footer-card-wrapper {
+            max-width: 800px;
+            margin: 0 0 0 3%;
+            padding: 10px 15px;
+            background: transparent;
+        }
+
         .footer-container {
-            max-width: 1150px;
-            margin: 0 auto;
-            padding: 0 25px;
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr 1.5fr;
-            gap: 40px;
+            grid-template-columns: 1.8fr 1fr 1fr 1.4fr;
+            gap: 25px;
+            text-align: left;
         }
 
         .footer-col h3 {
@@ -954,6 +962,7 @@ try {
             text-transform: uppercase;
             letter-spacing: 0.8px;
             position: relative;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
         }
 
         .footer-col h3::after {
@@ -961,21 +970,25 @@ try {
             display: block;
             width: 35px;
             height: 3px;
-            background: #a62428;
+            background: #fff8bd;
             margin-top: 8px;
             border-radius: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
         }
 
         .footer-about img {
             height: 55px;
             width: auto;
             margin-bottom: 15px;
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
         }
 
         .footer-about p {
             font-size: 13.5px;
-            color: #e2e8f0;
+            color: #ffffff;
             line-height: 1.6;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+            font-weight: 500;
         }
 
         .footer-links {
@@ -990,9 +1003,10 @@ try {
             color: #ffffff;
             text-decoration: none;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             transition: color 0.3s ease, padding-left 0.3s ease;
             display: inline-block;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
         }
 
         .footer-links a:hover {
@@ -1009,7 +1023,7 @@ try {
         .footer-social a {
             width: 40px;
             height: 40px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(11, 19, 41, 0.65);
             color: #ffffff;
             border-radius: 50%;
             display: flex;
@@ -1018,26 +1032,31 @@ try {
             text-decoration: none;
             font-size: 16px;
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 248, 189, 0.4);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
         }
 
         .footer-social a:hover {
             background: #a62428;
             color: #fff8bd;
+            border-color: #fff8bd;
             transform: translateY(-4px);
         }
 
         .footer-bottom {
-            max-width: 1150px;
-            margin: 40px auto 0;
-            padding: 20px 25px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            text-align: center;
+            max-width: 800px;
+            margin: 35px 0 0 0;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+            text-align: left;
             font-size: 13px;
-            color: #cbd5e1;
+            color: #ffffff;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.9);
+            font-weight: 500;
         }
 
         .footer-bottom i {
-            color: #ff9800;
+            color: #fff8bd;
         }
 
         /* --- MODAIS FLUTUANTES --- */
@@ -1251,6 +1270,7 @@ try {
             .conteudo-banner-texto { max-width: 100%; }
             .grid-home-receitas { grid-template-columns: 1fr; }
             .footer-container { grid-template-columns: 1fr 1fr; }
+            .footer-card-wrapper { margin: 0 auto; }
 
             .banner-red-img, .banner-creme-img {
                 position: relative;
@@ -1285,6 +1305,7 @@ try {
 
         @media (max-width: 600px) {
             .footer-container { grid-template-columns: 1fr; }
+            .footer-card-wrapper { padding: 10px 0; }
         }
     </style>
 </head>
@@ -1293,7 +1314,7 @@ try {
 
     <!-- NAVBAR -->
     <div class="navbar">
-      <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites"></a></div>
+      <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php" class="ativo">Início</a>
             <a href="#containerReceitas">Receitas</a>
@@ -1541,7 +1562,7 @@ try {
                 </div>
 
                 <p class="magia-p-main">
-                    Se existisse um feitiço capaz de reunir todo mundo ao redor da mesa com um sorriso no rosto, com certeza seriam estas receitas. Elas conquistaram o topo do nosso ranking porque entregam muito mais do que um sabor impecável:
+                    Se existisse um feitiço capaz de reunir todo mundo ao redor da mesa com um sorriso no rosto, com certeza seriam estas receitas. Elas conquistarão o topo do nosso ranking porque entregam muito mais do que um sabor impecável:
                 </p>
 
                 <p class="magia-p-sub">
@@ -1774,48 +1795,50 @@ try {
         </div>
     </section>
 
-    <!-- 10. RODAPÉ MÁGICO DO SITE -->
+    <!-- 10. RODAPÉ MÁGICO DO SITE (IMAGEM À DIREITA & TEXTO À ESQUERDA) -->
     <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-col footer-about">
-                <img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites" onerror="this.src='img/logo/logo_menu.png'">
-                <p>Traga a magia dos filmes Disney diretamente para a sua cozinha! No Magical Bites encontra as receitas mais encantadoras do cinema.</p>
-                <div class="footer-social">
-                    <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-                    <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="#" title="Pinterest"><i class="fa-brands fa-pinterest"></i></a>
+        <div class="footer-card-wrapper">
+            <div class="footer-container">
+                <div class="footer-col footer-about">
+                    <img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites" onerror="this.src='img/logo/logo_menu.png'">
+                    <p>Traga a magia dos filmes Disney diretamente para a sua cozinha! No Magical Bites encontra as receitas mais encantadoras do cinema.</p>
+                    <div class="footer-social">
+                        <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="#" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" title="Pinterest"><i class="fa-brands fa-pinterest"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Navegação</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Início</a></li>
+                        <li><a href="#containerReceitas"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Receitas</a></li>
+                        <li><a href="favoritos.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Favoritos</a></li>
+                        <li><a href="filmes.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Filmes</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Categorias</h3>
+                    <ul class="footer-links">
+                        <li><a href="salgados.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Salgados</a></li>
+                        <li><a href="doces.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Doces</a></li>
+                        <li><a href="bebidas.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Bebidas</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Magia & Sabor</h3>
+                    <p style="font-size: 13.5px; color: #ffffff; line-height: 1.6; text-shadow: 0 2px 5px rgba(0,0,0,0.9);">"Qualquer um pode cozinhar, mas apenas os destemidos podem ser grandes."</p>
+                    <p style="font-size: 12px; color: #fff8bd; margin-top: 10px; font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.9);">— Ratatouille</p>
                 </div>
             </div>
 
-            <div class="footer-col">
-                <h3>Navegação</h3>
-                <ul class="footer-links">
-                    <li><a href="index.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Início</a></li>
-                    <li><a href="#containerReceitas"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Receitas</a></li>
-                    <li><a href="favoritos.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Favoritos</a></li>
-                    <li><a href="filmes.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Filmes</a></li>
-                </ul>
+            <div class="footer-bottom">
+                <p>&copy; <?= date('Y') ?> Magical Bites. Todos os direitos reservados. Feito com <i class="fa-solid fa-heart"></i> e magia.</p>
             </div>
-
-            <div class="footer-col">
-                <h3>Categorias</h3>
-                <ul class="footer-links">
-                    <li><a href="salgados.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Salgados</a></li>
-                    <li><a href="doces.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Doces</a></li>
-                    <li><a href="bebidas.php"><i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 6px;"></i> Bebidas</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>Magia & Sabor</h3>
-                <p style="font-size: 13.5px; color: #e2e8f0; line-height: 1.6;">"Qualquer um pode cozinhar, mas apenas os destemidos podem ser grandes."</p>
-                <p style="font-size: 12px; color: #fff8bd; margin-top: 10px; font-weight: 700;">— Ratatouille</p>
-            </div>
-        </div>
-
-        <div class="footer-bottom">
-            <p>&copy; <?= date('Y') ?> Magical Bites. Todos os direitos reservados. Feito com <i class="fa-solid fa-heart"></i> e magia.</p>
         </div>
     </footer>
 

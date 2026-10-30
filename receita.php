@@ -924,7 +924,7 @@ function buscarImagem($nomeImagem) {
     <!-- NAVBAR PADRONIZADA -->
     <div class="navbar">
         <div class="logo">
-            <a href="index.php"><img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites"></a>
+            <a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a>
         </div>
         <div class="menu">
             <a href="index.php">Início</a>
