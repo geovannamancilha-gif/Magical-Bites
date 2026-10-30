@@ -162,7 +162,7 @@ try {
             background-repeat: no-repeat;
         }
 
-        /* --- WRAPPER PRINCIPAL & MARCA D'ÁGUA DE FUNDO --- */
+        /* --- WRAPPER PRINCIPAL & MARCAS D'ÁGUA DE FUNDO --- */
         .main-wrapper {
             position: relative;
             width: 100%;
@@ -170,11 +170,11 @@ try {
             overflow: hidden;
         }
 
-        /* IMAGEM DE ENFEITE BEM GRANDE NO FUNDO ESQUERDO */
-        .enfeite-fundo-esquerdo {
+        /* IMAGENS DE ENFEITE NO FUNDO ESQUERDO E DIREITO */
+        .enfeite-fundo-esquerdo,
+        .enfeite-fundo-direito {
             position: absolute;
             top: -40px;
-            left: -50px;
             width: 1200px;
             max-width: 85vw;
             height: auto;
@@ -182,6 +182,14 @@ try {
             z-index: 0;
             opacity: 0.45;
             mix-blend-mode: multiply;
+        }
+
+        .enfeite-fundo-esquerdo {
+            left: -50px;
+        }
+
+        .enfeite-fundo-direito {
+            right: -50px;
         }
 
         .container { 
@@ -194,10 +202,10 @@ try {
             z-index: 2;
         }
         
-        /* --- CABEÇALHO DA PÁGINA (ALINHADO À ESQUERDA) --- */
+        /* --- CABEÇALHO DA PÁGINA (CENTRALIZADO) --- */
         .header-favoritos {
             margin-bottom: 45px;
-            text-align: left;
+            text-align: center;
             position: relative;
             z-index: 2;
         }
@@ -226,7 +234,7 @@ try {
         .subtitulo-editorial {
             color: #1f4396;
             font-size: 13.5px;
-            margin-top: 10px;
+            margin: 10px auto 0;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -464,7 +472,8 @@ try {
                 height: 480px;
                 min-height: 350px;
             }
-            .enfeite-fundo-esquerdo {
+            .enfeite-fundo-esquerdo,
+            .enfeite-fundo-direito {
                 width: 900px;
                 max-width: 80vw;
             }
@@ -488,7 +497,8 @@ try {
             }
             .titulo-editorial { font-size: 30px; padding-right: 35px; }
             .titulo-editorial .icone-coroa { font-size: 30px; top: -10px; }
-            .enfeite-fundo-esquerdo { opacity: 0.3; width: 650px; }
+            .enfeite-fundo-esquerdo,
+            .enfeite-fundo-direito { opacity: 0.3; width: 650px; }
         }
     </style>
 </head>
@@ -589,9 +599,10 @@ try {
 
     <!-- ÁREA PRINCIPAL DA PÁGINA -->
     <div class="main-wrapper">
-        <!-- MARCA D'ÁGUA FIXA BEM GRANDE NO CANTO ESQUERDO -->
+        <!-- MARCAS D'ÁGUA FIXAS NOS CANTOS ESQUERDO E DIREITO -->
         <img src="<?= buscarImagem('enfeite_favoritos1.webp') ?>" class="enfeite-fundo-esquerdo" alt="" onerror="this.src='img/enfeite_favoritos1.webp';">
-
+        <img src="<?= buscarImagem('enfeite_favoritos.webp') ?>" class="enfeite-fundo-direito" alt="" onerror="this.src='img/enfeite_favoritos.webp';">
+        
         <div class="container" id="containerFavoritos">
             <div class="header-favoritos">
                 <h1 class="titulo-editorial">
