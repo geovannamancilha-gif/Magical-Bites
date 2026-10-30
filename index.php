@@ -6,7 +6,6 @@ $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
 $pass = ""; 
-//$pass = "Home@spSENAI2025!"; 
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -109,6 +108,25 @@ function buscarImagem($nomeImagem) {
     return "img/logo/logo_menu.png";
 }
 
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR SEM RETORNAR A LOGO DO SITE
+function buscarImagemCursor($tipo) {
+    $nomesPossiveis = ($tipo === 'aberto') 
+        ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
+        : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
+
+    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+
+    foreach ($pastas as $pasta) {
+        foreach ($nomesPossiveis as $nome) {
+            $caminho = $pasta . $nome;
+            if (file_exists($caminho)) return $caminho;
+        }
+    }
+
+    // Retorna o caminho presumido caso o PHP não encontre pelo file_exists
+    return "img/" . $nomesPossiveis[0];
+}
+
 // =========================================================================
 // 3. CONSULTAS DINÂMICAS DAS RECEITAS (DO BANCO DE DADOS + FILMES + AVALIAÇÕES)
 // =========================================================================
@@ -163,6 +181,26 @@ try {
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
         }
+
+        /* --- OCULTA O CURSOR PADRÃO DO SISTEMA --- */
+        html, body, *, a, button, input, select, textarea, label {
+            cursor: none !important;
+        }
+
+        /* --- ESTILO DO CURSOR PERSONALIZADO DO MICKEY --- */
+        #mickeyCursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 38px;
+            height: auto;
+            pointer-events: none;
+            z-index: 999999;
+            display: none;
+            transform: translate(-30%, -10%);
+            transition: transform 0.05s ease-out;
+        }
+
         html {
             scroll-behavior: smooth;
         }
@@ -207,7 +245,6 @@ try {
             font-size: 16px;
             font-weight: 700;
             transition: 0.3s;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -269,7 +306,6 @@ try {
             background: rgba(255, 255, 255, 0.9);
             color: #ab232a;
             border: none;
-            cursor: pointer;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
             display: flex;
             align-items: center;
@@ -300,7 +336,6 @@ try {
             height: 11px;
             background: rgba(255, 255, 255, 0.4);
             border-radius: 50%;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
 
@@ -372,7 +407,6 @@ try {
             color: #a62428;
             border: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -762,7 +796,6 @@ try {
             transition: all 0.3s ease;
             box-shadow: 0 6px 20px rgba(166, 36, 40, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            cursor: pointer;
         }
 
         .btn-ver-mais-vermelho:hover {
@@ -784,7 +817,6 @@ try {
             transition: all 0.3s ease;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            cursor: pointer;
         }
 
         .btn-ver-mais-creme:hover {
@@ -1239,13 +1271,13 @@ try {
         .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
 
         .card-vermelho .btn-acao-creme {
-            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
-        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
+        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; }
 
-        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
+        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
         .card-amarelo .btn-fechar-absoluto { color: rgba(166,36,40,0.7); }
         .card-amarelo .btn-fechar-absoluto:hover { color: #a62428; }
@@ -1253,7 +1285,7 @@ try {
         .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
         .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
-        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; overflow: hidden; transition: 0.2s; }
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
 
@@ -1314,6 +1346,9 @@ try {
 </head>
 
 <body>
+
+    <!-- ELEMENTO DO CURSOR DO MICKEY -->
+    <img id="mickeyCursor" src="<?= buscarImagemCursor('aberto') ?>" alt="Cursor Mickey">
 
     <!-- NAVBAR -->
     <div class="navbar">
@@ -1391,7 +1426,7 @@ try {
                     </div>
                 <?php endforeach; ?>
             </div>
-            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center; cursor:pointer;" onclick="document.getElementById('fotoUploadInput').click()">
+            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center;" onclick="document.getElementById('fotoUploadInput').click()">
                 <i class="fa-solid fa-image"></i> Escolher da Galeria
             </label>
             <input type="file" id="fotoUploadInput" name="foto_upload" accept="image/*" style="display:none;" onchange="limparAvatarModal()">
@@ -1845,8 +1880,56 @@ try {
         </div>
     </footer>
 
-    <!-- JAVASCRIPT DOS SLIDERS E MODAIS -->
+    <!-- JAVASCRIPT DO CURSOR DO MICKEY, SLIDERS E MODAIS -->
     <script>
+    // --- LÓGICA DO CURSOR PERSONALIZADO DO MICKEY ---
+    const mickeyCursor = document.getElementById('mickeyCursor');
+    const imgAberto = "<?= buscarImagemCursor('aberto') ?>";
+    const imgFechado = "<?= buscarImagemCursor('fechado') ?>";
+
+    if (mickeyCursor) {
+        // Acompanhar movimento do rato
+        document.addEventListener('mousemove', (e) => {
+            mickeyCursor.style.display = 'block';
+            mickeyCursor.style.left = e.clientX + 'px';
+            mickeyCursor.style.top = e.clientY + 'px';
+        });
+
+        // Ocultar ao sair da janela
+        document.addEventListener('mouseleave', () => {
+            mickeyCursor.style.display = 'none';
+        });
+
+        // Seletor de elementos interativos
+        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .dot, .avatar-item, .hero-slider-btn, .btn-seta-magia-left';
+
+        // Mudar para mão fechada ao passar sobre elementos interativos
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgFechado;
+            }
+        });
+
+        // Voltar para mão aberta ao sair do elemento
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+
+        // Mudar para mão fechada durante o clique
+        document.addEventListener('mousedown', () => {
+            mickeyCursor.src = imgFechado;
+        });
+
+        // Restaurar mão aberta após libertar o clique (se não estiver sobre elemento clicável)
+        document.addEventListener('mouseup', (e) => {
+            if (!e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+    }
+
     // 1. Hero Slider Principal
     let slideAtual = 0;
     const slides = document.querySelectorAll('.hero-slide');
