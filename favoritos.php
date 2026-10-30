@@ -23,22 +23,19 @@ try {
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
+    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
 
-    $pastas = ['fundo', 'slider', 'pratos', 'filme', 'logo', 'perfis', 'avatares', 'img/fundo', 'img/slider', 'img/perfis', 'img/avatares', 'img/logo'];
+    $pastas = ['', 'fundo', 'slider', 'pratos', 'filme', 'logo', 'perfis', 'avatares', 'img/fundo', 'img/slider', 'img/perfis', 'img/avatares', 'img/logo'];
     $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp', '.jfif'];
 
     foreach ($pastas as $pasta) {
         foreach ($extensoes as $ext) {
-            $caminhoCompleto = "img/" . $pasta . "/" . $nomeImagem . $ext;
-            if (file_exists($caminhoCompleto)) return $caminhoCompleto;
+            $caminho = empty($pasta) ? "img/" . $nomeImagem . $ext : "img/" . $pasta . "/" . $nomeImagem . $ext;
+            if (file_exists($caminho)) return $caminho;
 
-            $caminhoRaiz = $pasta . "/" . $nomeImagem . $ext;
+            $caminhoRaiz = empty($pasta) ? $nomeImagem . $ext : $pasta . "/" . $nomeImagem . $ext;
             if (file_exists($caminhoRaiz)) return $caminhoRaiz;
         }
-    }
-
-    foreach ($extensoes as $ext) {
-        if (file_exists("img/" . $nomeImagem . $ext)) return "img/" . $nomeImagem . $ext;
     }
 
     return "img/logo/logo_menu.png";
@@ -337,7 +334,7 @@ try {
             opacity: 0.9;
         }
 
-        /* --- ESTRELA E MÉDIA NUMÉRICA (ESTILO DA IMAGEM) --- */
+        /* --- ESTRELA E MÉDIA NUMÉRICA --- */
         .card-fav-stars {
             display: flex;
             align-items: center;
@@ -593,7 +590,7 @@ try {
     <!-- ÁREA PRINCIPAL DA PÁGINA -->
     <div class="main-wrapper">
         <!-- MARCA D'ÁGUA FIXA BEM GRANDE NO CANTO ESQUERDO -->
-        <img src="<?= buscarImagem('enfeite_favoritos') ?>" class="enfeite-fundo-esquerdo" alt="" onerror="this.style.display='none'">
+        <img src="<?= buscarImagem('enfeite_favoritos1.webp') ?>" class="enfeite-fundo-esquerdo" alt="" onerror="this.src='img/enfeite_favoritos1.webp';">
 
         <div class="container" id="containerFavoritos">
             <div class="header-favoritos">
