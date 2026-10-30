@@ -177,7 +177,7 @@ try {
         .navbar {
             width: 100%;
             background: #294f88;
-            padding: 10px 30px;
+            padding: 4px 30px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -188,9 +188,11 @@ try {
         }
 
         .logo img {
-            height: 50px; 
+            height: 620px;
+            max-height: 62px;
             width: auto;
             display: block;
+            margin: -4px 0;
         }
 
         .menu {
@@ -978,7 +980,7 @@ try {
         }
 
         .footer-about img {
-            height: 55px;
+            height: 85px;
             width: auto;
             margin-bottom: 15px;
             filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
@@ -1585,7 +1587,7 @@ try {
 
             <div class="grid-3-categorias">
                 <a href="salgados.php" class="card-categoria-item">
-                    <img src="<?= buscarImagem('arepas_salgadas.webp') ?>" class="card-categoria-bg" alt="Receitas Salgadas" onerror="this.src='img/pratos/ratatouille_prato.webp'">
+                    <img src="<?= buscarImagem('ratatouille_prato.webp') ?>" class="card-categoria-bg" alt="Receitas Salgadas" onerror="this.src='img/pratos/ratatouille_prato.webp'">
                     <div class="card-categoria-overlay"></div>
                     <span class="card-cat-tag">RECEITAS SALGADAS</span>
                     <h3 class="card-cat-titulo">"QUALQUER UM PODE COZINHAR"</h3>
