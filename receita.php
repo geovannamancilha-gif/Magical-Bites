@@ -858,6 +858,44 @@ function buscarImagemCursor($tipo) {
             border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
+        /* --- BOTÃO FLUTUANTE DE VOLTAR AO TOPO --- */
+        .btn-flutuante-voltar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 52px;
+            height: 52px;
+            background-color: #ab232a;
+            color: #fff8bd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 22px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+            transition: opacity 0.35s ease, visibility 0.35s ease, transform 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+            border: 2.5px solid #fff8bd;
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .btn-flutuante-voltar.visivel {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .btn-flutuante-voltar:hover {
+            transform: scale(1.12);
+            background-color: #881c20;
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+        }
+
         /* MODAIS DISNEY */
         .modal-overlay {
             display: none;
@@ -949,6 +987,16 @@ function buscarImagemCursor($tipo) {
             .hero-imagem { height: 280px; }
             .conteudo-grid { grid-template-columns: 1fr; gap: 30px; }
             .grid-avaliacoes { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .btn-flutuante-voltar {
+                width: 46px;
+                height: 46px;
+                font-size: 18px;
+                bottom: 20px;
+                right: 20px;
+            }
         }
     </style>
 </head>
@@ -1267,8 +1315,34 @@ function buscarImagemCursor($tipo) {
         </div>
     </div>
 
-    <!-- JAVASCRIPT DOS MODAIS, AVALIAÇÃO E CURSOR DO MICKEY -->
+    <!-- BOTÃO FLUTUANTE DE VOLTAR AO TOPO -->
+    <a href="javascript:void(0)" onclick="voltarAoTopo(event)" class="btn-flutuante-voltar" id="btnVoltarTopo" title="Voltar ao topo">
+        <i class="fa-solid fa-arrow-up"></i>
+    </a>
+
+    <!-- JAVASCRIPT DOS MODAIS, AVALIAÇÃO, CURSOR DO MICKEY E BOTÃO VOLTAR AO TOPO -->
     <script>
+    // --- EXIBIR A SETA FLUTUANTE AO ROLAR A PÁGINA ---
+    window.addEventListener('scroll', function() {
+        let btn = document.getElementById('btnVoltarTopo');
+        if (btn) {
+            if (window.scrollY >= 250) {
+                btn.classList.add('visivel');
+            } else {
+                btn.classList.remove('visivel');
+            }
+        }
+    });
+
+    // FUNÇÃO PARA ROLAR ATÉ O TOPO DE FORMA SUAVE
+    function voltarAoTopo(event) {
+        if (event) event.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+
     // --- LÓGICA DO CURSOR PERSONALIZADO DO MICKEY ---
     const mickeyCursor = document.getElementById('mickeyCursor');
     const imgAberto = "<?= buscarImagemCursor('aberto') ?>";
@@ -1285,7 +1359,7 @@ function buscarImagemCursor($tipo) {
             mickeyCursor.style.display = 'none';
         });
 
-        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .card-recomendada, .estrelas-avaliacao i, .btn-acao-pill';
+        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .card-recomendada, .estrelas-avaliacao i, .btn-acao-pill, .btn-flutuante-voltar';
 
         document.addEventListener('mouseover', (e) => {
             if (e.target.closest(seletorInterativo)) {
