@@ -93,8 +93,8 @@ function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['cardsfilme', 'pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'fundo', 'img/cardsfilme', 'img/perfis', 'img/avatares', 'img/fundo', 'img/logo', 'img/slider'];
-    $extensoes = ['', '.jpg', '.png', '.webp', '.jpeg', '.jfif'];
+    $pastas = ['slider', 'filme', 'cardsfilme', 'pratos', 'logo', 'perfis', 'avatares', 'fundo', 'img/slider', 'img/filme', 'img/cardsfilme', 'img/perfis', 'img/avatares', 'img/fundo', 'img/logo'];
+    $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg', '.jfif'];
 
     foreach ($pastas as $pasta) {
         foreach ($extensoes as $ext) {
@@ -289,7 +289,7 @@ try {
         /* --- 1. BANNER PRINCIPAL DO TOPO --- */
         .banner-inicio {
             width: 100%;
-            height: 680px;
+            height: 610px;
             position: relative;
             overflow: hidden;
             background: #0b1329;
@@ -308,14 +308,10 @@ try {
 
         /* --- 2. SEÇÃO DE BUSCA E CATEGORIAS --- */
         .secao-busca-categorias {
-            background-color: #f7f6f2;
-            background-image: url('<?= buscarImagem("mickey1.png") ?>');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
+            background-color: #fffdf5ff;
             padding: 50px 0 70px;
             position: relative;
-            box-shadow: inset 0 15px 20px -10px rgba(0,0,0,0.25), inset 0 -15px 20px -10px rgba(0,0,0,0.25);
+            box-shadow: inset 0 15px 20px -10px rgba(0,0,0,0.15), inset 0 -15px 20px -10px rgba(0,0,0,0.15);
         }
 
         .container-secao {
@@ -338,25 +334,25 @@ try {
             width: 100%;
             padding: 13px 25px 13px 52px;
             border-radius: 50px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: #ffffff;
+            border: 1px solid rgba(168, 26, 26, 0.08);
+            background: #a62428;
             font-size: 15px;
             font-weight: 500;
-            color: #294f88;
+            color: #ffffffff;
             outline: none;
             box-shadow: 0 8px 20px rgba(0,0,0,0.12);
             transition: all 0.3s ease;
         }
 
-        .search-home-box input::placeholder { color: #597398; }
-        .search-home-box i { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #294f88; font-size: 17px; }
+        .search-home-box input::placeholder { color: #fffde6ff; }
+        .search-home-box i { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #fffde6ff; font-size: 17px; }
 
         /* GRID DOS 3 CARDS DE CATEGORIA */
         .grid-3-categorias {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 32px;
-            max-width: 980px;
+            max-width: 12000px;
             margin: 0 auto;
         }
 
@@ -372,7 +368,7 @@ try {
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            padding-top: 25px;
+            padding-top: 145px;
             cursor: pointer;
             isolation: isolate;
             transform: translateZ(0);
@@ -526,7 +522,6 @@ try {
             transform: scale(1.06);
         }
 
-        /* DEGRADÊ LEVE PARA MANTER A CAPA VISÍVEL */
         .box-overlay {
             position: absolute;
             bottom: 0;
@@ -556,7 +551,6 @@ try {
             color: #ffffff;
         }
 
-        /* BLUR LEVE NA PÍLULA */
         .box-overlay span {
             font-size: 11px;
             font-weight: 700;
@@ -572,7 +566,7 @@ try {
             gap: 5px;
         }
 
-        /* --- MODAIS FLUTUANTES DA CONTA (EXATOS DO INDEX.PHP) --- */
+        /* --- MODAIS FLUTUANTES DA CONTA --- */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -643,7 +637,7 @@ try {
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
 
-        /* --- MODAL DE RECEITAS DO FILME COM A COR DO TEMA NO INTERIOR --- */
+        /* --- MODAL DE RECEITAS DO FILME --- */
         .modal-filme-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(5px); z-index: 999; justify-content: center; align-items: center; padding: 20px; opacity: 0; transition: opacity 0.3s; }
         .modal-filme-overlay.ativo { display: flex; opacity: 1; }
         
@@ -736,7 +730,7 @@ try {
 
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
+        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="index.php#containerReceitas">Receitas</a>
@@ -756,10 +750,10 @@ try {
 
     <!-- 1. BANNER PRINCIPAL DO TOPO -->
     <div class="banner-inicio">
-        <img src="<?= buscarImagem('filme.webp') ?>" alt="Banner Filmes" onerror="this.src='img/slider/bg-destaque.webp'">
+        <img src="<?= buscarImagem('filme.png') ?>" alt="Banner Filmes" onerror="this.src='img/slider/bg-destaque.webp'">
     </div>
 
-    <!-- 2. SEÇÃO DE BUSCA E CATEGORIAS DA DISNEY (PARTE 2) -->
+    <!-- 2. SEÇÃO DE BUSCA E CATEGORIAS DA DISNEY (FUNDO AMARELO SÓLIDO #fff8bd) -->
     <section class="secao-busca-categorias" id="secaoCategorias">
         <div class="container-secao">
             
@@ -793,7 +787,7 @@ try {
     <!-- OVERLAY DOS MODAIS -->
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
 
-    <!-- 1. MODAL CADASTRO (IGUAL AO INDEX.PHP) -->
+    <!-- 1. MODAL CADASTRO -->
     <div id="modalCadastro" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
         <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
@@ -808,7 +802,7 @@ try {
         <div class="footer-modal">Já tem uma conta? <a onclick="alternarModais('login')">Faça login</a></div>
     </div>
 
-    <!-- 2. MODAL LOGIN (IGUAL AO INDEX.PHP) -->
+    <!-- 2. MODAL LOGIN -->
     <div id="modalLogin" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
         <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
@@ -822,7 +816,7 @@ try {
         <div class="footer-modal">Está chegando agora? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
-    <!-- 3. MODAL PERFIL (IGUAL AO INDEX.PHP) -->
+    <!-- 3. MODAL PERFIL -->
     <?php if (isset($_SESSION['usuario'])): ?>
     <div id="modalPerfil" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
@@ -941,7 +935,7 @@ try {
         }
     });
 
-    // ROLAGEM EXATA PARA ENQUADRAR COMO NA IMAGEM ENVIADA
+    // ROLAGEM EXATA PARA ENQUADRAR A SEÇÃO DE BUSCA
     function voltarParaParte2(event) {
         if (event) event.preventDefault();
         let secaoCategorias = document.getElementById('secaoCategorias');
