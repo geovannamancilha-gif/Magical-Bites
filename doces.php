@@ -5,7 +5,8 @@ session_start();
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
-$pass = ""; 
+$pass = "";
+//$pass = "Home@spSENAI2025!";  
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);

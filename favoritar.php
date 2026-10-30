@@ -5,7 +5,8 @@ session_start();
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
-$pass = ""; 
+$pass = "";
+//$pass = "Home@spSENAI2025!";  
 
 // Exige utilizador autenticado
 if (!isset($_SESSION['usuario'])) {
