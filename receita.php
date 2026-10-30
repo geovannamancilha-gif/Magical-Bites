@@ -5,7 +5,8 @@ session_start();
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
-$pass = "";     
+$pass = ""; 
+//$pass = "Home@spSENAI2025!";     
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -259,6 +260,24 @@ function buscarImagem($nomeImagem) {
     if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
     return "img/logo/logo_menu.png";
 }
+
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR SEM RETORNAR A LOGO DO SITE
+function buscarImagemCursor($tipo) {
+    $nomesPossiveis = ($tipo === 'aberto') 
+        ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
+        : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
+
+    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+
+    foreach ($pastas as $pasta) {
+        foreach ($nomesPossiveis as $nome) {
+            $caminho = $pasta . $nome;
+            if (file_exists($caminho)) return $caminho;
+        }
+    }
+
+    return "img/" . $nomesPossiveis[0];
+}
 ?>
 <!DOCTYPE html>
 <html lang="pt-pt">
@@ -276,6 +295,25 @@ function buscarImagem($nomeImagem) {
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
+        }
+
+        /* --- OCULTA O CURSOR PADRÃO DO SISTEMA --- */
+        html, body, *, a, button, input, select, textarea, label {
+            cursor: none !important;
+        }
+
+        /* --- ESTILO DO CURSOR PERSONALIZADO DO MICKEY --- */
+        #mickeyCursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 38px;
+            height: auto;
+            pointer-events: none;
+            z-index: 999999;
+            display: none;
+            transform: translate(-30%, -10%);
+            transition: transform 0.05s ease-out;
         }
 
         html { scroll-behavior: smooth; }
@@ -332,7 +370,6 @@ function buscarImagem($nomeImagem) {
             font-size: 16px;
             font-weight: 700;
             transition: 0.3s;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -665,7 +702,6 @@ function buscarImagem($nomeImagem) {
             font-size: 32px;
             color: rgba(255, 255, 255, 0.3);
             margin: 12px 0 8px;
-            cursor: pointer;
         }
 
         .estrelas-avaliacao i {
@@ -716,7 +752,6 @@ function buscarImagem($nomeImagem) {
         .campo-foto-avaliacao label {
             font-size: 13px;
             color: #cbd5e1;
-            cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 8px;
@@ -741,7 +776,6 @@ function buscarImagem($nomeImagem) {
             font-weight: 800;
             font-size: 14.5px;
             border-radius: 50px;
-            cursor: pointer;
             transition: 0.3s;
             margin-top: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
@@ -879,11 +913,11 @@ function buscarImagem($nomeImagem) {
         .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
 
         .card-vermelho .btn-acao-creme {
-            width: 100%; padding: 13px; background: #fff8bd; color: #ab232a; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%; padding: 13px; background: #fff8bd; color: #ab232a; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
-        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
+        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; }
 
         .card-amarelo {
             background: #fff8bd; color: #ab232a; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); text-align: center;
@@ -893,10 +927,10 @@ function buscarImagem($nomeImagem) {
         .card-amarelo h2.titulo-cursivo { font-family: 'Caveat', cursive; font-size: 42px; color: #1f4396; line-height: 1; margin-bottom: 6px; }
         .card-amarelo p.subtitulo-aviso { font-size: 14px; color: #701a1d; font-weight: 600; line-height: 1.4; margin-bottom: 22px; }
         .card-amarelo .btn-acao-vermelho {
-            width: 100%; padding: 13px; background: #ab232a; color: #ffffff; border: none; border-radius: 50px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.3s; margin-top: 8px; box-shadow: 0 4px 12px rgba(171, 35, 42, 0.3);
+            width: 100%; padding: 13px; background: #ab232a; color: #ffffff; border: none; border-radius: 50px; font-weight: 800; font-size: 15px; transition: 0.3s; margin-top: 8px; box-shadow: 0 4px 12px rgba(171, 35, 42, 0.3);
         }
 
-        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
+        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
         .card-amarelo .btn-fechar-absoluto { color: rgba(171,35,42,0.7); }
 
@@ -904,7 +938,7 @@ function buscarImagem($nomeImagem) {
         .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
-        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; overflow: hidden; transition: 0.2s; }
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
 
@@ -920,6 +954,9 @@ function buscarImagem($nomeImagem) {
 </head>
 
 <body>
+
+    <!-- ELEMENTO DO CURSOR DO MICKEY -->
+    <img id="mickeyCursor" src="<?= buscarImagemCursor('aberto') ?>" alt="Cursor Mickey">
 
     <!-- NAVBAR PADRONIZADA -->
     <div class="navbar">
@@ -999,7 +1036,7 @@ function buscarImagem($nomeImagem) {
                     </div>
                 <?php endforeach; ?>
             </div>
-            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center; cursor:pointer;" onclick="document.getElementById('fotoUploadInput').click()">
+            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center;" onclick="document.getElementById('fotoUploadInput').click()">
                 <i class="fa-solid fa-image"></i> Escolher da Galeria
             </label>
             <input type="file" id="fotoUploadInput" name="foto_upload" accept="image/*" style="display:none;" onchange="limparAvatarModal()">
@@ -1230,8 +1267,49 @@ function buscarImagem($nomeImagem) {
         </div>
     </div>
 
-    <!-- JAVASCRIPT DOS MODAIS E AVALIAÇÃO -->
+    <!-- JAVASCRIPT DOS MODAIS, AVALIAÇÃO E CURSOR DO MICKEY -->
     <script>
+    // --- LÓGICA DO CURSOR PERSONALIZADO DO MICKEY ---
+    const mickeyCursor = document.getElementById('mickeyCursor');
+    const imgAberto = "<?= buscarImagemCursor('aberto') ?>";
+    const imgFechado = "<?= buscarImagemCursor('fechado') ?>";
+
+    if (mickeyCursor) {
+        document.addEventListener('mousemove', (e) => {
+            mickeyCursor.style.display = 'block';
+            mickeyCursor.style.left = e.clientX + 'px';
+            mickeyCursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            mickeyCursor.style.display = 'none';
+        });
+
+        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .card-recomendada, .estrelas-avaliacao i, .btn-acao-pill';
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgFechado;
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+
+        document.addEventListener('mousedown', () => {
+            mickeyCursor.src = imgFechado;
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         const estrelas = document.querySelectorAll('#estrelasBox i');
         const inputEstrelas = document.getElementById('inputEstrelas');
