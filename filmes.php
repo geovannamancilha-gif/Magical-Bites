@@ -315,7 +315,7 @@ try {
         }
 
         .container-secao {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 25px;
             position: relative;
@@ -347,12 +347,12 @@ try {
         .search-home-box input::placeholder { color: #fffde6ff; }
         .search-home-box i { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #fffde6ff; font-size: 17px; }
 
-        /* GRID DOS 3 CARDS DE CATEGORIA COM ESFUMADO PRETO (OVERLAY) */
+        /* GRID DOS 3 CARDS DE CATEGORIA */
         .grid-3-categorias {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 32px;
-            max-width: 12000px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -373,7 +373,7 @@ try {
             transform: translateZ(0);
         }
 
-        /* ESFUMADO PRETO (GRADIENTE ESCURO) NOS CARDS DE CATEGORIA */
+        /* ESFUMADO PRETO NOS CARDS DE CATEGORIA */
         .card-categoria-item::after {
             content: '';
             position: absolute;
@@ -421,9 +421,9 @@ try {
             letter-spacing: 0.5px;
         }
 
-        /* --- 3. BLOCOS DE CATEGORIAS INDIVIDUALIZADOS --- */
+        /* --- 3. BLOCOS DE CATEGORIAS INDIVIDUALIZADOS (AMPLIADO LATERALMENTE) --- */
         .secao-bloco-categoria {
-            padding: 60px 0 75px;
+            padding: 65px 0 80px;
             position: relative;
             width: 100%;
             box-shadow: inset 0 10px 18px -8px rgba(0,0,0,0.3), inset 0 -10px 18px -8px rgba(0,0,0,0.3);
@@ -431,21 +431,21 @@ try {
 
         .container-filmes-grid {
             width: 100%;
-            max-width: 1350px;
+            max-width: 1550px; /* Alargado para ocupar mais o ecrã */
             margin: 0 auto;
-            padding: 0 35px;
+            padding: 0 25px; /* Margens laterais mais curtas */
             position: relative;
             z-index: 2;
         }
 
-        /* TÍTULO DA CATEGORIA (TEXTO + LINHA BRANCA CONTÍNUA) */
+        /* TÍTULO DA CATEGORIA */
         .categoria-titulo {
             width: 100%;
-            margin: 0 0 28px;
-            padding-bottom: 6px;
+            margin: 0 0 32px;
+            padding-bottom: 8px;
             border-bottom: 2px solid #ffffff;
             color: #ffffff;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
             display: flex;
             align-items: center;
@@ -456,23 +456,23 @@ try {
         /* GRELHA DE 3 EM 3 AMPLA */
         .grid-filmes {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 28px 32px;
+            grid-template-columns: repeat(3, 1fr); /* Mantém 3 por linha */
+            gap: 32px 36px;
         }
 
         .box-filme {
             position: relative;
-            height: 240px;
-            border-radius: 28px;
+            height: 295px; /* Cards maiores em altura (estava 240px) */
+            border-radius: 30px;
             overflow: hidden;
-            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.38);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.38);
             transition: transform 0.35s ease, box-shadow 0.35s ease;
             background-color: var(--cor-tema);
         }
 
         .box-filme:hover {
-            transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 18px 38px rgba(0, 0, 0, 0.55);
         }
 
         .img-capa-filme {
@@ -496,11 +496,11 @@ try {
             left: 0;
             right: 0;
             height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0, 0, 0, 0.05) 60%);
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0, 0, 0, 0.05) 60%);
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 18px 22px;
+            padding: 22px 26px;
             color: #ffffff;
             transition: 0.3s;
             z-index: 2;
@@ -509,34 +509,34 @@ try {
 
         .box-filme:hover .box-overlay {
             opacity: 1;
-            background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0, 0, 0, 0.15) 70%);
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0, 0, 0, 0.15) 70%);
         }
 
         .box-overlay h3 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.9);
-            margin-bottom: 6px;
-            line-height: 1.2;
+            margin-bottom: 8px;
+            line-height: 1.25;
             color: #ffffff;
         }
 
         .box-overlay span {
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 700;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.45);
             color: #ffffff;
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 20px;
             width: fit-content;
             backdrop-filter: blur(4px);
             border: 1px solid rgba(255, 255, 255, 0.25);
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
 
-        /* BOTÃO FLUTUANTE ESTÁVEL - OCULTO INICIALMENTE */
+        /* BOTÃO FLUTUANTE ESTÁVEL */
         .btn-flutuante-voltar {
             position: fixed;
             bottom: 30px;
@@ -704,14 +704,14 @@ try {
         .doce { background: #ff69b4; } .salgado { background: #2e7d32; } .bebida { background: #00bcd4; }
         .card p { padding: 0 15px 20px; text-align: center; font-weight: 700; font-size: 14px; color: #ffffff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); }
 
-        @media (max-width: 1024px) {
-            .grid-3-categorias { grid-template-columns: repeat(3, 1fr); }
-            .grid-filmes { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        @media (max-width: 1200px) {
             .container-filmes-grid { padding: 0 20px; }
+            .grid-filmes { gap: 24px; }
+            .box-filme { height: 260px; }
         }
-        @media (max-width: 850px) {
+        @media (max-width: 900px) {
             .grid-filmes { grid-template-columns: repeat(2, 1fr); }
-            .box-filme { height: 200px; }
+            .box-filme { height: 230px; }
         }
         @media (max-width: 768px) {
             .grid-3-categorias { grid-template-columns: repeat(2, 1fr); }
@@ -726,7 +726,7 @@ try {
         }
         @media (max-width: 580px) {
             .grid-filmes, .grid-3-categorias { grid-template-columns: repeat(1, 1fr); }
-            .box-filme { height: 180px; }
+            .box-filme { height: 200px; }
             .menu { gap: 12px; }
             .menu a { font-size: 13px; }
             .banner-inicio { height: 320px; }
