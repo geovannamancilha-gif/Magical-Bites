@@ -239,13 +239,20 @@ if (isset($_SESSION['usuario'])) {
     }
 }
 
-// FUNÇÃO DE CARREGAMENTO DE IMAGENS
+// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
+    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'avaliacoes', 'img/perfis', 'img/avatares', 'img/avaliacoes', 'fundo'];
-    $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp'];
+    $pastas = [
+        'fundos', 'fundo', 'titulos', 'titulo', 'banners', 'banner', 'index', 'mouse', 
+        'pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'avaliacoes', 'elementos',
+        'img/fundos', 'img/fundo', 'img/titulos', 'img/titulo', 'img/banners', 'img/banner', 
+        'img/index', 'img/mouse', 'img/pratos', 'img/filme', 'img/logo', 'img/slider', 
+        'img/perfis', 'img/avatares', 'img/avaliacoes', 'img/elementos'
+    ];
+    $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg', '.jfif'];
 
     foreach ($pastas as $pasta) {
         foreach ($extensoes as $ext) {
@@ -257,17 +264,16 @@ function buscarImagem($nomeImagem) {
         }
     }
 
-    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
     return "img/logo/logo_menu.png";
 }
 
-// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR SEM RETORNAR A LOGO DO SITE
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR
 function buscarImagemCursor($tipo) {
     $nomesPossiveis = ($tipo === 'aberto') 
         ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
         : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
 
-    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+    $pastas = ['', 'img/', 'mouse/', 'img/mouse/', 'fundos/', 'img/fundos/', 'img/logo/', 'img/fundo/'];
 
     foreach ($pastas as $pasta) {
         foreach ($nomesPossiveis as $nome) {
@@ -276,7 +282,7 @@ function buscarImagemCursor($tipo) {
         }
     }
 
-    return "img/" . $nomesPossiveis[0];
+    return "img/mouse/" . $nomesPossiveis[0];
 }
 ?>
 <!DOCTYPE html>
