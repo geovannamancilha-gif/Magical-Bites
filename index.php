@@ -1907,7 +1907,7 @@ try {
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <?= date('Y') ?> Magical Bites. Todos os direitos reservados. Feito com <i class="fa-solid fa-heart"></i> e magia.</p>
+                <p>&copy; <?= date('Y') ?> Magical Bites. Feito com <i class="fa-solid fa-heart"></i> e magia.</p>
             </div>
         </div>
     </footer>
