@@ -11,7 +11,6 @@ $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
 $pass = ""; 
-//$pass = "Home@spSENAI2025!"; 
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -20,13 +19,18 @@ try {
     die("Erro na conexão com a base de dados: " . $e->getMessage());
 }
 
-// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
+// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS (COM SUPORTE ÀS PASTAS FUNDOS, TITULOS E BANNERS)
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
     if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
 
-    $pastas = ['', 'fundo', 'slider', 'pratos', 'filme', 'logo', 'perfis', 'avatares', 'img/fundo', 'img/slider', 'img/perfis', 'img/avatares', 'img/logo'];
+    $pastas = [
+        'fundos', 'fundo', 'titulos', 'titulo', 'banners', 'banner', 'index', 'mouse', 
+        'pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'elementos',
+        'img/fundos', 'img/fundo', 'img/titulos', 'img/titulo', 'img/banners', 'img/banner', 
+        'img/index', 'img/mouse', 'img/perfis', 'img/avatares', 'img/logo', 'img/slider'
+    ];
     $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp', '.jfif'];
 
     foreach ($pastas as $pasta) {
@@ -42,13 +46,13 @@ function buscarImagem($nomeImagem) {
     return "img/logo/logo_menu.png";
 }
 
-// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR SEM RETORNAR A LOGO DO SITE
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR
 function buscarImagemCursor($tipo) {
     $nomesPossiveis = ($tipo === 'aberto') 
         ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
         : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
 
-    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+    $pastas = ['', 'img/', 'mouse/', 'img/mouse/', 'fundos/', 'img/fundos/', 'img/logo/', 'img/fundo/'];
 
     foreach ($pastas as $pasta) {
         foreach ($nomesPossiveis as $nome) {
@@ -57,7 +61,7 @@ function buscarImagemCursor($tipo) {
         }
     }
 
-    return "img/" . $nomesPossiveis[0];
+    return "img/mouse/" . $nomesPossiveis[0];
 }
 
 // Suporte flexível para a chave de ID na sessão
@@ -580,7 +584,7 @@ try {
 
     <!-- NAVBAR PADRONIZADA -->
     <div class="navbar">
-        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
+        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="index.php#containerReceitas">Receitas</a>
@@ -674,8 +678,8 @@ try {
     <!-- ÁREA PRINCIPAL DA PÁGINA -->
     <div class="main-wrapper">
         <!-- MARCAS D'ÁGUA FIXAS NOS CANTOS ESQUERDO E DIREITO -->
-        <img src="<?= buscarImagem('enfeite_favoritos1.webp') ?>" class="enfeite-fundo-esquerdo" alt="" onerror="this.src='img/enfeite_favoritos1.webp';">
-        <img src="<?= buscarImagem('enfeite_favoritos.webp') ?>" class="enfeite-fundo-direito" alt="" onerror="this.src='img/enfeite_favoritos.webp';">
+        <img src="<?= buscarImagem('enfeite_favoritos1') ?>" class="enfeite-fundo-esquerdo" alt="" onerror="this.src='img/enfeite_favoritos1.webp';">
+        <img src="<?= buscarImagem('enfeite_favoritos') ?>" class="enfeite-fundo-direito" alt="" onerror="this.src='img/enfeite_favoritos.webp';">
         
         <div class="container" id="containerFavoritos">
             <div class="header-favoritos">

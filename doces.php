@@ -6,7 +6,6 @@ $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
 $pass = "";
-//$pass = "Home@spSENAI2025!";  
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -87,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
     exit;
 }
 
-// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
+// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS (COM SUPORTE À PASTA TITULOS)
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
 
@@ -99,8 +98,13 @@ function buscarImagem($nomeImagem) {
         $variacoes[] = 'doces_receitas.png';
     }
 
-    $pastas = ['', 'logo', 'elementos', 'fundo', 'pratos', 'filme', 'slider', 'perfis', 'avatares'];
-    $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg'];
+    $pastas = [
+        'titulos', 'titulo', 'banners', 'banner', 'fundos', 'fundo', 'index', 'mouse', 
+        'pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'elementos',
+        'img/titulos', 'img/titulo', 'img/banners', 'img/banner', 'img/fundos', 'img/fundo', 
+        'img/index', 'img/mouse', 'img/perfis', 'img/avatares', 'img/logo', 'img/slider'
+    ];
+    $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg', '.jfif'];
 
     foreach ($variacoes as $var) {
         if (file_exists($var)) return $var;
@@ -123,13 +127,13 @@ function buscarImagem($nomeImagem) {
     return "img/" . (strpos($nomeImagem, '.') !== false ? $nomeImagem : $nomeImagem . ".png");
 }
 
-// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR SEM RETORNAR A LOGO DO SITE
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR
 function buscarImagemCursor($tipo) {
     $nomesPossiveis = ($tipo === 'aberto') 
         ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
         : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
 
-    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+    $pastas = ['', 'img/', 'mouse/', 'img/mouse/', 'fundos/', 'img/fundos/', 'img/logo/', 'img/fundo/'];
 
     foreach ($pastas as $pasta) {
         foreach ($nomesPossiveis as $nome) {
@@ -138,10 +142,10 @@ function buscarImagemCursor($tipo) {
         }
     }
 
-    return "img/" . $nomesPossiveis[0];
+    return "img/mouse/" . $nomesPossiveis[0];
 }
 
-// CONSULTA DINÂMICA DAS RECEITAS DOCES COM NOME DO FILME E MÉDIA DE AVALIAÇÕES
+// CONSULTA DINÂMICA DAS RECEITAS DOCES
 $stmtDoces = $pdo->query("
     SELECT r.*, f.nome_filme, 
            COUNT(a.id_avaliacao) AS total_avaliacoes, 
@@ -176,19 +180,12 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-        /* --- OCULTA O CURSOR PADRÃO DO SISTEMA --- */
         html, body, *, a, button, input, select, textarea, label {
             cursor: none !important;
         }
 
-        /* --- ESTILO DO CURSOR PERSONALIZADO DO MICKEY --- */
         #mickeyCursor {
             position: fixed;
             top: 0;
@@ -203,14 +200,8 @@ try {
         }
 
         html { scroll-behavior: smooth; }
+        body { background-color: #0a1733; color: #ffffff; overflow-x: hidden; }
 
-        body {
-            background-color: #0a1733;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
-
-        /* --- NAVBAR --- */
         .navbar {
             width: 100%;
             background: #294f88;
@@ -224,18 +215,8 @@ try {
             z-index: 100;
         }
 
-        .logo img {
-            height: 50px; 
-            width: auto;
-            display: block;
-        }
-
-        .menu {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-
+        .logo img { height: 50px; width: auto; display: block; }
+        .menu { display: flex; align-items: center; gap: 30px; }
         .menu a {
             color: #ffffff;
             text-decoration: none;
@@ -246,11 +227,7 @@ try {
             align-items: center;
             gap: 8px;
         }
-
-        .menu a:hover, .menu a.ativo {
-            color: #fff6a9ff;
-        }
-
+        .menu a:hover, .menu a.ativo { color: #fff6a9ff; }
         .nav-user-avatar {
             width: 32px;
             height: 32px;
@@ -259,7 +236,6 @@ try {
             border: 2px solid #fff6a9ff;
         }
 
-        /* --- PAGE HEADER BANNER --- */
         .page-header-banner {
             background-color: #fff4b8;
             padding: 25px 20px 30px;
@@ -302,21 +278,9 @@ try {
             box-shadow: none;
         }
 
-        .search-page-box input::placeholder {
-            color: #a62428;
-            opacity: 0.8;
-        }
+        .search-page-box input::placeholder { color: #a62428; opacity: 0.8; }
+        .search-page-box i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #a62428; font-size: 17px; }
 
-        .search-page-box i {
-            position: absolute;
-            left: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #a62428;
-            font-size: 17px;
-        }
-
-        /* --- SEÇÃO DOCES --- */
         .secao-doces-page {
             position: relative;
             background-image: linear-gradient(rgba(10, 25, 55, 0.45), rgba(6, 16, 38, 0.55)), url('<?= buscarImagem("fundo2_index") ?>');
@@ -328,17 +292,8 @@ try {
             min-height: 70vh;
         }
 
-        .container-secao {
-            max-width: 1150px;
-            margin: 0 auto;
-            padding: 0 25px;
-        }
-
-        .grid-receitas {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-        }
+        .container-secao { max-width: 1150px; margin: 0 auto; padding: 0 25px; }
+        .grid-receitas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
 
         .card-receita-item {
             background: rgba(10, 20, 42, 0.65);
@@ -360,23 +315,9 @@ try {
             background: rgba(14, 28, 58, 0.75);
         }
 
-        .card-receita-img {
-            width: 100%;
-            height: 210px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .card-receita-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-
-        .card-receita-item:hover .card-receita-img img {
-            transform: scale(1.06);
-        }
+        .card-receita-img { width: 100%; height: 210px; overflow: hidden; position: relative; }
+        .card-receita-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .card-receita-item:hover .card-receita-img img { transform: scale(1.06); }
 
         .badge-filme {
             position: absolute;
@@ -392,21 +333,8 @@ try {
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        .card-receita-body {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-        }
-
-        .card-receita-titulo {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #ffffff;
-            line-height: 1.3;
-        }
-
+        .card-receita-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-receita-titulo { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #ffffff; line-height: 1.3; }
         .card-receita-desc {
             font-size: 12.5px;
             color: #e2e8f0;
@@ -418,7 +346,6 @@ try {
             overflow: hidden;
             flex-grow: 1;
         }
-
         .card-receita-meta {
             display: flex;
             align-items: center;
@@ -429,14 +356,8 @@ try {
             padding-top: 12px;
             border-top: 1px solid rgba(255, 255, 255, 0.12);
         }
+        .card-receita-rating { color: #ffca28; letter-spacing: 1px; font-size: 13px; }
 
-        .card-receita-rating {
-            color: #ffca28;
-            letter-spacing: 1px;
-            font-size: 13px;
-        }
-
-        /* --- BOTÃO FLUTUANTE DE VOLTAR AO TOPO --- */
         .btn-flutuante-voltar {
             position: fixed;
             bottom: 30px;
@@ -461,20 +382,9 @@ try {
             pointer-events: none;
         }
 
-        .btn-flutuante-voltar.visivel {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
+        .btn-flutuante-voltar.visivel { opacity: 1; visibility: visible; pointer-events: auto; }
+        .btn-flutuante-voltar:hover { transform: scale(1.12); background-color: #831a1e; color: #ffffff; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65); }
 
-        .btn-flutuante-voltar:hover {
-            transform: scale(1.12);
-            background-color: #831a1e;
-            color: #ffffff;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
-        }
-
-        /* MODAIS */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -502,42 +412,20 @@ try {
             to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
-        .card-vermelho {
-            background: #a62428;
-            color: #ffffff;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-        }
-
+        .card-vermelho { background: #a62428; color: #ffffff; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45); border: 2px solid rgba(255, 255, 255, 0.15); }
         .card-vermelho .castelo-header { text-align: center; margin-bottom: 12px; }
         .card-vermelho .castelo-header i { font-size: 38px; color: #ffffff; }
-
-        .card-vermelho h2.titulo-cursivo {
-            font-family: 'Caveat', cursive;
-            font-size: 38px; color: #ffffff; text-align: center; line-height: 1; margin-bottom: 2px;
-        }
-
-        .card-vermelho p.subtitulo-modal {
-            font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; margin-bottom: 22px; font-weight: 500;
-        }
-
+        .card-vermelho h2.titulo-cursivo { font-family: 'Caveat', cursive; font-size: 38px; color: #ffffff; text-align: center; line-height: 1; margin-bottom: 2px; }
+        .card-vermelho p.subtitulo-modal { font-size: 13px; color: rgba(255, 255, 255, 0.9); text-align: center; margin-bottom: 22px; font-weight: 500; }
         .card-vermelho .input-group-modal { position: relative; margin-bottom: 14px; }
         .card-vermelho .input-group-modal i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #ffffff; font-size: 15px; }
-        .card-vermelho .input-group-modal input {
-            width: 100%; padding: 12px 18px 12px 48px; border: 2px solid #ffffff; background: transparent; border-radius: 50px; outline: none; color: #ffffff; font-size: 14px; font-weight: 500; transition: 0.3s;
-        }
+        .card-vermelho .input-group-modal input { width: 100%; padding: 12px 18px 12px 48px; border: 2px solid #ffffff; background: transparent; border-radius: 50px; outline: none; color: #ffffff; font-size: 14px; font-weight: 500; transition: 0.3s; }
         .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
-
-        .card-vermelho .btn-acao-creme {
-            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
+        .card-vermelho .btn-acao-creme { width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
         .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; }
-
         .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
-
         .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
         .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
@@ -552,25 +440,17 @@ try {
         @media (max-width: 600px) {
             .grid-receitas { grid-template-columns: 1fr; }
             .img-titulo-banner { max-width: 210px; }
-            .btn-flutuante-voltar {
-                width: 46px;
-                height: 46px;
-                font-size: 18px;
-                bottom: 20px;
-                right: 20px;
-            }
+            .btn-flutuante-voltar { width: 46px; height: 46px; font-size: 18px; bottom: 20px; right: 20px; }
         }
     </style>
 </head>
 
 <body>
 
-    <!-- ELEMENTO DO CURSOR DO MICKEY -->
     <img id="mickeyCursor" src="<?= buscarImagemCursor('aberto') ?>" alt="Cursor Mickey">
 
-    <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
+        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="salgados.php">Salgados</a>
@@ -590,10 +470,8 @@ try {
         </div>
     </div>
 
-    <!-- OVERLAY DOS MODAIS -->
     <div id="modalOverlay" class="modal-overlay" onclick="fecharTodosModais()"></div>
 
-    <!-- MODAL CADASTRO -->
     <div id="modalCadastro" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
         <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
@@ -608,7 +486,6 @@ try {
         <div class="footer-modal">Já tem uma conta? <a onclick="alternarModais('login')">Faça login</a></div>
     </div>
 
-    <!-- MODAL LOGIN -->
     <div id="modalLogin" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
         <div class="castelo-header"><i class="fa-solid fa-chess-castle"></i></div>
@@ -622,7 +499,6 @@ try {
         <div class="footer-modal">Está chegando agora? <a onclick="alternarModais('cadastro')">Crie uma conta</a></div>
     </div>
 
-    <!-- MODAL PERFIL -->
     <?php if (isset($_SESSION['usuario'])): ?>
     <div id="modalPerfil" class="card-flutuante card-vermelho">
         <button class="btn-fechar-absoluto" onclick="fecharTodosModais()">&times;</button>
@@ -658,10 +534,9 @@ try {
     </div>
     <?php endif; ?>
 
-    <!-- HEADER DA PÁGINA -->
     <header class="page-header-banner">
         <div class="banner-titulo-box">
-            <img src="<?= buscarImagem('doces-receitas.webp') ?>" alt="Receitas Doces" class="img-titulo-banner">
+            <img src="<?= buscarImagem('doces-receitas') ?>" alt="Receitas Doces" class="img-titulo-banner">
         </div>
         
         <div class="search-page-box">
@@ -670,7 +545,6 @@ try {
         </div>
     </header>
 
-    <!-- LISTAGEM DE RECEITAS -->
     <section class="secao-doces-page">
         <div class="container-secao">
             <div class="grid-receitas">
@@ -701,14 +575,11 @@ try {
         </div>
     </section>
 
-    <!-- BOTÃO FLUTUANTE DE VOLTAR AO TOPO -->
     <a href="javascript:void(0)" onclick="voltarAoTopo(event)" class="btn-flutuante-voltar" id="btnVoltarTopo" title="Voltar ao topo">
         <i class="fa-solid fa-arrow-up"></i>
     </a>
 
-    <!-- JAVASCRIPT DO CURSOR DO MICKEY, MODAIS E SETA AO TOPO -->
     <script>
-    // --- EXIBIR A SETA FLUTUANTE AO ROLAR A PÁGINA ---
     window.addEventListener('scroll', function() {
         let btn = document.getElementById('btnVoltarTopo');
         if (btn) {
@@ -720,16 +591,11 @@ try {
         }
     });
 
-    // FUNÇÃO PARA ROLAR ATÉ O TOPO DE FORMA SUAVE
     function voltarAoTopo(event) {
         if (event) event.preventDefault();
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // --- LÓGICA DO CURSOR PERSONALIZADO DO MICKEY ---
     const mickeyCursor = document.getElementById('mickeyCursor');
     const imgAberto = "<?= buscarImagemCursor('aberto') ?>";
     const imgFechado = "<?= buscarImagemCursor('fechado') ?>";
@@ -748,25 +614,16 @@ try {
         const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .card-receita-item, .btn-flutuante-voltar';
 
         document.addEventListener('mouseover', (e) => {
-            if (e.target.closest(seletorInterativo)) {
-                mickeyCursor.src = imgFechado;
-            }
+            if (e.target.closest(seletorInterativo)) { mickeyCursor.src = imgFechado; }
         });
 
         document.addEventListener('mouseout', (e) => {
-            if (e.target.closest(seletorInterativo)) {
-                mickeyCursor.src = imgAberto;
-            }
+            if (e.target.closest(seletorInterativo)) { mickeyCursor.src = imgAberto; }
         });
 
-        document.addEventListener('mousedown', () => {
-            mickeyCursor.src = imgFechado;
-        });
-
+        document.addEventListener('mousedown', () => { mickeyCursor.src = imgFechado; });
         document.addEventListener('mouseup', (e) => {
-            if (!e.target.closest(seletorInterativo)) {
-                mickeyCursor.src = imgAberto;
-            }
+            if (!e.target.closest(seletorInterativo)) { mickeyCursor.src = imgAberto; }
         });
     }
 

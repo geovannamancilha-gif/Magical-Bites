@@ -86,12 +86,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
     exit;
 }
 
-// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
+// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS (INCLUI AS PASTAS FUNDOS E FUNDO)
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
 
-    $pastas = ['pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares', 'fundo', 'img/perfis', 'img/avatares', 'img/fundo', 'img/logo', 'img/slider'];
+    $pastas = [
+        'fundos', 'fundo', 'index', 'mouse', 'pratos', 'filme', 'logo', 'slider', 'perfis', 'avatares',
+        'img/fundos', 'img/fundo', 'img/index', 'img/mouse', 'img/perfis', 'img/avatares', 'img/logo', 'img/slider'
+    ];
     $extensoes = ['', '.png', '.jpg', '.jpeg', '.webp', '.jfif'];
 
     foreach ($pastas as $pasta) {
@@ -108,13 +111,13 @@ function buscarImagem($nomeImagem) {
     return "img/logo/logo_menu.png";
 }
 
-// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR SEM RETORNAR A LOGO DO SITE
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR
 function buscarImagemCursor($tipo) {
     $nomesPossiveis = ($tipo === 'aberto') 
         ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
         : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
 
-    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+    $pastas = ['', 'img/', 'mouse/', 'img/mouse/', 'fundos/', 'img/fundos/', 'img/logo/', 'img/fundo/'];
 
     foreach ($pastas as $pasta) {
         foreach ($nomesPossiveis as $nome) {
@@ -123,7 +126,7 @@ function buscarImagemCursor($tipo) {
         }
     }
 
-    return "img/" . $nomesPossiveis[0];
+    return "img/mouse/" . $nomesPossiveis[0];
 }
 
 // =========================================================================
@@ -627,10 +630,10 @@ try {
             margin: auto 0;
         }
 
-        /* --- 4. SECÇÃO: RECEITAS SALGADAS --- */
+        /* --- 4. SECÇÃO: RECEITAS SALGADAS (FUNDO DE FUNDOS) --- */
         .secao-salgados {
             position: relative;
-            background-image: url('img/slider/fundo2_index.png');
+            background-image: url('<?= buscarImagem("fundo2_index") ?>');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -638,10 +641,10 @@ try {
             overflow: hidden;
         }
 
-        /* --- 6. SECÇÃO: RECEITAS DOCES --- */
+        /* --- 6. SECÇÃO: RECEITAS DOCES (FUNDO DE FUNDOS) --- */
         .secao-doces {
             position: relative;
-            background-image: url('img/slider/fundo1_index.jfif');
+            background-image: url('<?= buscarImagem("fundo1_index") ?>');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -649,10 +652,10 @@ try {
             overflow: hidden;
         }
 
-        /* --- 8. SECÇÃO: RECEITAS BEBIDAS --- */
+        /* --- 8. SECÇÃO: RECEITAS BEBIDAS (FUNDO DE FUNDOS) --- */
         .secao-bebidas {
             position: relative;
-            background-image: url('img/slider/fundo3_index.png');
+            background-image: url('<?= buscarImagem("fundo3_index") ?>');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -988,10 +991,10 @@ try {
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
         }
 
-        /* --- RODAPÉ MÁGICO DO SITE (IMAGEM Á DIREITA & TEXTO À ESQUERDA) --- */
+        /* --- RODAPÉ MÁGICO DO SITE --- */
         .site-footer {
             position: relative;
-            background-image: linear-gradient(180deg, rgba(11, 19, 41, 0.40) 0%, rgba(11, 19, 41, 0.85) 100%), url('<?= buscarImagem("dama_vagabundo.png") ?>');
+            background-image: linear-gradient(180deg, rgba(11, 19, 41, 0.40) 0%, rgba(11, 19, 41, 0.85) 100%), url('<?= buscarImagem("dama_vagabundo") ?>');
             background-size: cover;
             background-position: right 80%;
             background-repeat: no-repeat;
@@ -1387,7 +1390,7 @@ try {
 
     <!-- NAVBAR -->
     <div class="navbar">
-      <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
+      <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php" class="ativo">Início</a>
             <a href="#containerReceitas">Receitas</a>
@@ -1504,19 +1507,19 @@ try {
         </div>
         <div class="grid-combo-items">
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('pocao_da_bruxa.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Poção da Bruxa">
+                <img src="<?= buscarImagem('pocao_da_bruxa') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Poção da Bruxa">
                 <h4>Poção da Bruxa</h4>
                 <p>Bebida quente, aromática e aconchegante com especiarias.</p>
                 <a href="receita.php?id=57" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('petisco_pongo.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Petiscos do Pongo">
+                <img src="<?= buscarImagem('petisco_pongo') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Petiscos do Pongo">
                 <h4>Petiscos do Pongo</h4>
                 <p>Rolinhos de carne moída recheados com queijo e bacon.</p>
                 <a href="receita.php?id=33" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('torta_maca_branca_neve.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Torta de Maçã">
+                <img src="<?= buscarImagem('torta_maca_branca_neve') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Torta de Maçã">
                 <h4>Torta de Maçã</h4>
                 <p>A clássica torta de maçã da Branca de Neve sem feitiço.</p>
                 <a href="receita.php?id=1" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
@@ -1534,19 +1537,19 @@ try {
         </div>
         <div class="grid-combo-items">
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('tody_de_lava.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Toddy de Lava do Wu">
+                <img src="<?= buscarImagem('tody_de_lava') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Toddy de Lava do Wu">
                 <h4>Toddy de Lava do Wu</h4>
                 <p>Uma bebida quente, aconchegante e aromática.</p>
                 <a href="receita.php?id=61" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('cookies_enrolados.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Cookies de Enrolados">
+                <img src="<?= buscarImagem('cookies_enrolados') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Cookies de Enrolados">
                 <h4>Cookies de Enrolados</h4>
                 <p>Cookies macios e coloridos com confeitos lilás e amarelos.</p>
                 <a href="receita.php?id=4" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('bolo_de_cafe.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Bolo de Café com Espiral de Canela">
+                <img src="<?= buscarImagem('bolo_de_cafe') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Bolo de Café com Espiral de Canela">
                 <h4>Bolo de Café com Espiral de Canela</h4>
                 <p>Bolo fofinho com espiral aconchegante de canela.</p>
                 <a href="receita.php?id=6" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
@@ -1564,19 +1567,19 @@ try {
         </div>
         <div class="grid-combo-items">
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('pipoca_da_bela.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Pipoca Rosa da Aurora">
+                <img src="<?= buscarImagem('pipoca_da_bela') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Pipoca Rosa da Aurora">
                 <h4>Pipoca Rosa da Aurora</h4>
                 <p>Pipoca doce rosa e crocante com calda de marshmallow.</p>
                 <a href="receita.php?id=10" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('refrigeranteazul_wei.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Refrigerante Azul Gelado do Wei">
+                <img src="<?= buscarImagem('refrigeranteazul_wei') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Refrigerante Azul Gelado do Wei">
                 <h4>Refrigerante Azul Gelado do Wei</h4>
                 <p>Uma bebida leve, efervescente e super refrescante.</p>
                 <a href="receita.php?id=62" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
             </div>
             <div class="item-combo-card">
-                <img src="<?= buscarImagem('chips_mulan.webp') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Chips Crocantes da Mulan">
+                <img src="<?= buscarImagem('chips_mulan') ?>" onerror="this.src='img/logo/logo_menu.png'" alt="Chips Crocantes da Mulan">
                 <h4>Chips Crocantes da Mulan</h4>
                 <p>Chips crocantes e temperadas de batata-doce assadas.</p>
                 <a href="receita.php?id=37" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
@@ -1588,8 +1591,8 @@ try {
     <!-- 1. BANNER PRINCIPAL (HERO SLIDER) -->
     <section class="secao-hero">
         <div class="hero-slider-wrapper">
-            <div class="hero-slide active" style="background-image: url('<?= buscarImagem('cookies_banner.png') ?>');"></div>
-            <div class="hero-slide" style="background-image: url('<?= buscarImagem('beignet_banner.png') ?>');"></div>
+            <div class="hero-slide active" style="background-image: url('<?= buscarImagem('cookies_banner') ?>');"></div>
+            <div class="hero-slide" style="background-image: url('<?= buscarImagem('beignet_banner') ?>');"></div>
 
             <button class="hero-slider-btn" onclick="mudarSlide(1)" title="Próximo Slide">
                 <i class="fa-solid fa-chevron-right"></i>
@@ -1608,15 +1611,15 @@ try {
             <div class="magia-carousel-side">
                 <div class="magia-cards-wrapper">
                     <div class="magia-card-peek">
-                        <img id="imgPratoPeek" src="<?= buscarImagem('torta_maca_branca_neve.webp') ?>" alt="Torta de Maçã">
+                        <img id="imgPratoPeek" src="<?= buscarImagem('torta_maca_branca_neve') ?>" alt="Torta de Maçã">
                         <button class="btn-seta-magia-left" onclick="mudarPratoMagia(-1)" title="Anterior">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
                     </div>
 
                     <div class="magia-card-main">
-                        <img id="imgPratoMain" class="prato-img" src="<?= buscarImagem('espaguete_almondegas.webp') ?>" alt="Espaguete com Almôndegas">
-                        <img src="<?= buscarImagem('luva_mickey.png') ?>" class="mickey-glove-img" alt="Luva Mickey" onerror="this.style.display='none'">
+                        <img id="imgPratoMain" class="prato-img" src="<?= buscarImagem('espaguete_almondegas') ?>" alt="Espaguete com Almôndegas">
+                        <img src="<?= buscarImagem('luva_mickey') ?>" class="mickey-glove-img" alt="Luva Mickey" onerror="this.style.display='none'">
                     </div>
                 </div>
             </div>
@@ -1639,7 +1642,7 @@ try {
                     entregam nostalgia, aconchego e aquela pitada de encantamento que faz qualquer dia comum parecer uma celebração especial. Clássicos amados e testados por milhares de pessoas que não abrem mão de uma experiência verdadeiramente mágica.
                 </p>
 
-                <img src="<?= buscarImagem('mickey_feiticeiro.png') ?>" class="mickey-feiticeiro-img" alt="Mickey Feiticeiro" onerror="this.style.display='none'">
+                <img src="<?= buscarImagem('mickey_feiticeiro') ?>" class="mickey-feiticeiro-img" alt="Mickey Feiticeiro" onerror="this.style.display='none'">
             </div>
         </div>
     </section>
@@ -1654,21 +1657,21 @@ try {
 
             <div class="grid-3-categorias">
                 <a href="salgados.php" class="card-categoria-item">
-                    <img src="<?= buscarImagem('ratatouille_prato.webp') ?>" class="card-categoria-bg" alt="Receitas Salgadas" onerror="this.src='img/pratos/ratatouille_prato.webp'">
+                    <img src="<?= buscarImagem('ratatouille_prato') ?>" class="card-categoria-bg" alt="Receitas Salgadas" onerror="this.src='img/pratos/ratatouille_prato.webp'">
                     <div class="card-categoria-overlay"></div>
                     <span class="card-cat-tag">RECEITAS SALGADAS</span>
                     <h3 class="card-cat-titulo">"QUALQUER UM PODE COZINHAR"</h3>
                 </a>
 
                 <a href="doces.php" class="card-categoria-item">
-                    <img src="<?= buscarImagem('torta_maca_branca_neve.webp') ?>" class="card-categoria-bg" alt="Receitas Doces" onerror="this.src='img/pratos/torta_maca_branca_neve.webp'">
+                    <img src="<?= buscarImagem('torta_maca_branca_neve') ?>" class="card-categoria-bg" alt="Receitas Doces" onerror="this.src='img/pratos/torta_maca_branca_neve.webp'">
                     <div class="card-categoria-overlay"></div>
                     <span class="card-cat-tag">RECEITAS DOCES</span>
                     <h3 class="card-cat-titulo">UM DOCE FINAL FELIZ</h3>
                 </a>
 
                 <a href="bebidas.php" class="card-categoria-item">
-                    <img src="<?= buscarImagem('suco_ilha.webp') ?>" class="card-categoria-bg" alt="Bebidas" onerror="this.src='img/pratos/beignet_banner.png'">
+                    <img src="<?= buscarImagem('suco_ilha') ?>" class="card-categoria-bg" alt="Bebidas" onerror="this.src='img/pratos/beignet_banner.png'">
                     <div class="card-categoria-overlay"></div>
                     <span class="card-cat-tag">BEBIDAS</span>
                     <h3 class="card-cat-titulo">GOLES DE PURA MAGIA</h3>
@@ -1677,7 +1680,7 @@ try {
         </div>
     </section>
 
-    <!-- 4. SECÇÃO: RECEITAS SALGADAS (FUNDO: fundo2_index.png) -->
+    <!-- 4. SECÇÃO: RECEITAS SALGADAS -->
     <section class="secao-salgados" id="containerReceitas">
         <div class="container-secao">
             
@@ -1737,11 +1740,11 @@ try {
             </div>
         </div>
         <div class="banner-red-img">
-            <img src="<?= buscarImagem('banquete_real.png') ?>" onerror="this.src='<?= buscarImagem('pocao_da_bruxa.webp') ?>'" alt="Banquete Real na Floresta Encantada">
+            <img src="<?= buscarImagem('banquete_real') ?>" onerror="this.src='<?= buscarImagem('pocao_da_bruxa') ?>'" alt="Banquete Real na Floresta Encantada">
         </div>
     </section>
 
-    <!-- 6. SECÇÃO: RECEITAS DOCES (FUNDO: fundo1_index.jfif) -->
+    <!-- 6. SECÇÃO: RECEITAS DOCES -->
     <section class="secao-doces">
         <div class="container-secao">
             <div class="grid-home-receitas">
@@ -1799,11 +1802,11 @@ try {
             </div>
         </div>
         <div class="banner-creme-img">
-            <img src="<?= buscarImagem('festival_lanternas.png') ?>" onerror="this.src='<?= buscarImagem('tody_de_lava.webp') ?>'" alt="Festival das Lanternas Douradas">
+            <img src="<?= buscarImagem('festival_lanternas') ?>" onerror="this.src='<?= buscarImagem('tody_de_lava') ?>'" alt="Festival das Lanternas Douradas">
         </div>
     </section>
 
-    <!-- 8. SECÇÃO: RECEITAS BEBIDAS (FUNDO: fundo3_index.png) -->
+    <!-- 8. SECÇÃO: RECEITAS BEBIDAS -->
     <section class="secao-bebidas">
         <div class="container-secao">
             <div class="grid-home-receitas">
@@ -1861,7 +1864,7 @@ try {
             </div>
         </div>
         <div class="banner-red-img">
-            <img src="<?= buscarImagem('sessao_cinema.png') ?>" onerror="this.src='<?= buscarImagem('pipoca_da_bela.webp') ?>'" alt="Sessão Mágica de Cinema">
+            <img src="<?= buscarImagem('sessao_cinema') ?>" onerror="this.src='<?= buscarImagem('pipoca_da_bela') ?>'" alt="Sessão Mágica de Cinema">
         </div>
     </section>
 
@@ -1875,7 +1878,7 @@ try {
         <div class="footer-card-wrapper">
             <div class="footer-container">
                 <div class="footer-col footer-about">
-                    <img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites" onerror="this.src='img/logo/logo_menu.png'">
+                    <img src="<?= buscarImagem('logo_menu') ?>" alt="Magical Bites" onerror="this.src='img/logo/logo_menu.png'">
                     <p>Traga a magia dos filmes Disney diretamente para a sua cozinha! No Magical Bites encontra as receitas mais encantadoras do cinema.</p>
                     <div class="footer-social">
                         <a href="#" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
@@ -2022,10 +2025,10 @@ try {
 
     // 2. Carousel de Fotos da secção de receitas (troca direta sem animação)
     const listaPratosMagia = [
-        "<?= buscarImagem('espaguete_almondegas.webp') ?>",
-        "<?= buscarImagem('torta_maca_branca_neve.webp') ?>",
-        "<?= buscarImagem('beignet_princesa_sapo.webp') ?>",
-        "<?= buscarImagem('ratatouille_prato.webp') ?>"
+        "<?= buscarImagem('espaguete_almondegas') ?>",
+        "<?= buscarImagem('torta_maca_branca_neve') ?>",
+        "<?= buscarImagem('beignet_princesa_sapo') ?>",
+        "<?= buscarImagem('ratatouille_prato') ?>"
     ];
     let idxPratoMagia = 0;
 

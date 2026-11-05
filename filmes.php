@@ -93,8 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
+    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
 
-    $pastas = ['slider', 'filme', 'cardsfilme', 'pratos', 'logo', 'perfis', 'avatares', 'fundo', 'img/slider', 'img/filme', 'img/cardsfilme', 'img/perfis', 'img/avatares', 'img/fundo', 'img/logo'];
+    $pastas = [
+        'fundos', 'fundo', 'titulos', 'titulo', 'banners', 'banner', 'index', 'mouse', 
+        'cardsfilme', 'slider', 'filme', 'pratos', 'logo', 'perfis', 'avatares', 'elementos',
+        'img/fundos', 'img/fundo', 'img/titulos', 'img/titulo', 'img/banners', 'img/banner', 
+        'img/index', 'img/mouse', 'img/cardsfilme', 'img/slider', 'img/filme', 'img/pratos', 
+        'img/logo', 'img/perfis', 'img/avatares', 'img/elementos'
+    ];
     $extensoes = ['', '.webp', '.png', '.jpg', '.jpeg', '.jfif'];
 
     foreach ($pastas as $pasta) {
@@ -107,7 +114,6 @@ function buscarImagem($nomeImagem) {
         }
     }
 
-    if (file_exists("img/" . $nomeImagem)) return "img/" . $nomeImagem;
     return "img/logo/logo_menu.png";
 }
 
@@ -117,7 +123,7 @@ function buscarImagemCursor($tipo) {
         ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
         : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
 
-    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+    $pastas = ['', 'img/', 'mouse/', 'img/mouse/', 'fundos/', 'img/fundos/', 'img/logo/', 'img/fundo/'];
 
     foreach ($pastas as $pasta) {
         foreach ($nomesPossiveis as $nome) {
@@ -126,7 +132,7 @@ function buscarImagemCursor($tipo) {
         }
     }
 
-    return "img/" . $nomesPossiveis[0];
+    return "img/mouse/" . $nomesPossiveis[0];
 }
 
 // Mapeamento automático de categorias
