@@ -123,7 +123,6 @@ function buscarImagemCursor($tipo) {
         }
     }
 
-    // Retorna o caminho presumido caso o PHP não encontre pelo file_exists
     return "img/" . $nomesPossiveis[0];
 }
 
@@ -285,7 +284,7 @@ try {
             height: 100%;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s ease-in-out;
             background-size: cover;
             background-position: center center;
         }
@@ -471,17 +470,6 @@ try {
             letter-spacing: -0.5px;
             line-height: 1.05;
             text-transform: uppercase;
-        }
-
-        .magia-coroa-svg {
-            width: 46px;
-            height: 46px;
-            fill: none;
-            stroke: #a62428;
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            flex-shrink: 0;
         }
 
         .magia-rating-line {
@@ -1139,6 +1127,7 @@ try {
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(18, 24, 41, 0.75);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 999;
         }
 
@@ -1224,6 +1213,7 @@ try {
             align-items: center;
             justify-content: space-between;
             backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             border: 1px solid rgba(255,255,255,0.15);
         }
 
@@ -1634,9 +1624,6 @@ try {
             <div class="magia-text-side">
                 <div class="magia-header-title">
                     <h2>A MAGIA DE<br>CADA PEDAÇO</h2>
-                    <svg class="magia-coroa-svg" viewBox="0 0 24 24">
-                        <path d="M2 19h20L19 7l-5 5-2-7-2 7-5-5L2 19z"/>
-                    </svg>
                 </div>
 
                 <div class="magia-rating-line">
@@ -1917,7 +1904,6 @@ try {
                     </ul>
                 </div>
 
-               
             </div>
 
             <div class="footer-bottom">
@@ -1955,41 +1941,34 @@ try {
     const imgFechado = "<?= buscarImagemCursor('fechado') ?>";
 
     if (mickeyCursor) {
-        // Acompanhar movimento do rato
         document.addEventListener('mousemove', (e) => {
             mickeyCursor.style.display = 'block';
             mickeyCursor.style.left = e.clientX + 'px';
             mickeyCursor.style.top = e.clientY + 'px';
         });
 
-        // Ocultar ao sair da janela
         document.addEventListener('mouseleave', () => {
             mickeyCursor.style.display = 'none';
         });
 
-        // Seletor de elementos interativos
         const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .dot, .avatar-item, .hero-slider-btn, .btn-seta-magia-left, .btn-flutuante-voltar';
 
-        // Mudar para mão fechada ao passar sobre elementos interativos
         document.addEventListener('mouseover', (e) => {
             if (e.target.closest(seletorInterativo)) {
                 mickeyCursor.src = imgFechado;
             }
         });
 
-        // Voltar para mão aberta ao sair do elemento
         document.addEventListener('mouseout', (e) => {
             if (e.target.closest(seletorInterativo)) {
                 mickeyCursor.src = imgAberto;
             }
         });
 
-        // Mudar para mão fechada durante o clique
         document.addEventListener('mousedown', () => {
             mickeyCursor.src = imgFechado;
         });
 
-        // Restaurar mão aberta após libertar o clique (se não estiver sobre elemento clicável)
         document.addEventListener('mouseup', (e) => {
             if (!e.target.closest(seletorInterativo)) {
                 mickeyCursor.src = imgAberto;
@@ -1997,10 +1976,11 @@ try {
         });
     }
 
-    // 1. Hero Slider Principal
+    // 1. Hero Slider Principal (transição suave de opacidade 0.8s)
     let slideAtual = 0;
     const slides = document.querySelectorAll('.hero-slide');
     const dots = document.querySelectorAll('.hero-slider-dots .dot');
+    let timerSlide;
 
     function atualizarSlide() {
         slides.forEach((slide, idx) => {
@@ -2016,14 +1996,31 @@ try {
         if (slideAtual >= slides.length) slideAtual = 0;
         if (slideAtual < 0) slideAtual = slides.length - 1;
         atualizarSlide();
+        reiniciarTimerSlide();
     }
 
     function irParaSlide(index) {
         slideAtual = index;
         atualizarSlide();
+        reiniciarTimerSlide();
     }
 
-    // 2. Carousel de Fotos do Bloco "A Magia de Cada PEDAÇO"
+    function iniciarTimerSlide() {
+        timerSlide = setInterval(() => {
+            slideAtual++;
+            if (slideAtual >= slides.length) slideAtual = 0;
+            atualizarSlide();
+        }, 5000);
+    }
+
+    function reiniciarTimerSlide() {
+        clearInterval(timerSlide);
+        iniciarTimerSlide();
+    }
+
+    iniciarTimerSlide();
+
+    // 2. Carousel de Fotos da secção de receitas (troca direta sem animação)
     const listaPratosMagia = [
         "<?= buscarImagem('espaguete_almondegas.webp') ?>",
         "<?= buscarImagem('torta_maca_branca_neve.webp') ?>",
@@ -2033,11 +2030,14 @@ try {
     let idxPratoMagia = 0;
 
     function mudarPratoMagia(dir = 1) {
+        const imgMain = document.getElementById('imgPratoMain');
+        const imgPeek = document.getElementById('imgPratoPeek');
+
         idxPratoMagia = (idxPratoMagia + dir + listaPratosMagia.length) % listaPratosMagia.length;
         let idxPeek = (idxPratoMagia - 1 + listaPratosMagia.length) % listaPratosMagia.length;
 
-        document.getElementById('imgPratoMain').src = listaPratosMagia[idxPratoMagia];
-        document.getElementById('imgPratoPeek').src = listaPratosMagia[idxPeek];
+        imgMain.src = listaPratosMagia[idxPratoMagia];
+        imgPeek.src = listaPratosMagia[idxPeek];
     }
 
     // 3. Pesquisa em Tempo Real

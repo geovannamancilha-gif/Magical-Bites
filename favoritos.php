@@ -257,16 +257,6 @@ try {
             line-height: 1.1;
             position: relative;
             display: inline-block;
-            padding-right: 42px;
-        }
-
-        .titulo-editorial .icone-coroa {
-            position: absolute;
-            top: -14px;
-            right: 0;
-            font-size: 38px;
-            color: #a62428;
-            transform: rotate(20deg);
         }
 
         .subtitulo-editorial {
@@ -570,8 +560,7 @@ try {
                 height: 320px;
                 min-height: 240px;
             }
-            .titulo-editorial { font-size: 30px; padding-right: 35px; }
-            .titulo-editorial .icone-coroa { font-size: 30px; top: -10px; }
+            .titulo-editorial { font-size: 30px; }
             .enfeite-fundo-esquerdo,
             .enfeite-fundo-direito { opacity: 0.3; width: 650px; }
             .btn-flutuante-voltar {
@@ -692,7 +681,6 @@ try {
             <div class="header-favoritos">
                 <h1 class="titulo-editorial">
                     MINHAS RECEITAS FAVORITAS
-                    <i class="fa-solid fa-crown icone-coroa"></i>
                 </h1>
                 <p class="subtitulo-editorial">
                     GUARDE OS SEUS PRATOS MÁGICOS PREFERIDOS PARA CONSULTAR SEMPRE QUE QUISER PREPARAR UM BANQUETE.

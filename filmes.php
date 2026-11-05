@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
 }
 
 // =========================================================================
-// 3. FUNÇÕES INTELIGENTES DE IMAGEM
+// 3. FUNÇÕES INTELIGENTES DE IMAGEM E CONFIGURAÇÕES
 // =========================================================================
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
@@ -111,6 +111,24 @@ function buscarImagem($nomeImagem) {
     return "img/logo/logo_menu.png";
 }
 
+// FUNÇÃO ESPECÍFICA PARA LOCALIZAR A IMAGEM DO CURSOR
+function buscarImagemCursor($tipo) {
+    $nomesPossiveis = ($tipo === 'aberto') 
+        ? ['mause_aberto.webp', 'mouse_aberto.webp', 'mause_aberto.png', 'mouse_aberto.png']
+        : ['mause_fechado.webp', 'mouse_fechado.webp', 'mause_fechado.png', 'mouse_fechado.png'];
+
+    $pastas = ['', 'img/', 'img/logo/', 'img/fundo/'];
+
+    foreach ($pastas as $pasta) {
+        foreach ($nomesPossiveis as $nome) {
+            $caminho = $pasta . $nome;
+            if (file_exists($caminho)) return $caminho;
+        }
+    }
+
+    return "img/" . $nomesPossiveis[0];
+}
+
 // Mapeamento automático de categorias
 function obterCategoriaFilme($nomeFilme) {
     $categorias = [
@@ -128,53 +146,9 @@ function obterCategoriaFilme($nomeFilme) {
     return 'Clássicos & Aventuras';
 }
 
+// COR PADRONIZADA PARA TODOS OS FILMES (VERMELHO VINHO - DAMA E O VAGABUNDO)
 function obterCorFilme($nomeFilme) {
-    $cores = [
-        'Era do Gelo'              => '#00b4d8',
-        'Espada Era a Lei'         => '#6c757d',
-        'Nova Onda do Imperador'   => '#c77dff',
-        'Alice'                    => '#0077b6',
-        'Carros'                   => '#d62828',
-        'Como Treinar'             => '#2b2d42',
-        'Hércules'                 => '#ffb703',
-        'Malévola'                 => '#5a189a',
-        'Rei Leão'                 => '#e85d04',
-        'Peter Pan'                => '#2d6a4f',
-        'Pocahontas'               => '#9e2a2b',
-        'Tinker Bell'              => '#52b788',
-        'Branca de Neve'           => '#d62828',
-        'Frozen'                   => '#72efdd',
-        'Enrolados'                => '#e0aaff',
-        'Princesa e o Sapo'        => '#2a9d8f',
-        'Ratatouille'              => '#f77f00',
-        'Lilo'                     => '#0077b6',
-        'Bela Adormecida'          => '#ff006e',
-        'Up'                       => '#4ea8de',
-        'Mogli'                    => '#38b000',
-        'Mickey'                   => '#d00000',
-        'Valente'                  => '#e85d04',
-        'Pooh'                     => '#ffb703',
-        'Encanto'                  => '#8338ec',
-        'Luca'                     => '#00b4d8',
-        'Dama e o Vagabundo'       => '#780000',
-        'Zootopia'                 => '#fb8500',
-        'Viva'                     => '#f48c06',
-        'Aristogatas'              => '#f7aef8',
-        'Moana'                    => '#00f5d4',
-        'Pinóquio'                 => '#9c6644',
-        'Dálmatas'                 => '#343a40',
-        'Aladdin'                  => '#3c096c',
-        'Incríveis'                => '#e63946',
-        'Mulan'                    => '#bc4749',
-        'Cinderela'                => '#4cc9f0'
-    ];
-
-    foreach ($cores as $chave => $cor) {
-        if (stripos($nomeFilme, $chave) !== false) {
-            return $cor;
-        }
-    }
-    return '#1f4396'; 
+    return '#780000';
 }
 
 // Consulta de Filmes e Receitas no BD
@@ -247,8 +221,28 @@ try {
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        /* --- OCULTA O CURSOR PADRÃO DO SISTEMA --- */
+        html, body, *, a, button, input, select, textarea, label {
+            cursor: none !important;
+        }
+
+        /* --- ESTILO DO CURSOR PERSONALIZADO DO MICKEY --- */
+        #mickeyCursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 38px;
+            height: auto;
+            pointer-events: none;
+            z-index: 999999;
+            display: none;
+            transform: translate(-30%, -10%);
+            transition: transform 0.05s ease-out;
+        }
+
         html { scroll-behavior: smooth; }
-        body { background: #0b1329; color: #ffffff; overflow-x: hidden; }
+        body { background: #0e2646; color: #ffffff; overflow-x: hidden; }
 
         /* --- NAVBAR --- */
         .navbar {
@@ -273,7 +267,6 @@ try {
             font-size: 16px;
             font-weight: 700;
             transition: 0.3s;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -307,12 +300,12 @@ try {
             display: block;
         }
 
-        /* --- 2. SEÇÃO DE BUSCA E CATEGORIAS --- */
+        /* --- 2. SEÇÃO DE BUSCA E CATEGORIAS (BLOCO CLARO) --- */
         .secao-busca-categorias {
             background-color: #fffdf5ff;
             padding: 50px 0 70px;
             position: relative;
-            box-shadow: inset 0 15px 20px -10px rgba(0,0,0,0.15), inset 0 -15px 20px -10px rgba(0,0,0,0.15);
+            box-shadow: inset 0 15px 20px -10px rgba(0,0,0,0.12), inset 0 -15px 20px -10px rgba(0,0,0,0.12);
         }
 
         .container-secao {
@@ -348,7 +341,7 @@ try {
         .search-home-box input::placeholder { color: #fffde6ff; }
         .search-home-box i { position: absolute; left: 22px; top: 50%; transform: translateY(-50%); color: #fffde6ff; font-size: 17px; }
 
-        /* GRID DOS 3 CARDS DE CATEGORIA */
+        /* GRID DOS 3 CARDS DE CATEGORIA COM ESFUMADO PRETO (OVERLAY) */
         .grid-3-categorias {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -370,14 +363,27 @@ try {
             align-items: center;
             justify-content: flex-start;
             padding-top: 145px;
-            cursor: pointer;
             isolation: isolate;
             transform: translateZ(0);
+        }
+
+        /* ESFUMADO PRETO (GRADIENTE ESCURO) NOS CARDS DE CATEGORIA */
+        .card-categoria-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.25) 50%, rgba(0, 0, 0, 0.45) 100%);
+            z-index: 2;
+            transition: background 0.35s ease;
         }
 
         .card-categoria-item:hover {
             transform: translateY(-8px);
             box-shadow: 0 18px 38px rgba(0, 0, 0, 0.38);
+        }
+
+        .card-categoria-item:hover::after {
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.35) 50%, rgba(0, 0, 0, 0.55) 100%);
         }
 
         .card-categoria-bg {
@@ -404,108 +410,63 @@ try {
             text-transform: uppercase;
             line-height: 1.25;
             text-align: center;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
             padding: 0 15px;
             letter-spacing: 0.5px;
         }
 
-        /* --- 3. SEÇÃO INFERIOR DA GRELHA DE FILMES --- */
-        .secao-grid-filmes {
-            background-color: #0b1329;
-            background-image: url('<?= buscarImagem("fundofilme3") ?>');
-            background-repeat: no-repeat;
-            background-position: center top;
-            background-size: cover;
-            background-attachment: fixed;
-            padding: 50px 0 80px;
+        /* --- 3. BLOCOS DE CATEGORIAS INDIVIDUALIZADOS --- */
+        .secao-bloco-categoria {
+            padding: 60px 0 75px;
             position: relative;
             width: 100%;
+            box-shadow: inset 0 10px 18px -8px rgba(0,0,0,0.3), inset 0 -10px 18px -8px rgba(0,0,0,0.3);
         }
 
         .container-filmes-grid {
             width: 100%;
-            max-width: 1180px;
+            max-width: 1350px;
             margin: 0 auto;
-            padding: 0 25px;
+            padding: 0 35px;
             position: relative;
             z-index: 2;
         }
 
+        /* TÍTULO DA CATEGORIA (TEXTO + LINHA BRANCA CONTÍNUA) */
         .categoria-titulo {
             width: 100%;
-            margin: 30px 0 20px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #fff3bc;
+            margin: 0 0 28px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #ffffff;
             color: #ffffff;
-            font-size: 26px;
+            font-size: 20px;
             font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 12px;
-            letter-spacing: 0.3px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
-        /* BOTÃO FLUTUANTE ESTÁVEL - OCULTO INICIALMENTE */
-        .btn-flutuante-voltar {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 52px;
-            height: 52px;
-            background-color: #a62428;
-            color: #fff3bc;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            font-size: 22px;
-            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
-            transition: opacity 0.35s ease, visibility 0.35s ease, transform 0.3s ease, background-color 0.3s ease;
-            cursor: pointer;
-            border: 2.5px solid #fff3bc;
-            z-index: 99;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .btn-flutuante-voltar.visivel {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-
-        .btn-flutuante-voltar:hover {
-            transform: scale(1.12);
-            background-color: #831a1e;
-            color: #ffffff;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
-        }
-
-        /* GRELHA COM 4 COLUNAS */
+        /* GRELHA DE 3 EM 3 AMPLA */
         .grid-filmes {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 22px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 28px 32px;
         }
 
         .box-filme {
             position: relative;
-            height: 175px;
-            border-radius: 20px;
+            height: 240px;
+            border-radius: 28px;
             overflow: hidden;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.38);
             transition: transform 0.35s ease, box-shadow 0.35s ease;
             background-color: var(--cor-tema);
         }
 
         .box-filme:hover {
             transform: translateY(-6px) scale(1.02);
-            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 16px 34px rgba(0, 0, 0, 0.55);
         }
 
         .img-capa-filme {
@@ -529,42 +490,81 @@ try {
             left: 0;
             right: 0;
             height: 100%;
-            background: linear-gradient(to top, var(--cor-tema) 15%, rgba(0, 0, 0, 0.05) 75%);
+            background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0, 0, 0, 0.05) 60%);
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 14px;
+            padding: 18px 22px;
             color: #ffffff;
             transition: 0.3s;
             z-index: 2;
+            opacity: 0.9;
         }
 
         .box-filme:hover .box-overlay {
-            background: linear-gradient(to top, var(--cor-tema) 28%, rgba(0, 0, 0, 0.15) 75%);
+            opacity: 1;
+            background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0, 0, 0, 0.15) 70%);
         }
 
         .box-overlay h3 {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 800;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.85);
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.9);
             margin-bottom: 6px;
             line-height: 1.2;
             color: #ffffff;
         }
 
         .box-overlay span {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
-            background: rgba(0, 0, 0, 0.28);
+            background: rgba(0, 0, 0, 0.4);
             color: #ffffff;
-            padding: 4px 10px;
+            padding: 4px 12px;
             border-radius: 20px;
             width: fit-content;
-            backdrop-filter: blur(3px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+        }
+
+        /* BOTÃO FLUTUANTE ESTÁVEL - OCULTO INICIALMENTE */
+        .btn-flutuante-voltar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 52px;
+            height: 52px;
+            background-color: #a62428;
+            color: #fff3bc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 22px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+            transition: opacity 0.35s ease, visibility 0.35s ease, transform 0.3s ease, background-color 0.3s ease;
+            border: 2.5px solid #fff3bc;
+            z-index: 99;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .btn-flutuante-voltar.visivel {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .btn-flutuante-voltar:hover {
+            transform: scale(1.12);
+            background-color: #831a1e;
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
         }
 
         /* --- MODAIS FLUTUANTES DA CONTA --- */
@@ -622,19 +622,19 @@ try {
         .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
 
         .card-vermelho .btn-acao-creme {
-            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
-        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; cursor: pointer; }
+        .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; }
 
-        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; cursor: pointer; color: rgba(255,255,255,0.8); transition: 0.2s; }
+        .btn-fechar-absoluto { position: absolute; top: 18px; right: 22px; background: none; border: none; font-size: 24px; color: rgba(255,255,255,0.8); transition: 0.2s; }
         .btn-fechar-absoluto:hover { color: #ffffff; transform: scale(1.1); }
 
         .perfil-avatar-header { text-align: center; margin-bottom: 12px; }
         .perfil-avatar-header img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .grid-avatares-modal { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-height: 160px; overflow-y: auto; padding: 6px; margin: 12px 0; }
-        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; overflow: hidden; transition: 0.2s; }
+        .avatar-item { width: 48px; height: 48px; border-radius: 50%; border: 2px solid transparent; overflow: hidden; transition: 0.2s; }
         .avatar-item img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-item:hover, .avatar-item.selected { border-color: #fff8bd; transform: scale(1.12); }
 
@@ -661,7 +661,7 @@ try {
         .modal-header img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.85; }
         .modal-header-overlay { position: absolute; inset: 0; background: linear-gradient(to top, var(--cor-tema) 10%, rgba(0, 0, 0, 0.15) 100%); }
         .modal-header h2 { position: relative; color: #ffffff; font-size: 32px; font-weight: 800; z-index: 3; text-shadow: 0 2px 10px rgba(0,0,0,0.7); }
-        .modal-filme-content .btn-fechar { position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 10; transition: 0.3s; }
+        .modal-filme-content .btn-fechar { position: absolute; top: 20px; right: 20px; background: rgba(0, 0, 0, 0.5); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; z-index: 10; transition: 0.3s; }
         .modal-filme-content .btn-fechar:hover { background: rgba(0, 0, 0, 0.8); transform: scale(1.1); }
 
         .modal-body { 
@@ -699,17 +699,17 @@ try {
         .card p { padding: 0 15px 20px; text-align: center; font-weight: 700; font-size: 14px; color: #ffffff; text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6); }
 
         @media (max-width: 1024px) {
-            .grid-filmes { grid-template-columns: repeat(3, 1fr); }
             .grid-3-categorias { grid-template-columns: repeat(3, 1fr); }
+            .grid-filmes { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+            .container-filmes-grid { padding: 0 20px; }
+        }
+        @media (max-width: 850px) {
+            .grid-filmes { grid-template-columns: repeat(2, 1fr); }
+            .box-filme { height: 200px; }
         }
         @media (max-width: 768px) {
-            .grid-filmes, .grid-3-categorias { grid-template-columns: repeat(2, 1fr); }
+            .grid-3-categorias { grid-template-columns: repeat(2, 1fr); }
             .banner-inicio { height: 450px; }
-            .secao-grid-filmes { 
-                background-attachment: scroll; 
-                background-size: cover;
-                background-position: center center;
-            }
             .btn-flutuante-voltar {
                 width: 46px;
                 height: 46px;
@@ -718,8 +718,9 @@ try {
                 right: 20px;
             }
         }
-        @media (max-width: 520px) {
+        @media (max-width: 580px) {
             .grid-filmes, .grid-3-categorias { grid-template-columns: repeat(1, 1fr); }
+            .box-filme { height: 180px; }
             .menu { gap: 12px; }
             .menu a { font-size: 13px; }
             .banner-inicio { height: 320px; }
@@ -729,9 +730,12 @@ try {
 
 <body>
 
+    <!-- ELEMENTO DO CURSOR DO MICKEY -->
+    <img id="mickeyCursor" src="<?= buscarImagemCursor('aberto') ?>" alt="Cursor Mickey">
+
     <!-- NAVBAR -->
     <div class="navbar">
-        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.jpg') ?>" alt="Magical Bites"></a></div>
+        <div class="logo"><a href="index.php"><img src="<?= buscarImagem('logo_menu.png') ?>" alt="Magical Bites"></a></div>
         <div class="menu">
             <a href="index.php">Início</a>
             <a href="index.php#containerReceitas">Receitas</a>
@@ -754,7 +758,7 @@ try {
         <img src="<?= buscarImagem('filme.png') ?>" alt="Banner Filmes" onerror="this.src='img/slider/bg-destaque.webp'">
     </div>
 
-    <!-- 2. SEÇÃO DE BUSCA E CATEGORIAS DA DISNEY (FUNDO AMARELO SÓLIDO #fff8bd) -->
+    <!-- 2. SEÇÃO DE BUSCA E CATEGORIAS DA DISNEY (BLOCO CLARO) -->
     <section class="secao-busca-categorias" id="secaoCategorias">
         <div class="container-secao">
             
@@ -841,7 +845,7 @@ try {
                     </div>
                 <?php endforeach; ?>
             </div>
-            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center; cursor:pointer;" onclick="document.getElementById('fotoUploadInput').click()">
+            <label style="font-size:12px; font-weight:600; color:#ffffff; display:block; text-align:center;" onclick="document.getElementById('fotoUploadInput').click()">
                 <i class="fa-solid fa-image"></i> Escolher da Galeria
             </label>
             <input type="file" id="fotoUploadInput" name="foto_upload" accept="image/*" style="display:none;" onchange="limparAvatarModal()">
@@ -853,76 +857,129 @@ try {
     </div>
     <?php endif; ?>
 
-    <!-- 3. SEÇÃO INFERIOR DA GRELHA DE FILMES -->
-    <section class="secao-grid-filmes" id="secaoFilmes">
-        <div class="container-filmes-grid" id="containerFilmesGrid">
-            
-            <?php foreach($categorias as $nomeCategoria => $filmesCategoria): ?>
-            <?php if(!empty($filmesCategoria)): ?>
+    <!-- 3. BLOCOS DE CATEGORIA SEPARADOS EM SECÇÕES COM OS FUNDOS CUSTOMIZADOS -->
+    <div id="secaoFilmes">
+        <?php 
+        $estilosFundoBlocos = [
+            "background-color: #283f61ff;", 
+            "background-image: url('" . buscarImagem('fundo2_index') . "'); background-repeat: no-repeat; background-position: center center; background-size: cover; background-attachment: fixed;", 
+            "background-color: #0e2646;"
+        ];
+        $indexBloco = 0;
+        ?>
 
-            <div class="bloco-categoria" data-nome-cat="<?= htmlspecialchars($nomeCategoria) ?>">
-                <h2 class="categoria-titulo"><?= htmlspecialchars($nomeCategoria) ?></h2>
+        <?php foreach($categorias as $nomeCategoria => $filmesCategoria): ?>
+        <?php if(!empty($filmesCategoria)): 
+            $estiloFundoAtual = $estilosFundoBlocos[$indexBloco % count($estilosFundoBlocos)];
+            $indexBloco++;
+        ?>
 
-                <div class="grid-filmes">
-                    <?php foreach($filmesCategoria as $id => $filme): 
-                        $corTema = obterCorFilme($filme['nome_filme']);
-                        $qtdReceitas = count($filme['receitas']);
-                    ?>
-                    <div class="box-filme" style="--cor-tema: <?= $corTema ?>;" data-nome="<?= strtolower(htmlspecialchars($filme['nome_filme'])) ?>" data-categoria="<?= htmlspecialchars($nomeCategoria) ?>" onclick="abrirModalFilme('modal-filme-<?= $id ?>')">
-                        <img src="<?= buscarImagem($filme['imagem']) ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>" class="img-capa-filme" onerror="this.style.opacity='0';">
-                        <div class="box-overlay">
-                            <h3><?= htmlspecialchars($filme['nome_filme']) ?></h3>
-                            <span><i class="fa fa-utensils"></i> <?= $qtdReceitas ?> Receita(s)</span>
-                        </div>
-                    </div>
+        <section class="secao-bloco-categoria" style="<?= $estiloFundoAtual ?>">
+            <div class="container-filmes-grid">
+                <div class="bloco-categoria" data-nome-cat="<?= htmlspecialchars($nomeCategoria) ?>">
+                    <h2 class="categoria-titulo"><?= htmlspecialchars($nomeCategoria) ?></h2>
 
-                    <!-- MODAL DE RECEITAS DO FILME COM A COR DO TEMA NO INTERIOR -->
-                    <div id="modal-filme-<?= $id ?>" class="modal-filme-overlay">
-                        <div class="modal-filme-content" style="--cor-tema: <?= $corTema ?>;">
-                            <div class="modal-header">
-                                <img src="<?= buscarImagem($filme['imagem']) ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>" onerror="this.style.opacity='0';">
-                                <div class="modal-header-overlay"></div>
-                                <button onclick="fecharModalFilme('modal-filme-<?= $id ?>', event)" class="btn-fechar">&times;</button>
-                                <h2><?= htmlspecialchars($filme['nome_filme']) ?></h2>
+                    <div class="grid-filmes">
+                        <?php foreach($filmesCategoria as $id => $filme): 
+                            $corTema = obterCorFilme($filme['nome_filme']);
+                            $qtdReceitas = count($filme['receitas']);
+                        ?>
+                        <div class="box-filme" style="--cor-tema: <?= $corTema ?>;" data-nome="<?= strtolower(htmlspecialchars($filme['nome_filme'])) ?>" data-categoria="<?= htmlspecialchars($nomeCategoria) ?>" onclick="abrirModalFilme('modal-filme-<?= $id ?>')">
+                            <img src="<?= buscarImagem($filme['imagem']) ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>" class="img-capa-filme" onerror="this.style.opacity='0';">
+                            <div class="box-overlay">
+                                <h3><?= htmlspecialchars($filme['nome_filme']) ?></h3>
+                                <span><i class="fa fa-utensils"></i> <?= $qtdReceitas ?> Receita(s)</span>
                             </div>
+                        </div>
 
-                            <div class="modal-body">
-                                <div class="lista-receitas">
-                                    <?php if (!empty($filme['receitas'])): ?>
-                                        <?php foreach($filme['receitas'] as $r): ?>
-                                        <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
-                                            <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='<?= buscarImagem('logo_menu.png') ?>'">
-                                            <div class="tag <?= strtolower(htmlspecialchars($r['tipo'])) ?>">
-                                                <?= htmlspecialchars($r['tipo']) ?>
-                                            </div>
-                                            <p><?= htmlspecialchars($r['nome_receita']) ?></p>
-                                        </a>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <p style="text-align:center; width:100%; color:#ffffff; font-weight: 500;">Ainda não há receitas cadastradas para este filme.</p>
-                                    <?php endif; ?>
+                        <!-- MODAL DE RECEITAS DO FILME COM A COR DO TEMA NO INTERIOR -->
+                        <div id="modal-filme-<?= $id ?>" class="modal-filme-overlay">
+                            <div class="modal-filme-content" style="--cor-tema: <?= $corTema ?>;">
+                                <div class="modal-header">
+                                    <img src="<?= buscarImagem($filme['imagem']) ?>" alt="<?= htmlspecialchars($filme['nome_filme']) ?>" onerror="this.style.opacity='0';">
+                                    <div class="modal-header-overlay"></div>
+                                    <button onclick="fecharModalFilme('modal-filme-<?= $id ?>', event)" class="btn-fechar">&times;</button>
+                                    <h2><?= htmlspecialchars($filme['nome_filme']) ?></h2>
+                                </div>
+
+                                <div class="modal-body">
+                                    <div class="lista-receitas">
+                                        <?php if (!empty($filme['receitas'])): ?>
+                                            <?php foreach($filme['receitas'] as $r): ?>
+                                            <a href="receita.php?id=<?= $r['id_receita'] ?>" class="card">
+                                                <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='<?= buscarImagem('logo_menu.png') ?>'">
+                                                <div class="tag <?= strtolower(htmlspecialchars($r['tipo'])) ?>">
+                                                    <?= htmlspecialchars($r['tipo']) ?>
+                                                </div>
+                                                <p><?= htmlspecialchars($r['nome_receita']) ?></p>
+                                            </a>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <p style="text-align:center; width:100%; color:#ffffff; font-weight: 500;">Ainda não há receitas cadastradas para este filme.</p>
+                                        <?php endif; ?>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        <?php endforeach; ?>
                     </div>
-                    <?php endforeach; ?>
                 </div>
             </div>
+        </section>
 
-            <?php endif; ?>
-            <?php endforeach; ?>
+        <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
 
-        </div>
-    </section>
-
-    <!-- BOTÃO FLUTUANTE QUE SÓ APARECE NA 3ª PARTE -->
+    <!-- BOTÃO FLUTUANTE QUE SÓ APARECE NA PARTE DOS FILMES -->
     <a href="javascript:void(0)" onclick="voltarParaParte2(event)" class="btn-flutuante-voltar" id="btnVoltarParte2" title="Voltar para a Busca e Categorias">
         <i class="fa-solid fa-arrow-up"></i>
     </a>
 
-    <!-- JAVASCRIPT DOS FILTROS, MODAIS E SCROLL -->
+    <!-- JAVASCRIPT DOS FILTROS, MODAIS, CURSOR DO MICKEY E SCROLL -->
     <script>
-    // MOSTRAR A SETA SÓ NA 3ª PARTE (GRELHA DE FILMES)
+    // --- LÓGICA DO CURSOR PERSONALIZADO DO MICKEY ---
+    const mickeyCursor = document.getElementById('mickeyCursor');
+    const imgAberto = "<?= buscarImagemCursor('aberto') ?>";
+    const imgFechado = "<?= buscarImagemCursor('fechado') ?>";
+
+    if (mickeyCursor) {
+        document.addEventListener('mousemove', (e) => {
+            mickeyCursor.style.display = 'block';
+            mickeyCursor.style.left = e.clientX + 'px';
+            mickeyCursor.style.top = e.clientY + 'px';
+        });
+
+        document.addEventListener('mouseleave', () => {
+            mickeyCursor.style.display = 'none';
+        });
+
+        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .box-filme, .card-categoria-item, .card, .btn-flutuante-voltar, .btn-fechar';
+
+        document.addEventListener('mouseover', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgFechado;
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if (e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+
+        document.addEventListener('mousedown', () => {
+            mickeyCursor.src = imgFechado;
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (!e.target.closest(seletorInterativo)) {
+                mickeyCursor.src = imgAberto;
+            }
+        });
+    }
+
+    // MOSTRAR A SETA SÓ NA PARTE DOS FILMES
     window.addEventListener('scroll', function() {
         let btn = document.getElementById('btnVoltarParte2');
         let secaoFilmes = document.getElementById('secaoFilmes');
@@ -1007,10 +1064,11 @@ try {
 
         blocos.forEach(bloco => {
             let cardsVisiveis = Array.from(bloco.querySelectorAll('.box-filme')).filter(c => c.style.display !== 'none');
+            let secaoPai = bloco.closest('.secao-bloco-categoria') || bloco;
             if (cardsVisiveis.length > 0) {
-                bloco.style.display = 'block';
+                secaoPai.style.display = 'block';
             } else {
-                bloco.style.display = 'none';
+                secaoPai.style.display = 'none';
             }
         });
     }
@@ -1031,10 +1089,11 @@ try {
 
         blocos.forEach(bloco => {
             let catBloco = bloco.getAttribute('data-nome-cat');
+            let secaoPai = bloco.closest('.secao-bloco-categoria') || bloco;
             if (categoria === 'todos' || catBloco === categoria) {
-                bloco.style.display = 'block';
+                secaoPai.style.display = 'block';
             } else {
-                bloco.style.display = 'none';
+                secaoPai.style.display = 'none';
             }
         });
 
