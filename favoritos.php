@@ -19,7 +19,7 @@ try {
     die("Erro na conexão com a base de dados: " . $e->getMessage());
 }
 
-// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS (COM SUPORTE ÀS PASTAS FUNDOS, TITULOS E BANNERS)
+// FUNÇÃO INTELIGENTE DE CARREGAMENTO DE IMAGENS
 function buscarImagem($nomeImagem) {
     if (empty($nomeImagem)) return "img/logo/logo_menu.png";
     if (file_exists($nomeImagem)) return $nomeImagem;
@@ -390,39 +390,103 @@ try {
             margin-left: 6px;
         }
 
-        /* ESTADO VAZIO (SEM FAVORITOS) */
+        /* --- ESTADO VAZIO BASEADO NA IMAGEM DE REFERÊNCIA --- */
         .sem-favoritos { 
             text-align: center; 
-            padding: 70px 25px; 
-            background: #ffffff;
-            border-radius: 32px;
-            border: 2px dashed #1f4396;
-            max-width: 620px;
+            padding: 50px 20px 30px; 
+            max-width: 780px;
             margin: 20px auto;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             position: relative;
             z-index: 2;
         }
-        .sem-favoritos i { font-size: 65px; color: #1f4396; margin-bottom: 20px; }
-        .sem-favoritos h3 { font-size: 24px; color: #1f4396; margin-bottom: 12px; font-weight: 800; }
-        .sem-favoritos p { color: #1f4396; font-size: 14.5px; margin-bottom: 28px; line-height: 1.6; opacity: 0.85; }
 
-        .btn-explorar {
-            display: inline-block;
-            padding: 14px 40px;
-            background: #a62428;
-            color: #ffffff;
+        .divisoria-topo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 22px;
+            width: 100%;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .divisoria-topo .linha {
+            flex: 1;
+            height: 1.5px;
+            background: linear-gradient(to right, transparent, rgba(31, 67, 150, 0.4), transparent);
+        }
+
+        .divisoria-topo .icon-estrela {
+            color: #1f4396;
+            font-size: 20px;
+            transform: rotate(45deg);
+        }
+
+        .titulo-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+
+        .titulo-wrapper .brilho-esq,
+        .titulo-wrapper .brilho-dir {
+            font-size: 26px;
+            color: #1f4396;
+            opacity: 0.85;
+        }
+
+        .titulo-cursivo-vazio { 
+            font-family: 'Caveat', cursive;
+            font-size: 44px; 
+            font-weight: 700; 
+            color: #1f4396; 
+            line-height: 1.15;
+        }
+
+        .subtitulo-vazio { 
+            color: #1f4396; 
+            font-size: 15px; 
+            font-weight: 500;
+            line-height: 1.55; 
+            margin: 0 auto 32px; 
+            opacity: 0.9; 
+            max-width: 580px;
+        }
+
+        .btn-explorar-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffea9f;
+            color: #1f4396;
             text-decoration: none;
+            padding: 13px 34px;
             border-radius: 50px;
             font-weight: 800;
             font-size: 15px;
-            transition: 0.3s;
-            box-shadow: 0 6px 20px rgba(166, 36, 40, 0.4);
+            box-shadow: 0 6px 18px rgba(31, 67, 150, 0.15);
+            border: 1.5px solid #fce07e;
+            transition: all 0.3s ease;
         }
-        .btn-explorar:hover {
-            background: #881c20;
-            color: #fff8bd;
+
+        .btn-explorar-pill:hover {
+            background: #ffd85c;
+            color: #a62428;
             transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(31, 67, 150, 0.22);
+        }
+
+        .btn-explorar-pill i {
+            font-size: 16.5px;
+        }
+
+        .btn-explorar-pill .seta {
+            font-size: 13px;
+            margin-left: 2px;
         }
 
         /* --- BOTÃO FLUTUANTE DE VOLTAR AO TOPO --- */
@@ -565,6 +629,7 @@ try {
                 min-height: 240px;
             }
             .titulo-editorial { font-size: 30px; }
+            .titulo-cursivo-vazio { font-size: 34px; }
             .enfeite-fundo-esquerdo,
             .enfeite-fundo-direito { opacity: 0.3; width: 650px; }
             .btn-flutuante-voltar {
@@ -682,16 +747,18 @@ try {
         <img src="<?= buscarImagem('enfeite_favoritos') ?>" class="enfeite-fundo-direito" alt="" onerror="this.src='img/enfeite_favoritos.webp';">
         
         <div class="container" id="containerFavoritos">
-            <div class="header-favoritos">
-                <h1 class="titulo-editorial">
-                    MINHAS RECEITAS FAVORITAS
-                </h1>
-                <p class="subtitulo-editorial">
-                    GUARDE OS SEUS PRATOS MÁGICOS PREFERIDOS PARA CONSULTAR SEMPRE QUE QUISER PREPARAR UM BANQUETE.
-                </p>
-            </div>
 
             <?php if (count($receitasFavoritas) > 0): ?>
+                <!-- TÍTULO PRINCIPAL: EXIBIDO APENAS QUANDO EXISTEM RECEITAS FAVORITADAS -->
+                <div class="header-favoritos">
+                    <h1 class="titulo-editorial">
+                        MINHAS RECEITAS FAVORITAS
+                    </h1>
+                    <p class="subtitulo-editorial">
+                        GUARDE OS SEUS PRATOS MÁGICOS PREFERIDOS PARA CONSULTAR SEMPRE QUE QUISER PREPARAR UM BANQUETE.
+                    </p>
+                </div>
+
                 <div class="lista-favoritos">
                     <?php foreach($receitasFavoritas as $r): ?>
                     <div class="card-favorito-item">
@@ -734,11 +801,27 @@ try {
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
+                <!-- ESTADO VAZIO: EXIBIDO QUANDO NÃO HÁ NENHUMA RECEITA FAVORITADA -->
                 <div class="sem-favoritos">
-                    <i class="fa-regular fa-heart"></i>
-                    <h3>Sua lista de favoritos está vazia!</h3>
-                    <p>Explore o nosso menu de receitas encantadoras e clique no ícone de coração para guardar aqui os seus pratos prediletos.</p>
-                    <a href="index.php#containerReceitas" class="btn-explorar">EXPLORAR RECEITAS</a>
+                    <div class="divisoria-topo">
+                        <span class="linha"></span>
+                        <i class="fa-solid fa-star icon-estrela"></i>
+                        <span class="linha"></span>
+                    </div>
+
+                    <div class="titulo-wrapper">
+                        <span class="brilho-esq">✦</span>
+                        <h3 class="titulo-cursivo-vazio">Você ainda não favoritou nenhuma receita!</h3>
+                        <span class="brilho-dir">✦</span>
+                    </div>
+
+                    <p class="subtitulo-vazio">Explore nossas receitas e adicione suas favoritas para acessá-las aqui depois!</p>
+
+                    <a href="index.php#containerReceitas" class="btn-explorar-pill">
+                        <i class="fa-solid fa-utensils"></i>
+                        <span>Explorar Receitas</span>
+                        <i class="fa-solid fa-chevron-right seta"></i>
+                    </a>
                 </div>
             <?php endif; ?>
 
@@ -789,7 +872,7 @@ try {
             mickeyCursor.style.display = 'none';
         });
 
-        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .card-favorito-item, .btn-fav-icon-overlay, .btn-explorar, .btn-flutuante-voltar';
+        const seletorInterativo = 'a, button, input, select, textarea, label, [onclick], .avatar-item, .card-favorito-item, .btn-fav-icon-overlay, .btn-explorar-pill, .btn-flutuante-voltar';
 
         document.addEventListener('mouseover', (e) => {
             if (e.target.closest(seletorInterativo)) {
