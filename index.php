@@ -15,7 +15,7 @@ try {
 }
 
 // =========================================================================
-// 1. PROCESSAMENTO DO LOGIN
+// 1. PROCESSAMENTO DO LOGIN (COM REDIRECIONAMENTO AUTOMÁTICO PARA ADMIN)
 // =========================================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_POST['senha']) && !isset($_POST['acao'])) {
     $email = trim($_POST['email']);
@@ -26,13 +26,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email']) && isset($_P
     $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
     if ($usuario && ($senha === $usuario['senha'] || password_verify($senha, $usuario['senha']))) {
+        $ehAdmin = (($usuario['is_admin'] ?? 0) == 1 || strtolower(trim($usuario['email'])) === 'admin@magicalbites.com') ? 1 : 0;
+
         $_SESSION['usuario'] = [
-            'id'    => $usuario['id_usuario'] ?? $usuario['id'] ?? null,
-            'nome'  => $usuario['nome_usuario'] ?? $usuario['nome'] ?? 'Usuário',
-            'email' => $usuario['email'],
-            'foto'  => !empty($usuario['foto_perfil']) ? $usuario['foto_perfil'] : 'logo_menu.png'
+            'id'       => $usuario['id_usuario'] ?? $usuario['id'] ?? null,
+            'nome'     => $usuario['nome_usuario'] ?? $usuario['nome'] ?? 'Usuário',
+            'email'    => $usuario['email'],
+            'foto'     => !empty($usuario['foto_perfil']) ? $usuario['foto_perfil'] : 'logo_menu.png',
+            'is_admin' => $ehAdmin
         ];
-        header("Location: index.php");
+
+        if ($ehAdmin === 1) {
+            header("Location: admin.php");
+        } else {
+            header("Location: index.php");
+        }
         exit;
     } else {
         header("Location: index.php?status=erro&msg=" . urlencode("Senha ou E-mail incorreto"));
@@ -1396,6 +1404,10 @@ try {
             <a href="#containerReceitas">Receitas</a>
             <a href="favoritos.php">Favoritos</a>
             <a href="filmes.php">Filmes</a>
+
+            <?php if (isset($_SESSION['usuario']) && (($_SESSION['usuario']['is_admin'] ?? 0) == 1 || strtolower(trim($_SESSION['usuario']['email'] ?? '')) === 'admin@magicalbites.com')): ?>
+                <a href="admin.php" style="color: #fff6a9;"><i class="fa-solid fa-wand-magic-sparkles"></i> Admin</a>
+            <?php endif; ?>
 
             <?php if (isset($_SESSION['usuario'])): ?>
                 <a href="javascript:void(0)" onclick="alternarModais('perfil')">

@@ -18,6 +18,7 @@ if (!isset($_SESSION['usuario'])) {
 $id_usuario = $_SESSION['usuario']['id'] ?? $_SESSION['usuario']['id_usuario'] ?? null;
 $id_receita = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
+
 if (!$id_usuario || $id_receita <= 0) {
     header("Location: index.php");
     exit;

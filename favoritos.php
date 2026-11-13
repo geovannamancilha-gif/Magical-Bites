@@ -656,6 +656,10 @@ try {
             <a href="favoritos.php" class="ativo">Favoritos</a>
             <a href="filmes.php">Filmes</a>
 
+            <?php if (isset($_SESSION['usuario']) && (($_SESSION['usuario']['is_admin'] ?? 0) == 1 || strtolower(trim($_SESSION['usuario']['email'] ?? '')) === 'admin@magicalbites.com')): ?>
+                <a href="admin.php" style="color: #fff6a9;"><i class="fa-solid fa-wand-magic-sparkles"></i> Admin</a>
+            <?php endif; ?>
+
             <?php if (isset($_SESSION['usuario'])): ?>
                 <a href="javascript:void(0)" onclick="alternarModais('perfil')">
                     <img src="<?= buscarImagem($_SESSION['usuario']['foto'] ?? '') ?>" class="nav-user-avatar" onerror="this.src='img/logo/logo_menu.png'">
