@@ -5,7 +5,7 @@ session_start();
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
-$pass = "Home@spSENAI2025!"; 
+$pass = ""; 
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -272,6 +272,79 @@ try {
             border: 2px solid #fff6a9ff;
         }
 
+        /* --- PADRONIZAÇÃO GLOBAL DE BOTÕES DO SITE --- */
+        .btn-padrao-vermelho,
+        .btn-ver-mais-vermelho,
+        .btn-acao-vermelho {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 42px;
+            background-color: #a62428;
+            color: #ffffff;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(166, 36, 40, 0.45);
+        }
+
+        .btn-padrao-vermelho:hover,
+        .btn-ver-mais-vermelho:hover,
+        .btn-acao-vermelho:hover {
+            background-color: #881c20;
+            color: #ffffff;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(166, 36, 40, 0.65);
+        }
+
+        .btn-padrao-creme,
+        .btn-ver-mais-creme,
+        .btn-acao-creme {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 42px;
+            background-color: #fff8bd;
+            color: #a62428;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-radius: 50px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 15px;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn-padrao-creme:hover,
+        .btn-ver-mais-creme:hover,
+        .btn-acao-creme:hover {
+            background-color: #ffffff;
+            color: #a62428;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Ajustes específicos para botões de largura total em modais */
+        .card-vermelho .btn-acao-creme,
+        .card-amarelo .btn-acao-vermelho,
+        .card-combo-modal .btn-acao-creme,
+        .card-combo-modal .btn-ver-mais-vermelho {
+            width: 100%;
+            padding: 13px 24px;
+            margin-top: 12px;
+        }
+
         /* --- 1. HERO BANNER SLIDER --- */
         .secao-hero {
             width: 100%;
@@ -314,7 +387,7 @@ try {
             height: 48px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.9);
-            color: #ab232a;
+            color: #a62428;
             border: none;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
             display: flex;
@@ -327,7 +400,7 @@ try {
 
         .hero-slider-btn:hover {
             background: #ffffff;
-            color: #8e1c22;
+            color: #881c20;
             transform: translateY(-50%) scale(1.12);
         }
 
@@ -782,48 +855,6 @@ try {
             z-index: 2;
         }
 
-        .btn-ver-mais-vermelho {
-            display: inline-block;
-            padding: 14px 60px;
-            background: #a62428;
-            color: #ffffff;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 15px;
-            text-decoration: none;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(166, 36, 40, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-ver-mais-vermelho:hover {
-            background: #881c20;
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(166, 36, 40, 0.7);
-        }
-
-        .btn-ver-mais-creme {
-            display: inline-block;
-            padding: 14px 60px;
-            background: #fff8bd;
-            color: #a62428;
-            border-radius: 50px;
-            font-weight: 800;
-            font-size: 15px;
-            text-decoration: none;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-ver-mais-creme:hover {
-            background: #ffffff;
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-        }
-
         /* --- 5. & 7. & 9. SECÇÕES FULL-WIDTH --- */
         .secao-full-vermelha, .secao-full-creme {
             width: 100%;
@@ -1187,6 +1218,42 @@ try {
             color: #a62428;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
             border: 2px solid rgba(166, 36, 40, 0.2);
+            text-align: center;
+        }
+
+        .card-amarelo .castelo-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .card-amarelo .castelo-header i {
+            font-size: 38px;
+            color: #a62428;
+        }
+
+        .card-amarelo h2.titulo-aviso {
+            font-size: 24px;
+            font-weight: 900;
+            color: #a62428;
+            text-transform: uppercase;
+            line-height: 1.25;
+            margin-bottom: 10px;
+        }
+
+        .card-amarelo h2.titulo-cursivo {
+            font-family: 'Caveat', cursive;
+            font-size: 42px;
+            color: #1f4396;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .card-amarelo p.subtitulo-aviso {
+            font-size: 14.5px;
+            color: #701a1d;
+            font-weight: 600;
+            line-height: 1.45;
+            margin-bottom: 20px;
         }
 
         .combo-modal-header {
@@ -1257,15 +1324,20 @@ try {
         }
 
         .btn-ver-receita-combo {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             margin-top: auto;
-            padding: 8px 16px;
-            font-size: 12px;
+            padding: 10px 18px;
+            font-size: 12.5px;
             font-weight: 800;
             border-radius: 50px;
             text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             transition: all 0.3s ease;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .card-vermelho .btn-ver-receita-combo {
@@ -1276,7 +1348,7 @@ try {
         .card-vermelho .btn-ver-receita-combo:hover {
             background: #ffffff;
             transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
         }
 
         .card-amarelo .btn-ver-receita-combo {
@@ -1287,7 +1359,7 @@ try {
         .card-amarelo .btn-ver-receita-combo:hover {
             background: #881c20;
             transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(166,36,40,0.4);
+            box-shadow: 0 6px 14px rgba(166,36,40,0.4);
         }
 
         .card-vermelho .castelo-header { text-align: center; margin-bottom: 12px; }
@@ -1308,10 +1380,6 @@ try {
             width: 100%; padding: 12px 18px 12px 48px; border: 2px solid #ffffff; background: transparent; border-radius: 50px; outline: none; color: #ffffff; font-size: 14px; font-weight: 500; transition: 0.3s;
         }
         .card-vermelho .input-group-modal input::placeholder { color: rgba(255, 255, 255, 0.85); }
-
-        .card-vermelho .btn-acao-creme {
-            width: 100%; padding: 13px; background: #fff8bd; color: #a62428; border: none; border-radius: 50px; font-weight: 800; font-size: 16px; transition: 0.3s ease; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
 
         .card-vermelho .footer-modal { margin-top: 18px; font-size: 13px; text-align: center; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
         .card-vermelho .footer-modal a { color: #ffffff; text-decoration: underline; font-weight: 700; }
@@ -1567,7 +1635,7 @@ try {
                 <a href="receita.php?id=6" class="btn-ver-receita-combo">Ver Receita <i class="fa-solid fa-arrow-right"></i></a>
             </div>
         </div>
-        <button class="btn-ver-mais-vermelho" onclick="fecharTodosModais()" style="margin-top:22px; width: 100%;">Fechar Combo</button>
+        <button class="btn-ver-mais-vermelho" onclick="fecharTodosModais()" style="margin-top:22px;">Fechar Combo</button>
     </div>
 
     <!-- 7. MODAL COMBO: SESSÃO MÁGICA DE CINEMA -->
@@ -1664,7 +1732,7 @@ try {
         <div class="container-secao">
             <div class="search-home-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="inputPesquisa" placeholder="Procurar por receitas ou filmes..." onkeyup="pesquisarReceitas()">
+                <input type="text" id="inputPesquisa" placeholder="Procurar por receitas..." onkeyup="pesquisarReceitas()">
             </div>
 
             <div class="grid-3-categorias">
