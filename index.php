@@ -164,6 +164,34 @@ $stmtBebidas = $pdo->prepare($sqlReceitas);
 $stmtBebidas->execute([':tipo' => 'BEBIDA']);
 $receitasBebidas = $stmtBebidas->fetchAll(PDO::FETCH_ASSOC);
 
+// CONSULTA GLOBAL DE TODAS AS RECEITAS PARA A BARRA DE PESQUISA (SALGADOS, DOCES E BEBIDAS)
+$sqlTodasReceitas = "
+    SELECT r.id_receita, r.nome_receita, r.tipo, r.descricao, r.imagem, f.nome_filme,
+           COUNT(a.id_avaliacao) AS total_avaliacoes,
+           AVG(a.estrelas) AS media_estrelas
+    FROM receitas r
+    LEFT JOIN filme f ON r.id_filme = f.id_filme
+    LEFT JOIN avaliacoes a ON r.id_receita = a.id_receita
+    GROUP BY r.id_receita
+    ORDER BY r.nome_receita ASC
+";
+$stmtTodas = $pdo->query($sqlTodasReceitas);
+$todasReceitasRaw = $stmtTodas->fetchAll(PDO::FETCH_ASSOC);
+
+$todasReceitasJS = [];
+foreach ($todasReceitasRaw as $item) {
+    $todasReceitasJS[] = [
+        'id'         => $item['id_receita'],
+        'nome'       => $item['nome_receita'],
+        'tipo'       => strtoupper(trim($item['tipo'] ?? '')),
+        'descricao'  => $item['descricao'] ?? '',
+        'imagem'     => buscarImagem($item['imagem']),
+        'filme'      => $item['nome_filme'] ?? '',
+        'avaliacoes' => (int)($item['total_avaliacoes'] ?? 0),
+        'media'      => round((float)($item['media_estrelas'] ?? 0), 1)
+    ];
+}
+
 $status = $_GET['status'] ?? "";
 $msg = $_GET['msg'] ?? ($_GET['erro'] ?? "");
 
@@ -616,7 +644,7 @@ try {
 
         .search-home-box input {
             width: 100%;
-            padding: 14px 25px 14px 50px;
+            padding: 14px 48px 14px 50px;
             border-radius: 50px;
             border: none;
             background: #fffdf5;
@@ -631,13 +659,113 @@ try {
             box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
         }
 
-        .search-home-box i {
+        .search-home-box i.fa-magnifying-glass {
             position: absolute;
             left: 20px;
             top: 50%;
             transform: translateY(-50%);
             color: #24487a;
             font-size: 18px;
+        }
+
+        .btn-limpar-busca {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #a62428;
+            font-size: 18px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .btn-limpar-busca:hover {
+            transform: translateY(-50%) scale(1.15);
+        }
+
+        /* --- PAINEL DE RESULTADOS DA PESQUISA GLOBAL --- */
+        #resultadosPesquisaContainer {
+            display: none;
+            margin-top: 10px;
+            animation: fadeInBusca 0.3s ease;
+        }
+
+        @keyframes fadeInBusca {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-resultados-busca {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(255, 248, 189, 0.25);
+        }
+
+        .header-resultados-busca h3 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff8bd;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badges-row-busca {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .badge-categoria-busca {
+            display: inline-block;
+            background-color: #a62428;
+            color: #fff8bd;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .badge-categoria-busca.tipo-doce {
+            background-color: #fff8bd;
+            color: #a62428;
+        }
+
+        .badge-categoria-busca.tipo-bebida {
+            background-color: #16a34a;
+            color: #ffffff;
+        }
+
+        .sem-resultados-box {
+            text-align: center;
+            padding: 45px 20px;
+            background: rgba(11, 19, 41, 0.45);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 248, 189, 0.2);
+        }
+
+        .sem-resultados-box i {
+            font-size: 38px;
+            color: #fff8bd;
+            margin-bottom: 12px;
+        }
+
+        .sem-resultados-box p {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
         }
 
         .grid-3-categorias {
@@ -1732,10 +1860,24 @@ try {
         <div class="container-secao">
             <div class="search-home-box">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="inputPesquisa" placeholder="Procurar por receitas..." onkeyup="pesquisarReceitas()">
+                <input type="text" id="inputPesquisa" placeholder="Procurar por salgados, doces, bebidas ou filmes..." onkeyup="pesquisarReceitas()">
+                <button type="button" id="btnLimparBusca" class="btn-limpar-busca" onclick="limparPesquisa()" title="Limpar pesquisa">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </button>
             </div>
 
-            <div class="grid-3-categorias">
+            <!-- RESULTADOS DA PESQUISA GLOBAL (SALGADOS, DOCES E BEBIDAS) -->
+            <div id="resultadosPesquisaContainer">
+                <div class="header-resultados-busca">
+                    <h3 id="tituloResultadosBusca">Resultados da pesquisa</h3>
+                    <button type="button" class="btn-padrao-creme" style="padding: 8px 20px; font-size: 12px;" onclick="limparPesquisa()">
+                        <i class="fa-solid fa-xmark"></i> Limpar Busca
+                    </button>
+                </div>
+                <div class="grid-home-receitas" id="gridResultadosPesquisa"></div>
+            </div>
+
+            <div class="grid-3-categorias" id="gridCategoriasHome">
                 <a href="salgados.php" class="card-categoria-item">
                     <img src="<?= buscarImagem('ratatouille_prato') ?>" class="card-categoria-bg" alt="Receitas Salgadas" onerror="this.src='img/pratos/ratatouille_prato.webp'">
                     <div class="card-categoria-overlay"></div>
@@ -1766,7 +1908,7 @@ try {
             
             <div class="grid-home-receitas">
                 <?php foreach($receitasSalgados as $r): ?>
-                <a href="receita.php?id=<?= $r['id_receita'] ?>" class="item-receita-clean item-busca">
+                <a href="receita.php?id=<?= $r['id_receita'] ?>" class="item-receita-clean">
                     <div class="item-receita-img">
                         <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                     </div>
@@ -1829,7 +1971,7 @@ try {
         <div class="container-secao">
             <div class="grid-home-receitas">
                 <?php foreach($receitasDoces as $r): ?>
-                <a href="receita.php?id=<?= $r['id_receita'] ?>" class="item-receita-clean item-busca">
+                <a href="receita.php?id=<?= $r['id_receita'] ?>" class="item-receita-clean">
                     <div class="item-receita-img">
                         <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                     </div>
@@ -1891,7 +2033,7 @@ try {
         <div class="container-secao">
             <div class="grid-home-receitas">
                 <?php foreach($receitasBebidas as $r): ?>
-                <a href="receita.php?id=<?= $r['id_receita'] ?>" class="item-receita-clean item-busca">
+                <a href="receita.php?id=<?= $r['id_receita'] ?>" class="item-receita-clean">
                     <div class="item-receita-img">
                         <img src="<?= buscarImagem($r['imagem']) ?>" onerror="this.src='img/logo/logo_menu.png'">
                     </div>
@@ -2123,19 +2265,112 @@ try {
         imgPeek.src = listaPratosMagia[idxPeek];
     }
 
-    // 3. Pesquisa em Tempo Real
-    function pesquisarReceitas() {
-        let input = document.getElementById('inputPesquisa').value.toLowerCase();
-        let items = document.querySelectorAll('.item-busca');
+    // 3. Pesquisa Global em Tempo Real (Salgados, Doces e Bebidas)
+    const baseTodasReceitas = <?= json_encode($todasReceitasJS, JSON_UNESCAPED_UNICODE) ?>;
 
-        items.forEach(item => {
-            let titulo = item.querySelector('.item-receita-titulo').innerText.toLowerCase();
-            if (titulo.includes(input)) {
-                item.style.display = "flex";
+    function normalizarTexto(texto) {
+        return (texto || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function escaparHTML(texto) {
+        const div = document.createElement('div');
+        div.textContent = texto || '';
+        return div.innerHTML;
+    }
+
+    function gerarEstrelasHTML(media) {
+        let html = '';
+        for (let i = 1; i <= 5; i++) {
+            if (media >= i) {
+                html += '<i class="fa-solid fa-star"></i>';
+            } else if (media >= i - 0.5) {
+                html += '<i class="fa-solid fa-star-half-stroke"></i>';
             } else {
-                item.style.display = "none";
+                html += '<i class="fa-regular fa-star"></i>';
             }
+        }
+        return html;
+    }
+
+    function pesquisarReceitas() {
+        const inputEl = document.getElementById('inputPesquisa');
+        const termoOriginal = inputEl.value.trim();
+        const termo = normalizarTexto(termoOriginal);
+
+        const containerResultados = document.getElementById('resultadosPesquisaContainer');
+        const gridResultados = document.getElementById('gridResultadosPesquisa');
+        const tituloResultados = document.getElementById('tituloResultadosBusca');
+        const gridCategorias = document.getElementById('gridCategoriasHome');
+        const btnLimpar = document.getElementById('btnLimparBusca');
+
+        if (termo === '') {
+            containerResultados.style.display = 'none';
+            gridCategorias.style.display = 'grid';
+            btnLimpar.style.display = 'none';
+            return;
+        }
+
+        btnLimpar.style.display = 'flex';
+        gridCategorias.style.display = 'none';
+        containerResultados.style.display = 'block';
+
+        const filtradas = baseTodasReceitas.filter(r => {
+            const nomeNorm = normalizarTexto(r.nome);
+            const filmeNorm = normalizarTexto(r.filme);
+            const tipoNorm = normalizarTexto(r.tipo);
+            return nomeNorm.includes(termo) || filmeNorm.includes(termo) || tipoNorm.includes(termo);
         });
+
+        tituloResultados.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> ${filtradas.length} receita(s) encontrada(s) para "${escaparHTML(termoOriginal)}"`;
+
+        if (filtradas.length === 0) {
+            gridResultados.style.display = 'block';
+            gridResultados.innerHTML = `
+                <div class="sem-resultados-box">
+                    <i class="fa-solid fa-utensils"></i>
+                    <p>Nenhuma receita salgada, doce ou bebida encontrada para "${escaparHTML(termoOriginal)}".</p>
+                </div>
+            `;
+            return;
+        }
+
+        gridResultados.style.display = 'grid';
+        gridResultados.innerHTML = filtradas.map(r => {
+            let classeTipo = '';
+            let labelTipo = r.tipo || 'RECEITA';
+            if (r.tipo === 'DOCE') classeTipo = 'tipo-doce';
+            if (r.tipo === 'BEBIDA') classeTipo = 'tipo-bebida';
+
+            const badgeFilmeHTML = r.filme ? `<span class="badge-filme">${escaparHTML(r.filme)}</span>` : '';
+            const ratingHTML = r.avaliacoes > 0 ? `
+                <div class="item-receita-rating">
+                    ${gerarEstrelasHTML(r.media)}
+                    <span style="font-size: 12px; color: #ffffff; font-weight: 700; margin-left: 4px;">${r.media.toFixed(1)}</span>
+                </div>
+            ` : '';
+
+            return `
+                <a href="receita.php?id=${r.id}" class="item-receita-clean">
+                    <div class="item-receita-img">
+                        <img src="${escaparHTML(r.imagem)}" onerror="this.src='img/logo/logo_menu.png'" alt="${escaparHTML(r.nome)}">
+                    </div>
+                    <div class="badges-row-busca">
+                        <span class="badge-categoria-busca ${classeTipo}">${escaparHTML(labelTipo)}</span>
+                        ${badgeFilmeHTML}
+                    </div>
+                    <div class="item-receita-titulo">${escaparHTML(r.nome)}</div>
+                    <div class="item-receita-desc">${escaparHTML(r.descricao || 'Deliciosa receita mágica inspirada no cinema.')}</div>
+                    ${ratingHTML}
+                </a>
+            `;
+        }).join('');
+    }
+
+    function limparPesquisa() {
+        const inputEl = document.getElementById('inputPesquisa');
+        inputEl.value = '';
+        pesquisarReceitas();
+        inputEl.focus();
     }
 
     // 4. Gestão de Modais
