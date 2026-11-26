@@ -5,7 +5,7 @@ session_start();
 $host = 'localhost';
 $dbname = 'magical_bites';
 $user = 'root'; 
-$pass = "Home@spSENAI2025!"; 
+$pass = ""; 
 //$pass = "Home@spSENAI2025!";     
 
 try {
@@ -210,9 +210,9 @@ try {
     $avaliacoesClientes = $stmtAvaliacoesList->fetchAll(PDO::FETCH_ASSOC);
     $totalAvaliacoes = count($avaliacoesClientes);
 
-    // Processamento de ingredientes e preparo
+    // Processamento de ingredientes e preparo (CORRIGIDO PARA PASSOS COM 10 OU MAIS ETAPAS)
     $lista_ingredientes = array_filter(array_map('trim', explode(";", $receita['ingredientes'])));
-    $passos_preparo = array_filter(array_map('trim', preg_split('/(?=\d+\.\s)/', $receita['modo_preparo'])));
+    $passos_preparo = array_filter(array_map('trim', preg_split('/(?:^|\s)(?=\d+\.\s)/', $receita['modo_preparo'])));
 
     $tipo_formatado = ucfirst(strtolower($receita['tipo'] ?? 'Salgado'));
 
